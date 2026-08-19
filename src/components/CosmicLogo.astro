@@ -12,46 +12,140 @@ const colors = {
 };
 
 const half = "M0 50 A50 50 0 0 0 100 50 Z";
+
+type Point = [number, number];
+
+/** Points on the 100x100 letter circle, by degree. */
+const ring = (degrees: number[]): Point[] =>
+	degrees.map((deg) => {
+		const rad = (deg * Math.PI) / 180;
+		return [
+			Number((50 + 50 * Math.cos(rad)).toFixed(1)),
+			Number((50 + 50 * Math.sin(rad)).toFixed(1)),
+		];
+	});
+
+/** Star positions the constellation lines connect, per letter. */
+const nodes: Record<string, Point[]> = {
+	c: ring([-60, -120, 180, 120, 60]),
+	o: ring([0, 45, 90, 135, 180, 225, 270, 315]),
+	s: [
+		[85, 12],
+		[35, 5],
+		[12, 32],
+		[50, 50],
+		[88, 68],
+		[65, 95],
+		[15, 88],
+	],
+	m: [
+		[0, 100],
+		[50, 0],
+		[67, 66],
+		[85, 0],
+		[135, 100],
+	],
+	i: [
+		[0, 0],
+		[40, 0],
+		[40, 100],
+		[0, 100],
+	],
+};
+
+const toPath = (points: Point[], close = false) =>
+	`M${points.map((p) => p.join(" ")).join(" L")}${close ? " Z" : ""}`;
 ---
 
 <h1 class="cosmic" aria-label="Cosmic">
 	<svg class="cosmic-word" viewBox="-8 -12 591 124" overflow="visible" role="presentation">
 		<g class="letter letter-c-green">
-			<path d={half} fill={colors.green} fill-opacity="0.75" transform="rotate(55 50 50)"></path>
-			<path d={half} fill={colors.blueGreen} fill-opacity="0.75" transform="rotate(125 50 50)"></path>
+			<g class="letter-lines">
+				<path class="c-line" d={toPath(nodes.c)}></path>
+			</g>
+			<g class="letter-nodes">
+				{nodes.c.map(([x, y]) => <circle class="c-node" cx={x} cy={y} r="3.5" />)}
+			</g>
+			<g class="letter-shape">
+				<path d={half} fill={colors.green} fill-opacity="0.75" transform="rotate(55 50 50)"></path>
+				<path d={half} fill={colors.blueGreen} fill-opacity="0.75" transform="rotate(125 50 50)"
+				></path>
+			</g>
 		</g>
 		<g transform="translate(90 0)">
 			<g class="letter letter-o">
-				<circle cx="50" cy="50" r="50" fill={colors.orange} fill-opacity="0.75"></circle>
+				<g class="letter-lines">
+					<path class="c-line" d={toPath(nodes.o, true)}></path>
+				</g>
+				<g class="letter-nodes">
+					{nodes.o.map(([x, y]) => <circle class="c-node" cx={x} cy={y} r="3.5" />)}
+				</g>
+				<g class="letter-shape">
+					<circle cx="50" cy="50" r="50" fill={colors.orange} fill-opacity="0.75"></circle>
+				</g>
 			</g>
 		</g>
 		<g transform="translate(200 0)">
 			<g class="letter letter-s">
-				<g transform="rotate(-48 50 50)">
-					<path d={half} fill={colors.pink} fill-opacity="0.75" transform="translate(-20 -15)"></path>
-					<path
-						d={half}
-						fill={colors.darkPink}
-						fill-opacity="0.75"
-						transform="translate(0 -5) rotate(180 50 50)"></path>
+				<g class="letter-lines">
+					<path class="c-line" d={toPath(nodes.s)}></path>
+				</g>
+				<g class="letter-nodes">
+					{nodes.s.map(([x, y]) => <circle class="c-node" cx={x} cy={y} r="3.5" />)}
+				</g>
+				<g class="letter-shape">
+					<g transform="rotate(-48 50 50)">
+						<path d={half} fill={colors.pink} fill-opacity="0.75" transform="translate(-20 -15)"
+						></path>
+						<path
+							d={half}
+							fill={colors.darkPink}
+							fill-opacity="0.75"
+							transform="translate(0 -5) rotate(180 50 50)"></path>
+					</g>
 				</g>
 			</g>
 		</g>
 		<g transform="translate(280 3)">
 			<g class="letter letter-m">
-				<polygon points="0,100 50,0 100,100" fill={colors.mint} fill-opacity="0.75"></polygon>
-				<polygon points="35,100 85,0 135,100" fill={colors.darkMint} fill-opacity="0.75"></polygon>
+				<g class="letter-lines">
+					<path class="c-line" d={toPath(nodes.m)}></path>
+				</g>
+				<g class="letter-nodes">
+					{nodes.m.map(([x, y]) => <circle class="c-node" cx={x} cy={y} r="3.5" />)}
+				</g>
+				<g class="letter-shape">
+					<polygon points="0,100 50,0 100,100" fill={colors.mint} fill-opacity="0.75"></polygon>
+					<polygon points="35,100 85,0 135,100" fill={colors.darkMint} fill-opacity="0.75"></polygon>
+				</g>
 			</g>
 		</g>
 		<g transform="translate(430 0)">
 			<g class="letter letter-i">
-				<rect width="40" height="100" fill={colors.orange} fill-opacity="0.75"></rect>
+				<g class="letter-lines">
+					<path class="c-line" d={toPath(nodes.i, true)}></path>
+				</g>
+				<g class="letter-nodes">
+					{nodes.i.map(([x, y]) => <circle class="c-node" cx={x} cy={y} r="3.5" />)}
+				</g>
+				<g class="letter-shape">
+					<rect width="40" height="100" fill={colors.orange} fill-opacity="0.75"></rect>
+				</g>
 			</g>
 		</g>
 		<g transform="translate(475 0)">
 			<g class="letter letter-c-red">
-				<path d={half} fill={colors.red} fill-opacity="0.75" transform="rotate(55 50 50)"></path>
-				<path d={half} fill={colors.darkRed} fill-opacity="0.75" transform="rotate(125 50 50)"></path>
+				<g class="letter-lines">
+					<path class="c-line" d={toPath(nodes.c)}></path>
+				</g>
+				<g class="letter-nodes">
+					{nodes.c.map(([x, y]) => <circle class="c-node" cx={x} cy={y} r="3.5" />)}
+				</g>
+				<g class="letter-shape">
+					<path d={half} fill={colors.red} fill-opacity="0.75" transform="rotate(55 50 50)"></path>
+					<path d={half} fill={colors.darkRed} fill-opacity="0.75" transform="rotate(125 50 50)"
+					></path>
+				</g>
 			</g>
 		</g>
 	</svg>

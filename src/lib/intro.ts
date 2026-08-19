@@ -1,16 +1,27 @@
 import gsap from "gsap";
 import { SplitText } from "gsap/SplitText";
+import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
 
-gsap.registerPlugin(SplitText);
+gsap.registerPlugin(SplitText, DrawSVGPlugin);
 
 export type Intro = {
+	replay: () => void;
 	kill: () => void;
+};
+
+type Refs = {
+	hero: Element;
+	letters: NodeListOf<Element>;
+	chars: Element[];
+	comingSoon: Element;
+	streak: Element;
 };
 
 export function playIntro(root: ParentNode): Intro {
 	let killed = false;
 	let split: SplitText | undefined;
 	let ctx: gsap.Context | undefined;
+	let timeline: gsap.core.Timeline | undefined;
 
 	const start = async () => {
 		if (document.fonts?.ready) {
@@ -23,12 +34,13 @@ export function playIntro(root: ParentNode): Intro {
 			return;
 		}
 
-		const cosmic = root.querySelectorAll(".cosmic .letter");
+		const hero = root.querySelector(".hero");
+		const letters = root.querySelectorAll(".cosmic .letter");
 		const strawberry = root.querySelector(".strawberry");
 		const comingSoon = root.querySelector(".coming-soon");
 		const streak = root.querySelector(".streak");
 
-		if (!cosmic.length || !strawberry || !comingSoon || !streak) {
+		if (!hero || !letters.length || !strawberry || !comingSoon || !streak) {
 			document.documentElement.classList.remove("preload");
 			return;
 		}
@@ -37,11 +49,7 @@ export function playIntro(root: ParentNode): Intro {
 		const chars = split.chars;
 
 		ctx = gsap.context(() => {
-			const tl = gsap.timeline({ repeat: -1, yoyo: true, repeatDelay: 5 });
-			tl.add(addCosmic(cosmic), "start")
-				.add(addStraw(chars), "start+=0.75")
-				.add(shootingStar(streak), "start+=0.75")
-				.add(addSoon(comingSoon));
+			timeline = buildTimeline({ hero, letters, chars, comingSoon, streak });
 		}, root as Element);
 
 		document.documentElement.classList.remove("preload");
@@ -50,6 +58,9 @@ export function playIntro(root: ParentNode): Intro {
 	void start();
 
 	return {
+		replay() {
+			timeline?.restart();
+		},
 		kill() {
 			killed = true;
 			ctx?.revert();
@@ -58,16 +69,52 @@ export function playIntro(root: ParentNode): Intro {
 	};
 }
 
-function addCosmic(letters: NodeListOf<Element>) {
-	const mid = (letters.length - 1) / 2;
-	return gsap.from(letters, {
-		opacity: 0,
-		scale: 0,
-		x: (i) => (mid - i) * 48,
-		duration: 2,
-		stagger: 0.25,
-		ease: "back.out",
+function buildTimeline(refs: Refs) {
+	const tl = gsap.timeline();
+
+	tl.set(refs.hero, { opacity: 1, scale: 1 });
+
+	refs.letters.forEach((letter, i) => {
+		tl.add(assembleLetter(letter), 0.15 + i * 0.28);
 	});
+
+	tl.add(addStraw(refs.chars), "-=0.9")
+		.add(shootingStar(refs.streak), "<")
+		.add(addSoon(refs.comingSoon), "<+=1.1");
+
+	return tl;
+}
+
+/**
+ * A letter arrives as a constellation: stars appear, lines connect them,
+ * the solid shape settles into the outline, and the scaffolding fades out.
+ */
+function assembleLetter(letter: Element) {
+	const nodes = letter.querySelectorAll(".c-node");
+	const lines = letter.querySelectorAll(".c-line");
+	const shape = letter.querySelector(".letter-shape");
+	const tl = gsap.timeline();
+
+	tl.fromTo(
+		nodes,
+		{ opacity: 0, scale: 0 },
+		{ opacity: 1, scale: 1, duration: 0.45, stagger: 0.07, ease: "back.out(3)" },
+	)
+		.fromTo(
+			lines,
+			{ drawSVG: "0%", opacity: 0.55 },
+			{ drawSVG: "100%", duration: 0.6, ease: "power2.inOut" },
+			"-=0.2",
+		)
+		.fromTo(
+			shape,
+			{ opacity: 0, scale: 0.8 },
+			{ opacity: 1, scale: 1, duration: 0.7, ease: "back.out(1.7)" },
+			"-=0.15",
+		)
+		.to([...nodes, ...lines], { opacity: 0, duration: 0.6, ease: "power2.out" }, "-=0.5");
+
+	return tl;
 }
 
 function addStraw(chars: Element[]) {

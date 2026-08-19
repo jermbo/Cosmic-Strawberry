@@ -20,6 +20,11 @@ html.preload .hero {
 	html.preload .hero {
 		opacity: 1;
 	}
+
+	.c-node,
+	.c-line {
+		display: none;
+	}
 }
 
 .starfield {
@@ -50,6 +55,30 @@ html.preload .hero {
 	box-shadow: 0 0 25px rgba(255, 255, 255, 0.75);
 }
 
+.flash {
+	position: fixed;
+	inset: 0;
+	z-index: 5;
+	opacity: 0;
+	pointer-events: none;
+	background: radial-gradient(circle at center, #eaffff 0%, #9fe8ef 55%, #0b1a20 100%);
+}
+
+.confetti-layer {
+	position: fixed;
+	inset: 0;
+	z-index: 4;
+	pointer-events: none;
+}
+
+.confetti {
+	position: absolute;
+	width: 8px;
+	height: 8px;
+	margin: -4px 0 0 -4px;
+	border-radius: 50%;
+}
+
 .hero {
 	position: relative;
 	z-index: 1;
@@ -72,9 +101,25 @@ html.preload .hero {
 	overflow: visible;
 }
 
-.cosmic .letter {
+.cosmic .letter,
+.cosmic .letter-shape,
+.cosmic .c-node {
 	transform-box: fill-box;
 	transform-origin: center;
+}
+
+.c-node {
+	fill: #00f6ff;
+	opacity: 0;
+}
+
+.c-line {
+	fill: none;
+	stroke: #00f6ff;
+	stroke-width: 1.6;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	opacity: 0;
 }
 
 .strawberry,

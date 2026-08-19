@@ -26,9 +26,11 @@ import "../styles/landing.css";
 			<p class="strawberry">strawberry</p>
 			<p class="coming-soon">coming soon</p>
 		</section>
+		<div class="flash" aria-hidden="true"></div>
 		<script>
 			import { createStarfield } from "../lib/starfield";
 			import { playIntro } from "../lib/intro";
+			import { initInteractions } from "../lib/interactions";
 
 			const canvas = document.querySelector<HTMLCanvasElement>(".starfield");
 			if (!canvas) {
@@ -36,12 +38,18 @@ import "../styles/landing.css";
 			}
 
 			const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-			createStarfield(canvas, { twinkle: !reduced });
+			const starfield = createStarfield(canvas, { twinkle: !reduced });
 
 			if (reduced) {
 				document.documentElement.classList.remove("preload");
 			} else {
-				playIntro(document.body);
+				const intro = playIntro(document.body);
+				const flash = document.querySelector(".flash");
+				const hero = document.querySelector(".hero");
+
+				if (flash && hero) {
+					initInteractions({ root: document.body, starfield, intro, flash, hero });
+				}
 			}
 		</script>
 	</body>

@@ -11,9 +11,12 @@ type Star = {
 	twinkleSpeed: number;
 	twinklePhase: number;
 	twinkles: boolean;
+	depth: number;
 };
 
 export type Starfield = {
+	warp: (options?: { onPeak?: () => void }) => gsap.core.Timeline;
+	isWarping: () => boolean;
 	destroy: () => void;
 };
 
@@ -26,12 +29,15 @@ export function createStarfield(
 	const ctx = canvas.getContext("2d");
 
 	if (!ctx) {
-		return { destroy() {} };
+		return { warp: () => gsap.timeline(), isWarping: () => false, destroy() {} };
 	}
 
 	const stars: Star[] = [];
+	const state = { warp: 0 };
 	let width = 0;
 	let height = 0;
+	let tickerActive = false;
+	let warping = false;
 
 	function seed() {
 		stars.length = 0;
@@ -44,6 +50,7 @@ export function createStarfield(
 				twinkleSpeed: Math.random() * 2 + 0.6,
 				twinklePhase: Math.random() * Math.PI * 2,
 				twinkles: i < count / 10,
+				depth: Math.random() * 0.8 + 0.4,
 			});
 		}
 	}
@@ -65,6 +72,11 @@ export function createStarfield(
 		ctx.clearRect(0, 0, width, height);
 		ctx.shadowColor = `rgb(${CYAN})`;
 		ctx.shadowBlur = 6;
+		ctx.lineCap = "round";
+
+		const warp = state.warp;
+		const cx = width / 2;
+		const cy = height / 2;
 
 		for (const star of stars) {
 			let alpha = star.baseAlpha;
@@ -74,10 +86,35 @@ export function createStarfield(
 					(0.35 + 0.65 * (0.5 + 0.5 * Math.sin(time * star.twinkleSpeed + star.twinklePhase)));
 			}
 
-			ctx.fillStyle = `rgba(${CYAN}, ${alpha})`;
+			const sx = star.x * width;
+			const sy = star.y * height;
+
+			if (warp < 0.001) {
+				ctx.fillStyle = `rgba(${CYAN}, ${alpha})`;
+				ctx.beginPath();
+				ctx.arc(sx, sy, star.r, 0, Math.PI * 2);
+				ctx.fill();
+				continue;
+			}
+
+			// Push each star away from center along its own radial, then trail it.
+			const dx = sx - cx;
+			const dy = sy - cy;
+			const dist = Math.hypot(dx, dy) || 1;
+			const ux = dx / dist;
+			const uy = dy / dist;
+
+			const push = warp * warp * (dist * 1.7 + 140) * star.depth;
+			const px = sx + ux * push;
+			const py = sy + uy * push;
+			const len = warp * (60 + dist * 0.55) * star.depth;
+
+			ctx.strokeStyle = `rgba(${CYAN}, ${Math.min(1, alpha + warp * 0.5)})`;
+			ctx.lineWidth = star.r * 1.3;
 			ctx.beginPath();
-			ctx.arc(star.x * width, star.y * height, star.r, 0, Math.PI * 2);
-			ctx.fill();
+			ctx.moveTo(px - ux * len, py - uy * len);
+			ctx.lineTo(px, py);
+			ctx.stroke();
 		}
 	}
 
@@ -85,18 +122,61 @@ export function createStarfield(
 		draw(time);
 	};
 
+	function addTicker() {
+		if (!tickerActive) {
+			gsap.ticker.add(tick);
+			tickerActive = true;
+		}
+	}
+
+	function removeTicker() {
+		if (tickerActive) {
+			gsap.ticker.remove(tick);
+			tickerActive = false;
+		}
+	}
+
 	const observer = new ResizeObserver(resize);
 	observer.observe(canvas);
 	resize();
 
 	if (twinkle) {
-		gsap.ticker.add(tick);
+		addTicker();
+	}
+
+	function warp(options?: { onPeak?: () => void }) {
+		const tl = gsap.timeline({
+			onStart() {
+				warping = true;
+				addTicker();
+			},
+			onComplete() {
+				warping = false;
+				if (!twinkle) {
+					removeTicker();
+					draw(gsap.ticker.time);
+				}
+			},
+		});
+
+		tl.to(state, { warp: 1, duration: 0.9, ease: "power3.in" })
+			.add(() => {
+				// New sky on the other side of the jump.
+				seed();
+				state.warp = 0.55;
+				options?.onPeak?.();
+			})
+			.to(state, { warp: 0, duration: 1.4, ease: "power2.out" });
+
+		return tl;
 	}
 
 	return {
+		warp,
+		isWarping: () => warping,
 		destroy() {
 			observer.disconnect();
-			gsap.ticker.remove(tick);
+			removeTicker();
 		},
 	};
 }
