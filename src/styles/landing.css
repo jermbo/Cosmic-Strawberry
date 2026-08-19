@@ -1,3 +1,13 @@
+:root {
+	--void: #04090b;
+	--phosphor: #00f6ff;
+	--phosphor-dim: #2f7d89;
+	--phosphor-bright: #c6fbff;
+	--alarm: #ff5f6d;
+	--mono: "Share Tech Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+	--glow: 0 0 8px rgba(0, 246, 255, 0.45);
+}
+
 *,
 *::before,
 *::after {
@@ -9,23 +19,20 @@ body {
 	margin: 0;
 	height: 100%;
 	overflow: hidden;
-	background: #0b1a20;
+	background: var(--void);
+	font-family: var(--mono);
+	color: var(--phosphor);
 }
 
-html.preload .hero {
+html.preload .ascii,
+html.preload .cosmic,
+html.preload .strawberry,
+html.preload .coming-soon,
+html.preload .commands {
 	opacity: 0;
 }
 
-@media (prefers-reduced-motion: reduce) {
-	html.preload .hero {
-		opacity: 1;
-	}
-
-	.c-node,
-	.c-line {
-		display: none;
-	}
-}
+/* ---------- background ---------- */
 
 .starfield {
 	position: fixed;
@@ -33,6 +40,7 @@ html.preload .hero {
 	width: 100%;
 	height: 100%;
 	z-index: 0;
+	opacity: 0.55;
 	pointer-events: none;
 }
 
@@ -46,52 +54,144 @@ html.preload .hero {
 	pointer-events: none;
 	z-index: 2;
 	opacity: 0;
-	background: linear-gradient(
-		to bottom,
-		#fff 0%,
-		rgba(255, 255, 255, 0.75) 25%,
-		transparent 100%
-	);
+	background: linear-gradient(to bottom, #fff 0%, rgba(255, 255, 255, 0.75) 25%, transparent 100%);
 	box-shadow: 0 0 25px rgba(255, 255, 255, 0.75);
 }
 
-.flash {
-	position: fixed;
-	inset: 0;
-	z-index: 5;
-	opacity: 0;
-	pointer-events: none;
-	background: radial-gradient(circle at center, #eaffff 0%, #9fe8ef 55%, #0b1a20 100%);
-}
+/* ---------- console chrome ---------- */
 
-.confetti-layer {
-	position: fixed;
-	inset: 0;
-	z-index: 4;
-	pointer-events: none;
-}
-
-.confetti {
-	position: absolute;
-	width: 8px;
-	height: 8px;
-	margin: -4px 0 0 -4px;
-	border-radius: 50%;
-}
-
-.hero {
+.console {
 	position: relative;
 	z-index: 1;
-	min-height: 100dvh;
+	height: 100dvh;
+	display: grid;
+	grid-template-rows: auto auto 1fr auto;
+	gap: clamp(0.75rem, 2vh, 1.5rem);
+	padding: clamp(0.9rem, 3vw, 2rem);
+	font-size: clamp(0.7rem, 1.5vw, 0.95rem);
+	text-shadow: var(--glow);
+}
+
+.console-head,
+.commands {
+	display: flex;
+	gap: clamp(1rem, 4vw, 3rem);
+	color: var(--phosphor-dim);
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+}
+
+.console-head {
+	justify-content: space-between;
+	padding-bottom: 0.5rem;
+	border-bottom: 1px solid rgba(0, 246, 255, 0.18);
+}
+
+.console-head .link {
+	color: var(--phosphor);
+	animation: pulse 2.4s steps(1, end) infinite;
+}
+
+.commands {
+	justify-content: center;
+	padding-top: 0.5rem;
+	border-top: 1px solid rgba(0, 246, 255, 0.18);
+}
+
+@keyframes pulse {
+	0%,
+	60% {
+		opacity: 1;
+	}
+	61%,
+	100% {
+		opacity: 0.25;
+	}
+}
+
+/* ---------- boot log ---------- */
+
+.boot {
+	height: min(34vh, 20rem);
+	overflow: hidden;
+	line-height: 1.55;
+	color: var(--phosphor-dim);
+}
+
+.t-line {
+	white-space: pre;
+}
+
+.t-head,
+.t-ok {
+	color: var(--phosphor-bright);
+}
+
+.t-bad {
+	color: var(--alarm);
+	text-shadow: 0 0 8px rgba(255, 95, 109, 0.5);
+}
+
+.t-check {
+	display: flex;
+	align-items: baseline;
+	gap: 0.5ch;
+	max-width: 32rem;
+}
+
+.t-leader {
+	flex: 1;
+	border-bottom: 1px dotted rgba(0, 246, 255, 0.3);
+	transform: translateY(-0.25em);
+}
+
+.t-status {
+	color: var(--phosphor);
+	min-width: 6ch;
+	text-align: right;
+}
+
+.t-status.is-set {
+	color: var(--phosphor-bright);
+}
+
+/* ---------- stage ---------- */
+
+.hero {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: clamp(4rem, 12vh, 8rem) 1.5rem 2rem;
+	justify-content: center;
+	gap: 0.75rem;
+}
+
+.logo-stack {
+	display: grid;
+	place-items: center;
+	width: min(92vw, 36rem);
+}
+
+.logo-stack > * {
+	grid-area: 1 / 1;
+	width: 100%;
+}
+
+.ascii {
+	margin: 0;
+	white-space: pre;
+	text-align: center;
+	line-height: 1.05;
+	font-size: calc(min(92vw, 36rem) / 26);
+	color: var(--phosphor);
+	text-shadow: 0 0 10px rgba(0, 246, 255, 0.6);
+}
+
+.ascii-row {
+	display: block;
 }
 
 .cosmic {
 	margin: 0;
-	width: min(92vw, 36rem);
 }
 
 .cosmic-word {
@@ -109,13 +209,13 @@ html.preload .hero {
 }
 
 .c-node {
-	fill: #00f6ff;
+	fill: var(--phosphor);
 	opacity: 0;
 }
 
 .c-line {
 	fill: none;
-	stroke: #00f6ff;
+	stroke: var(--phosphor);
 	stroke-width: 1.6;
 	stroke-linecap: round;
 	stroke-linejoin: round;
@@ -125,17 +225,16 @@ html.preload .hero {
 .strawberry,
 .coming-soon {
 	margin: 0;
-	color: #8aa4b0;
-	font-family: "Didact Gothic", "Open Sans", sans-serif;
-	font-weight: 400;
-	text-transform: uppercase;
 	text-align: center;
+	text-transform: uppercase;
+	color: var(--phosphor);
+	text-shadow: var(--glow);
 }
 
 .strawberry {
-	margin-top: 0.35rem;
-	font-size: clamp(1.25rem, 4.2vw, 2.75rem);
+	font-size: clamp(1.1rem, 3.6vw, 2.25rem);
 	letter-spacing: 0.55em;
+	text-indent: 0.55em;
 	perspective: 600px;
 }
 
@@ -145,7 +244,96 @@ html.preload .hero {
 }
 
 .coming-soon {
-	margin-top: 0.75rem;
-	font-size: clamp(1rem, 3.5vw, 2rem);
+	font-size: clamp(0.85rem, 2.4vw, 1.35rem);
 	letter-spacing: 0.45em;
+	text-indent: 0.45em;
+	color: var(--phosphor-dim);
+}
+
+/* ---------- overlays ---------- */
+
+.flash {
+	position: fixed;
+	inset: 0;
+	z-index: 5;
+	opacity: 0;
+	pointer-events: none;
+	background: radial-gradient(circle at center, #eaffff 0%, #9fe8ef 55%, var(--void) 100%);
+}
+
+.scanlines {
+	position: fixed;
+	inset: 0;
+	z-index: 6;
+	pointer-events: none;
+	background: repeating-linear-gradient(
+		to bottom,
+		rgba(0, 0, 0, 0) 0 2px,
+		rgba(0, 0, 0, 0.3) 2px 4px
+	);
+	animation: crt-flicker 4.5s steps(1, end) infinite;
+}
+
+.scanlines::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.6) 100%);
+}
+
+@keyframes crt-flicker {
+	0%,
+	97% {
+		opacity: 1;
+	}
+	97.5% {
+		opacity: 0.72;
+	}
+	98% {
+		opacity: 1;
+	}
+	98.5% {
+		opacity: 0.85;
+	}
+	99%,
+	100% {
+		opacity: 1;
+	}
+}
+
+.confetti-layer {
+	position: fixed;
+	inset: 0;
+	z-index: 4;
+	pointer-events: none;
+}
+
+.confetti {
+	position: absolute;
+	width: 8px;
+	height: 8px;
+	margin: -4px 0 0 -4px;
+	border-radius: 50%;
+}
+
+/* ---------- reduced motion: no boot, no CRT, just the wordmark ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+	.boot,
+	.commands,
+	.ascii,
+	.c-node,
+	.c-line {
+		display: none;
+	}
+
+	.scanlines {
+		animation: none;
+	}
+
+	html.preload .cosmic,
+	html.preload .strawberry,
+	html.preload .coming-soon {
+		opacity: 1;
+	}
 }

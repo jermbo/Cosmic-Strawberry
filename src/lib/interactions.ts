@@ -1,6 +1,6 @@
 import gsap from "gsap";
 import { Physics2DPlugin } from "gsap/Physics2DPlugin";
-import type { Intro } from "./intro";
+import type { Boot } from "./boot";
 import type { Starfield } from "./starfield";
 
 gsap.registerPlugin(Physics2DPlugin);
@@ -23,17 +23,17 @@ export type Interactions = {
 };
 
 /**
- * Click anywhere to jump to lightspeed and re-enter on a fresh sky.
- * Type the secret word to blow the wordmark apart and let it re-form.
+ * The two console commands. Click anywhere to jump to lightspeed and re-acquire
+ * the signal on a fresh sky; type the secret word to lose structural integrity.
  */
 export function initInteractions(options: {
 	root: ParentNode;
 	starfield: Starfield;
-	intro: Intro;
+	boot: Boot;
 	flash: Element;
-	hero: Element;
+	stage: Element;
 }): Interactions {
-	const { root, starfield, intro, flash, hero } = options;
+	const { root, starfield, boot, flash, stage } = options;
 	let busy = false;
 	let typed = "";
 
@@ -43,16 +43,26 @@ export function initInteractions(options: {
 		}
 		busy = true;
 
+		const term = boot.terminal();
 		const tl = gsap.timeline({
 			onComplete() {
 				busy = false;
 			},
 		});
 
-		tl.to(hero, { scale: 1.25, opacity: 0, duration: 0.75, ease: "power2.in" }, 0)
-			.add(starfield.warp({ onPeak: () => intro.replay() }), 0)
+		if (term) {
+			tl.add(term.print("> JUMP INITIATED // HOLD ON"), 0);
+		}
+
+		tl.to(stage, { scale: 1.25, opacity: 0, duration: 0.75, ease: "power2.in" }, 0)
+			.add(starfield.warp({ onPeak: () => boot.replayLock() }), 0)
 			.to(flash, { opacity: 1, duration: 0.14, ease: "power2.in" }, 0.76)
-			.to(flash, { opacity: 0, duration: 0.8, ease: "power2.out" }, 0.94);
+			.to(flash, { opacity: 0, duration: 0.8, ease: "power2.out" }, 0.94)
+			.set(stage, { scale: 1, opacity: 1 }, 0.9);
+
+		if (term) {
+			tl.add(term.print("> NEW SKY // RE-ACQUIRING SIGNAL"), 1.1);
+		}
 	}
 
 	function detonate() {
@@ -60,6 +70,9 @@ export function initInteractions(options: {
 			return;
 		}
 		busy = true;
+
+		const term = boot.terminal();
+		term?.print("> STRUCTURAL INTEGRITY LOST", { className: "t-bad" });
 
 		const letters = root.querySelectorAll(".cosmic .letter");
 		const chars = root.querySelectorAll(".strawberry .char");
@@ -82,7 +95,8 @@ export function initInteractions(options: {
 			stagger: { each: 0.02, from: "center" },
 			onComplete() {
 				gsap.set(pieces, { clearProps: "all" });
-				intro.replay();
+				term?.print("> RECOMPILING WORDMARK");
+				boot.replayLock();
 				busy = false;
 			},
 		});
@@ -90,6 +104,10 @@ export function initInteractions(options: {
 
 	function onClick(event: MouseEvent) {
 		if (event.target instanceof Element && event.target.closest("a, button")) {
+			return;
+		}
+		if (boot.isBooting()) {
+			boot.skip();
 			return;
 		}
 		jump();
@@ -102,6 +120,9 @@ export function initInteractions(options: {
 		typed = (typed + event.key.toLowerCase()).slice(-SECRET.length);
 		if (typed === SECRET) {
 			typed = "";
+			if (boot.isBooting()) {
+				boot.skip();
+			}
 			detonate();
 		}
 	}
