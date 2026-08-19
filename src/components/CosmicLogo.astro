@@ -1,0 +1,58 @@
+---
+const colors = {
+	green: "#00683E",
+	blueGreen: "#023E4F",
+	orange: "#F7913D",
+	pink: "#AE4A9B",
+	darkPink: "#952889",
+	mint: "#25B359",
+	darkMint: "#00A79C",
+	red: "#EF403E",
+	darkRed: "#A42132",
+};
+
+const half = "M0 50 A50 50 0 0 0 100 50 Z";
+---
+
+<h1 class="cosmic" aria-label="Cosmic">
+	<svg class="cosmic-word" viewBox="-8 -12 591 124" overflow="visible" role="presentation">
+		<g class="letter letter-c-green">
+			<path d={half} fill={colors.green} fill-opacity="0.75" transform="rotate(55 50 50)"></path>
+			<path d={half} fill={colors.blueGreen} fill-opacity="0.75" transform="rotate(125 50 50)"></path>
+		</g>
+		<g transform="translate(90 0)">
+			<g class="letter letter-o">
+				<circle cx="50" cy="50" r="50" fill={colors.orange} fill-opacity="0.75"></circle>
+			</g>
+		</g>
+		<g transform="translate(200 0)">
+			<g class="letter letter-s">
+				<g transform="rotate(-48 50 50)">
+					<path d={half} fill={colors.pink} fill-opacity="0.75" transform="translate(-20 -15)"></path>
+					<path
+						d={half}
+						fill={colors.darkPink}
+						fill-opacity="0.75"
+						transform="translate(0 -5) rotate(180 50 50)"></path>
+				</g>
+			</g>
+		</g>
+		<g transform="translate(280 3)">
+			<g class="letter letter-m">
+				<polygon points="0,100 50,0 100,100" fill={colors.mint} fill-opacity="0.75"></polygon>
+				<polygon points="35,100 85,0 135,100" fill={colors.darkMint} fill-opacity="0.75"></polygon>
+			</g>
+		</g>
+		<g transform="translate(430 0)">
+			<g class="letter letter-i">
+				<rect width="40" height="100" fill={colors.orange} fill-opacity="0.75"></rect>
+			</g>
+		</g>
+		<g transform="translate(475 0)">
+			<g class="letter letter-c-red">
+				<path d={half} fill={colors.red} fill-opacity="0.75" transform="rotate(55 50 50)"></path>
+				<path d={half} fill={colors.darkRed} fill-opacity="0.75" transform="rotate(125 50 50)"></path>
+			</g>
+		</g>
+	</svg>
+</h1>
