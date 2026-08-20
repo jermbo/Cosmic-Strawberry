@@ -1,5 +1,6 @@
 ---
 import CosmicLogo from "../components/CosmicLogo.astro";
+import AsciiLogo from "../components/AsciiLogo.astro";
 import "../styles/landing.css";
 ---
 
@@ -14,22 +15,44 @@ import "../styles/landing.css";
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
-			href="https://fonts.googleapis.com/css2?family=Didact+Gothic&family=Open+Sans:wght@300&display=swap"
+			href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap"
 			rel="stylesheet"
 		/>
 	</head>
 	<body>
 		<canvas class="starfield" aria-hidden="true"></canvas>
 		<div class="streak" aria-hidden="true"></div>
-		<section class="hero">
-			<CosmicLogo />
-			<p class="strawberry">strawberry</p>
-			<p class="coming-soon">coming soon</p>
-		</section>
+
+		<main class="console">
+			<header class="console-head" aria-hidden="true">
+				<span>CS-NAV</span>
+				<span>FW 0.0.1</span>
+				<span class="link">◉ LINK</span>
+			</header>
+
+			<div class="boot" aria-hidden="true"></div>
+
+			<section class="hero">
+				<div class="logo-stack">
+					<AsciiLogo />
+					<CosmicLogo />
+				</div>
+				<p class="strawberry">strawberry</p>
+				<p class="coming-soon">coming soon</p>
+			</section>
+
+			<footer class="commands" aria-hidden="true">
+				<span>[CLICK] JUMP</span>
+				<span>[TYPE] STRAWBERRY</span>
+			</footer>
+		</main>
+
 		<div class="flash" aria-hidden="true"></div>
+		<div class="scanlines" aria-hidden="true"></div>
+
 		<script>
 			import { createStarfield } from "../lib/starfield";
-			import { playIntro } from "../lib/intro";
+			import { playBoot } from "../lib/boot";
 			import { initInteractions } from "../lib/interactions";
 
 			const canvas = document.querySelector<HTMLCanvasElement>(".starfield");
@@ -43,12 +66,12 @@ import "../styles/landing.css";
 			if (reduced) {
 				document.documentElement.classList.remove("preload");
 			} else {
-				const intro = playIntro(document.body);
+				const boot = playBoot(document.body);
 				const flash = document.querySelector(".flash");
-				const hero = document.querySelector(".hero");
+				const stage = document.querySelector(".hero");
 
-				if (flash && hero) {
-					initInteractions({ root: document.body, starfield, intro, flash, hero });
+				if (flash && stage) {
+					initInteractions({ root: document.body, starfield, boot, flash, stage });
 				}
 			}
 		</script>

@@ -1,0 +1,14 @@
+---
+const glyphs: Record<string, string[]> = {
+	C: [" ████ ", "██    ", "██    ", "██    ", " ████ "],
+	O: [" ████ ", "██  ██", "██  ██", "██  ██", " ████ "],
+	S: [" █████", "██    ", " ████ ", "    ██", "█████ "],
+	M: ["██   ██", "███ ███", "██ █ ██", "██   ██", "██   ██"],
+	I: ["██", "██", "██", "██", "██"],
+};
+
+const word = ["C", "O", "S", "M", "I", "C"];
+const rows = [0, 1, 2, 3, 4].map((row) => word.map((char) => glyphs[char][row]).join(" "));
+---
+
+<pre class="ascii" aria-hidden="true">{rows.map((row) => <span class="ascii-row">{row}</span>)}</pre>
