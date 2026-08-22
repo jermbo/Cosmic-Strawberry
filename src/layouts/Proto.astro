@@ -6,9 +6,17 @@ interface Props {
 	desc?: string;
 	section: string;
 	progress?: boolean;
+	/** Off for the IA exploration pages, which are judged on structure alone. */
+	motion?: boolean;
 }
 
-const { title, desc = "Cosmic Strawberry — prototype", section, progress = false } = Astro.props;
+const {
+	title,
+	desc = "Cosmic Strawberry — prototype",
+	section,
+	progress = false,
+	motion = true,
+} = Astro.props;
 const path = Astro.url.pathname;
 ---
 
@@ -44,7 +52,7 @@ const path = Astro.url.pathname;
 		</script>
 	</head>
 
-	<body>
+	<body data-motion={motion ? "on" : "off"}>
 		<header class="nav">
 			<div class="shell nav__in">
 				<a class="nav__id mono" href="/proto" data-cursor="Home">
@@ -65,6 +73,12 @@ const path = Astro.url.pathname;
 						href="/proto/crossings/hard-vacuum"
 						aria-current={path.includes("/crossings/") ? "page" : undefined}
 						data-cursor="Read">Crossings</a
+					>
+					<a
+						class="nav__link mono"
+						href="/proto/hub"
+						aria-current={path.includes("/hub") ? "page" : undefined}
+						data-cursor="Explore">Hub</a
 					>
 					<a
 						class="nav__link mono"
@@ -116,11 +130,23 @@ const path = Astro.url.pathname;
 		<script>
 			import { initCursor } from "../lib/proto/cursor";
 			import { initTheme } from "../lib/proto/theme";
-			import { playHero, initReveals, initProgress, initPinned } from "../lib/proto/reveal";
+			import {
+				playHero,
+				initReveals,
+				initProgress,
+				initPinned,
+				settle,
+			} from "../lib/proto/reveal";
 
 			const start = () => {
 				initTheme();
 				initCursor();
+
+				if (document.body.dataset.motion === "off") {
+					settle();
+					return;
+				}
+
 				playHero();
 				initReveals();
 				initProgress();

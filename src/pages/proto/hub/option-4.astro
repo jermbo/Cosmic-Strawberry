@@ -1,0 +1,497 @@
+---
+/**
+ * OPTION 4 — CONSTELLATION (spatial map)
+ * Work positioned in 2D space with the relationships drawn between it.
+ * The one Phase 1 option with motion, because it does not read without it.
+ */
+import Proto from "../../../layouts/Proto.astro";
+import { projects } from "../../../data/projects";
+import { writing } from "../../../data/writing";
+import { lab } from "../../../data/lab";
+
+const W = 1600;
+const H = 1000;
+
+/* Writing and lab are not in the data with coordinates — the map places them
+   in fixed regions so the field stays legible while projects keep the centre. */
+const writingPos: [number, number][] = [
+	[10, 50],
+	[16, 70],
+	[7, 87],
+];
+
+const labPos: [number, number][] = [
+	[52, 8],
+	[62, 12],
+	[88, 40],
+	[93, 55],
+	[30, 12],
+	[18, 22],
+	[58, 90],
+	[68, 52],
+];
+
+type Node = {
+	kind: "project" | "writing" | "lab";
+	idx: string;
+	name: string;
+	href: string | null;
+	pos: [number, number];
+	accent: string;
+	readout: string;
+	links: string[];
+};
+
+const nodes: Node[] = [
+	...projects.map((p) => ({
+		kind: "project" as const,
+		idx: p.idx,
+		name: p.name,
+		href: p.href,
+		pos: p.pos,
+		accent: p.accent,
+		readout: `${p.idx} · ${p.name.toUpperCase()} — ${p.blurb}`,
+		links: p.links,
+	})),
+	...writing.map((w, i) => ({
+		kind: "writing" as const,
+		idx: w.idx,
+		name: w.title,
+		href: w.href,
+		pos: writingPos[i] ?? [5, 5],
+		accent: "fg",
+		readout: `${w.idx} · ${w.title.toUpperCase()} — ${w.kind}, ${w.minutes} min`,
+		links: [],
+	})),
+	...lab.map((l, i) => ({
+		kind: "lab" as const,
+		idx: l.idx,
+		name: l.name,
+		href: l.href,
+		pos: labPos[i] ?? [50, 50],
+		accent: "fg",
+		readout: `${l.idx} · ${l.name.toUpperCase()} — ${l.note}`,
+		links: [],
+	})),
+];
+
+const at = (pos: [number, number]) => [(pos[0] / 100) * W, (pos[1] / 100) * H];
+
+/* One line per declared relationship, de-duplicated. */
+const edges = projects.flatMap((p) =>
+	p.links
+		.filter((to) => p.idx < to)
+		.map((to) => {
+			const other = projects.find((q) => q.idx === to);
+			if (!other) return null;
+			const [x1, y1] = at(p.pos);
+			const [x2, y2] = at(other.pos);
+			return { from: p.idx, to, x1, y1, x2, y2 };
+		})
+		.filter((e) => e !== null)
+);
+---
+
+<Proto title="Hub / Option 4 — Constellation" section="hub">
+	<div class="sky">
+		<div class="sky__chrome">
+			<div class="shell sky__bar mono">
+				<span class="sky__label">COSMIC STRAWBERRY / FIELD MAP</span>
+				<span class="sky__readout" data-readout>DRAG TO PAN / SCROLL TO ZOOM</span>
+			</div>
+		</div>
+
+		<div class="map" data-map>
+			<div class="map__world" data-world>
+				<svg class="map__links" viewBox={`0 0 ${W} ${H}`} aria-hidden="true">
+					{
+						edges.map((e) => (
+							<line
+								class="edge"
+								data-link
+								data-from={e!.from}
+								data-to={e!.to}
+								x1={e!.x1}
+								y1={e!.y1}
+								x2={e!.x2}
+								y2={e!.y2}
+							/>
+						))
+					}
+				</svg>
+
+				{
+					nodes.map((n) => {
+						const Tag = n.href ? "a" : "span";
+						return (
+							<Tag
+								class={`node node--${n.kind}`}
+								data-node={n.idx}
+								data-links={n.links.join(",")}
+								data-readout={n.readout}
+								data-accent={n.accent}
+								data-cursor={n.kind === "project" ? "Launch ↗" : "Open →"}
+								href={n.href ?? undefined}
+								target={n.kind === "project" ? "_blank" : undefined}
+								rel={n.kind === "project" ? "noopener" : undefined}
+								style={`left:${n.pos[0]}%; top:${n.pos[1]}%`}
+							>
+								<span class="node__mark" aria-hidden="true" />
+								<span class="node__label">
+									<span class="mono node__idx">{n.idx}</span>
+									<span class="node__name">{n.name}</span>
+								</span>
+							</Tag>
+						);
+					})
+				}
+			</div>
+
+			<div class="map__controls mono">
+				<button type="button" data-zoom="in" aria-label="Zoom in" data-cursor="Closer">+</button>
+				<button type="button" data-zoom="out" aria-label="Zoom out" data-cursor="Wider">–</button>
+				<button type="button" data-reset aria-label="Reset view" data-cursor="Reset">◉</button>
+			</div>
+
+			<div class="map__legend mono">
+				<span><i class="key key--project"></i> Project</span>
+				<span><i class="key key--writing"></i> Writing</span>
+				<span><i class="key key--lab"></i> Lab</span>
+			</div>
+		</div>
+	</div>
+
+	<!-- The map is the argument; this is the thing that actually works everywhere. -->
+	<section class="section section--tight">
+		<div class="shell">
+			<div class="marker mono">
+				<span class="marker__idx">§ ALT</span>
+				<span class="marker__label">Flat index</span>
+				<span class="marker__count">{nodes.length} OBJECTS</span>
+			</div>
+
+			<ul class="flat">
+				{
+					nodes.map((n) => (
+						<li class="flat__row" data-kind={n.kind}>
+							{n.href ? (
+								<a href={n.href} data-cursor="Open →">
+									<span class="mono flat__idx">{n.idx}</span>
+									<span class="flat__name">{n.name}</span>
+									<span class="mono flat__kind">{n.kind}</span>
+								</a>
+							) : (
+								<span>
+									<span class="mono flat__idx">{n.idx}</span>
+									<span class="flat__name">{n.name}</span>
+									<span class="mono flat__kind">{n.kind}</span>
+								</span>
+							)}
+						</li>
+					))
+				}
+			</ul>
+		</div>
+	</section>
+</Proto>
+
+<script>
+	import { initConstellation } from "../../../lib/proto/hub/constellation";
+	initConstellation();
+</script>
+
+<style>
+	.sky {
+		padding-top: 5.5rem;
+	}
+
+	.sky__bar {
+		display: flex;
+		justify-content: space-between;
+		gap: var(--s-4);
+		padding-bottom: var(--s-2);
+		border-bottom: var(--hair) solid var(--rule-strong);
+	}
+
+	.sky__label {
+		color: var(--fg-mute);
+	}
+
+	.sky__readout {
+		color: var(--fg);
+		text-align: right;
+		max-width: 60ch;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	/* ---- the field ---- */
+	.map {
+		position: relative;
+		height: min(74svh, 780px);
+		overflow: hidden;
+		cursor: grab;
+		touch-action: none;
+		background-image: linear-gradient(var(--rule) var(--hair), transparent var(--hair)),
+			linear-gradient(90deg, var(--rule) var(--hair), transparent var(--hair));
+		background-size: 80px 80px;
+		border-bottom: var(--hair) solid var(--rule-strong);
+	}
+
+	.map.is-dragging {
+		cursor: grabbing;
+	}
+
+	.map__world {
+		position: absolute;
+		inset: 0;
+		will-change: transform;
+	}
+
+	.map__links {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		overflow: visible;
+	}
+
+	.edge {
+		stroke: var(--rule-strong);
+		stroke-width: 1;
+		stroke-dasharray: 4 5;
+		vector-effect: non-scaling-stroke;
+		transition: stroke 0.3s var(--ease);
+	}
+
+	.edge.is-lit {
+		stroke: var(--cs-orange);
+		stroke-dasharray: none;
+	}
+
+	/* ---- nodes ---- */
+	.node {
+		position: absolute;
+		transform: translate(-50%, -50%);
+		display: flex;
+		align-items: center;
+		gap: var(--s-1);
+		white-space: nowrap;
+		transition: opacity 0.3s var(--ease);
+	}
+
+	.node[data-accent="red"] {
+		--node-accent: var(--cs-red);
+	}
+	.node[data-accent="orange"] {
+		--node-accent: var(--cs-orange);
+	}
+	.node[data-accent="blue"] {
+		--node-accent: var(--cs-blue);
+	}
+	.node[data-accent="fg"] {
+		--node-accent: var(--fg-mute);
+	}
+
+	.node__mark {
+		flex: none;
+		background: var(--node-accent);
+		transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
+	}
+
+	.node--project .node__mark {
+		width: 16px;
+		height: 16px;
+	}
+
+	.node--writing .node__mark {
+		width: 10px;
+		height: 10px;
+		background: none;
+		border: 2px solid var(--fg-mute);
+	}
+
+	.node--lab .node__mark {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: var(--fg-faint);
+	}
+
+	.node__label {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.node__idx {
+		color: var(--fg-faint);
+	}
+
+	.node__name {
+		font-weight: 700;
+		font-stretch: 110%;
+		text-transform: uppercase;
+		letter-spacing: -0.005em;
+		line-height: 1;
+	}
+
+	.node--project .node__name {
+		font-size: 1.5rem;
+	}
+
+	.node--writing .node__name {
+		font-size: 0.9375rem;
+		color: var(--fg-mute);
+	}
+
+	.node--lab .node__name {
+		font-size: 0.75rem;
+		color: var(--fg-faint);
+		font-weight: 400;
+		font-family: var(--mono);
+		letter-spacing: 0.1em;
+	}
+
+	.node--lab .node__idx {
+		display: none;
+	}
+
+	/* focus mode: the field recedes, the relationship stays */
+	.map.is-focused .node {
+		opacity: 0.28;
+	}
+
+	.map.is-focused .node.is-related {
+		opacity: 1;
+	}
+
+	.node:hover .node__mark,
+	.node:focus-visible .node__mark {
+		transform: scale(1.35);
+	}
+
+	.node:hover .node__name,
+	.node:focus-visible .node__name {
+		color: var(--node-accent);
+	}
+
+	.node:focus-visible {
+		outline: var(--hair) solid var(--fg);
+		outline-offset: 6px;
+	}
+
+	/* ---- chrome over the field ---- */
+	.map__controls {
+		position: absolute;
+		right: var(--s-3);
+		bottom: var(--s-3);
+		display: flex;
+		flex-direction: column;
+		gap: var(--hair);
+		background: var(--rule);
+		border: var(--hair) solid var(--rule-strong);
+	}
+
+	.map__controls button {
+		width: 34px;
+		height: 34px;
+		background: var(--bg);
+		color: var(--fg);
+		font-size: 0.9rem;
+		cursor: pointer;
+	}
+
+	.map__controls button:hover {
+		background: var(--bg-panel);
+	}
+
+	.map__legend {
+		position: absolute;
+		left: var(--s-3);
+		bottom: var(--s-3);
+		display: flex;
+		gap: var(--s-3);
+		color: var(--fg-mute);
+		pointer-events: none;
+	}
+
+	.map__legend span {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.key {
+		width: 10px;
+		height: 10px;
+		display: inline-block;
+	}
+
+	.key--project {
+		background: var(--cs-red);
+	}
+
+	.key--writing {
+		border: 2px solid var(--fg-mute);
+	}
+
+	.key--lab {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: var(--fg-faint);
+	}
+
+	/* ---- flat index ---- */
+	.flat {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+		gap: var(--hair);
+		background: var(--rule);
+		border: var(--hair) solid var(--rule);
+	}
+
+	.flat__row {
+		background: var(--bg);
+	}
+
+	.flat__row > * {
+		display: flex;
+		align-items: baseline;
+		gap: var(--s-2);
+		padding: var(--s-1) var(--s-2);
+	}
+
+	.flat__idx,
+	.flat__kind {
+		color: var(--fg-faint);
+	}
+
+	.flat__name {
+		flex: 1;
+		font-size: 0.9375rem;
+	}
+
+	.flat__row a:hover {
+		background: var(--bg-panel);
+	}
+
+	@media (max-width: 900px) {
+		.map {
+			height: 62svh;
+		}
+
+		.map__legend {
+			display: none;
+		}
+
+		.sky__readout {
+			display: none;
+		}
+	}
+</style>

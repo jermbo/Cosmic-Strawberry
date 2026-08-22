@@ -1,0 +1,399 @@
+---
+/**
+ * Phase 1 compare page. Four IA options side by side with the thesis and the
+ * known risk of each, so the decision is made against stated criteria rather
+ * than whichever one loaded fastest.
+ */
+import Proto from "../../../layouts/Proto.astro";
+import { projects } from "../../../data/projects";
+import { writing } from "../../../data/writing";
+import { lab } from "../../../data/lab";
+
+const options = [
+	{
+		idx: "01",
+		name: "Mission Control",
+		href: "/proto/hub/option-1",
+		accent: "red",
+		thesis: "Everything visible at once on one screen. Projects are instrument panels, writing is a ticker, lab is a readout strip. Dense, immediate, no scroll.",
+		risk: "Density has a ceiling. The single screen is the whole idea, and the twelfth project is the thing that breaks it.",
+		scale: "Poor — fixed viewport",
+		motion: "None yet",
+	},
+	{
+		idx: "02",
+		name: "Manifest",
+		href: "/proto/hub/option-2",
+		accent: "orange",
+		thesis: "One long document. Projects lead as full-width rows, writing follows as cards, lab closes as a bench. Closest to the rhythm /proto already has.",
+		risk: "Safe. Nothing about the structure itself is a reason to visit — it works, and it asks nothing of you.",
+		scale: "Excellent — the row is the unit",
+		motion: "None yet",
+	},
+	{
+		idx: "03",
+		name: "Docking Bay",
+		href: "/proto/hub/option-3",
+		accent: "blue",
+		thesis: "The front door is nearly empty: a schematic core with three ports. Each port is its own page, generated from one template.",
+		risk: "An empty front door asks the visitor to make a decision before anything has sold them on making it.",
+		scale: "Excellent — new section, new port",
+		motion: "None yet",
+	},
+	{
+		idx: "04",
+		name: "Constellation",
+		href: "/proto/hub/option-4",
+		accent: "red",
+		thesis: "Work positioned in 2D space with the relationships drawn between it. Pan, zoom, and hover to see what connects to what.",
+		risk: "Spatial navigation is easy to make beautiful and hard to make usable. It also needs a flat fallback to be honest.",
+		scale: "Good — until the field gets crowded",
+		motion: "Yes — this one gets motion in Phase 1",
+	},
+	{
+		idx: "05",
+		name: "Orbital Field",
+		href: "/proto/hub/option-5",
+		accent: "orange",
+		thesis: "The four flat options were documents. This one is a system: projects travel elliptical paths around a core and cross in front of and behind the wordmark. Depth is the argument.",
+		risk: "Motion is load-bearing here in a way it is not anywhere else. If the orbit reads as decoration rather than structure, the whole option collapses into a slow carousel.",
+		scale: "Good — index derives the orbit, but the field crowds",
+		motion: "Yes — motion is the point",
+	},
+	{
+		idx: "06",
+		name: "Deck",
+		href: "/proto/hub/option-6",
+		accent: "red",
+		thesis: "Full viewport, nothing scrolls. Chrome is fixed and the world moves under it: left and right through the items in a section, up and down between sections. Ghosted word behind, type overhanging its panel.",
+		risk: "It takes the scroll wheel over. That is the reference's own bargain, but it is a real cost — and the sections rail is the only thing telling you how much there is.",
+		scale: "Excellent — a new item is a new cell",
+		motion: "Transitional only",
+	},
+	{
+		idx: "07",
+		name: "Vitrine",
+		href: "/proto/hub/option-7",
+		accent: "orange",
+		thesis: "One hairline frame filling the viewport that never moves. Sections switch from its own top band, specimens traverse left and right inside the stage. Nothing scrolls at all.",
+		risk: "One specimen at a time means most of the work is always hidden. The left-hand index is the only thing keeping that honest.",
+		scale: "Excellent — the frame does not care how many",
+		motion: "Transitional only",
+	},
+	{
+		idx: "08",
+		name: "Console",
+		href: "/proto/hub/option-8",
+		accent: "blue",
+		thesis: "The two combined. 07's still frame, 06's 2D movement. The world travels in both directions inside an aperture with drawn cross-hairs, and the frame's left cell reports on whatever is centred in it.",
+		risk: "Two mechanics in one screen. If the cross-hairs are not instantly legible it reads as a carousel that mysteriously changes the text beside it.",
+		scale: "Excellent — world scales, frame is fixed",
+		motion: "Transitional only",
+	},
+];
+
+const criteria = [
+	["A", "Twelve-project test", "Does it still work at 3× the content, without a redesign?"],
+	["B", "Who leads", "The work, or the chrome pointing at it? A hub that outshines its projects has failed."],
+	["C", "Where writing sits", "Does the notebook stay a first-class citizen, or become an afterthought?"],
+	["D", "Appetite for motion", "Does the layout want animation, or merely tolerate it? Phase 3 is easier if there are obvious places for it to live."],
+	["E", "Depth", "Is there a Z-axis, or is it a flat document wearing good chrome? Added after the first reference pass — it is what 01–04 were all missing."],
+	["F", "Is the count structural?", "Does the layout encode how many things there are? A 2x2 grid IS a four-project design; a stream is not."],
+	["G", "Ambient or transitional?", "Does anything move on its own? It should not. Motion that responds is legible; motion that just happens is noise."],
+	["H", "Does the frame travel?", "Can an internal page — an essay, a study — inherit this hierarchy, so the main site holds together page to page?"],
+];
+---
+
+<Proto title="Hub — IA Options" section="hub" motion={false}>
+	<div class="cmp">
+		<div class="shell">
+			<div class="cmp__meta mono">
+				<span>PHASE 01 / INFORMATION ARCHITECTURE</span>
+				<span>{projects.length} PROJECTS · {writing.length} PIECES · {lab.length} STUDIES</span>
+			</div>
+			<div class="rule"></div>
+
+			<h1 class="display cmp__word"><span>Eight</span><span>Doors</span></h1>
+
+			<div class="stripe cmp__stripe" aria-hidden="true">
+				<span></span><span></span><span></span>
+			</div>
+
+			<p class="lede cmp__lede">
+				Eight answers to one question: how does a visitor find the projects, the writing, and
+				the lab? Same content, same design system, eight different structures. 01–04 are flat
+				grids, 05 added a Z-axis and too much ambient motion, and 06–08 are the reference
+				pass: full viewport, nothing scrolls, movement is the navigation.
+			</p>
+
+			<div class="marker mono cmp__marker">
+				<span class="marker__idx">§ 01</span>
+				<span class="marker__label">Options</span>
+				<span class="marker__count">8</span>
+			</div>
+
+			<div class="opts">
+				{
+					options.map((o) => (
+						<a class="opt" href={o.href} data-accent={o.accent} data-cursor="Open →">
+							<div class="opt__head mono">
+								<span class="marker__idx">OPTION {o.idx}</span>
+								<span class="opt__motion">{o.motion}</span>
+							</div>
+
+							<h2 class="opt__name h3">{o.name}</h2>
+
+							<p class="opt__thesis">{o.thesis}</p>
+
+							<dl class="opt__spec mono">
+								<div>
+									<dt>Known risk</dt>
+									<dd>{o.risk}</dd>
+								</div>
+								<div>
+									<dt>Scales</dt>
+									<dd>{o.scale}</dd>
+								</div>
+							</dl>
+
+							<span class="opt__bar" aria-hidden="true" />
+						</a>
+					))
+				}
+			</div>
+
+			<div class="marker mono cmp__marker">
+				<span class="marker__idx">§ 02</span>
+				<span class="marker__label">How we decide</span>
+				<span class="marker__count">8 TESTS</span>
+			</div>
+
+			<ol class="tests">
+				{
+					criteria.map(([k, name, note]) => (
+						<li class="test">
+							<span class="mono test__idx">{k}</span>
+							<span class="test__name">{name}</span>
+							<span class="test__note">{note}</span>
+						</li>
+					))
+				}
+			</ol>
+
+			<p class="mono cmp__note">
+				OUTCOME: ONE WINNER OR AN EXPLICIT HYBRID. RECORDED IN docs/plans/00-hub-architecture.md
+			</p>
+		</div>
+	</div>
+
+	<footer class="foot">
+		<div class="shell">
+			<div class="stripe foot__mark" aria-hidden="true">
+				<span></span><span></span><span></span>
+			</div>
+			<div class="foot__grid mono">
+				<span>COSMIC STRAWBERRY © 2026</span>
+				<span>HUB / PHASE 01 — EXPLORATION</span>
+				<span>◉ UNDECIDED</span>
+			</div>
+		</div>
+	</footer>
+</Proto>
+
+<style>
+	.cmp {
+		padding-block: 8rem var(--s-12);
+	}
+
+	.cmp__meta {
+		display: flex;
+		justify-content: space-between;
+		gap: var(--s-4);
+		flex-wrap: wrap;
+		padding-bottom: var(--s-2);
+	}
+
+	.cmp__word {
+		margin-block: var(--s-4) var(--s-3);
+		font-size: clamp(3rem, 11vw, 9rem);
+	}
+
+	.cmp__word span {
+		display: block;
+	}
+
+	.cmp__stripe {
+		--stripe-h: 16px;
+		max-width: 360px;
+	}
+
+	.cmp__lede {
+		margin-top: var(--s-4);
+		max-width: 48ch;
+		color: var(--fg-mute);
+	}
+
+	.cmp__marker {
+		margin-top: var(--s-12);
+	}
+
+	/* ---- option cards ---- */
+	.opts {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: var(--hair);
+		background: var(--rule);
+		border: var(--hair) solid var(--rule);
+	}
+
+	.opt {
+		background: var(--bg);
+		padding: var(--s-3);
+		display: flex;
+		flex-direction: column;
+		gap: var(--s-2);
+		position: relative;
+		transition: background-color 0.35s var(--ease);
+	}
+
+	.opt[data-accent="red"] {
+		--opt-accent: var(--cs-red);
+	}
+	.opt[data-accent="orange"] {
+		--opt-accent: var(--cs-orange);
+	}
+	.opt[data-accent="blue"] {
+		--opt-accent: var(--cs-blue);
+	}
+
+	.opt:hover,
+	.opt:focus-visible {
+		background: var(--bg-panel);
+		outline: none;
+	}
+
+	.opt__head {
+		display: flex;
+		justify-content: space-between;
+		gap: var(--s-2);
+		font-family: var(--mono);
+		text-transform: uppercase;
+		letter-spacing: 0.16em;
+		font-size: 0.7rem;
+		color: var(--fg-mute);
+	}
+
+	.opt__motion {
+		color: var(--fg-faint);
+	}
+
+	.opt__name {
+		margin: 0;
+		transition: color 0.3s var(--ease);
+	}
+
+	.opt:hover .opt__name {
+		color: var(--opt-accent);
+	}
+
+	.opt__thesis {
+		margin: 0;
+		font-size: 0.9375rem;
+		line-height: 1.55;
+		color: var(--fg-mute);
+		max-width: 46ch;
+	}
+
+	.opt__spec {
+		margin: auto 0 0;
+		display: flex;
+		flex-direction: column;
+		gap: var(--s-2);
+		padding-top: var(--s-2);
+		border-top: var(--hair) solid var(--rule);
+	}
+
+	.opt__spec dt {
+		color: var(--fg-faint);
+		margin-bottom: 6px;
+	}
+
+	.opt__spec dd {
+		margin: 0;
+		font-family: var(--sans);
+		text-transform: none;
+		letter-spacing: 0;
+		font-size: 0.875rem;
+		line-height: 1.5;
+		color: var(--fg-mute);
+		max-width: 46ch;
+	}
+
+	.opt__bar {
+		position: absolute;
+		inset: auto 0 0 0;
+		height: 4px;
+		background: var(--opt-accent);
+		transform: scaleX(0);
+		transform-origin: left center;
+		transition: transform 0.4s var(--ease);
+	}
+
+	.opt:hover .opt__bar,
+	.opt:focus-visible .opt__bar {
+		transform: scaleX(1);
+	}
+
+	/* ---- decision criteria ---- */
+	.tests {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		border-top: var(--hair) solid var(--rule-strong);
+	}
+
+	.test {
+		display: grid;
+		grid-template-columns: 3rem minmax(0, 16rem) minmax(0, 1fr);
+		gap: var(--s-3);
+		align-items: baseline;
+		padding-block: var(--s-2);
+		border-bottom: var(--hair) solid var(--rule);
+	}
+
+	.test__idx {
+		color: var(--fg-faint);
+	}
+
+	.test__name {
+		font-weight: 700;
+		font-stretch: 108%;
+		text-transform: uppercase;
+		font-size: 1rem;
+	}
+
+	.test__note {
+		font-size: 0.9375rem;
+		color: var(--fg-mute);
+	}
+
+	.cmp__note {
+		margin-top: var(--s-3);
+		color: var(--fg-faint);
+	}
+
+	@media (max-width: 900px) {
+		.opts {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.test {
+			grid-template-columns: 2.5rem minmax(0, 1fr);
+			row-gap: var(--s-1);
+		}
+
+		.test__note {
+			grid-column: 2;
+		}
+	}
+</style>

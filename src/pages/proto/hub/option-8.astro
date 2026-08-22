@@ -1,0 +1,524 @@
+---
+/**
+ * OPTION 8 — THE CONSOLE  (the two references combined)
+ *
+ * From Flor Keeps: a hairline frame filling the viewport that never moves.
+ * From DUB Studios: 2D movement — left/right through the items in a section,
+ * up/down between sections.
+ *
+ * The combination is the point. In 06 the chrome floats over a moving world;
+ * in 07 the frame is still but only ever holds one thing. Here the frame is
+ * still *and* the world moves in two directions under it, and the frame's own
+ * cells report on whatever is currently in the aperture.
+ */
+import Proto from "../../../layouts/Proto.astro";
+import SchemaMark from "../../../components/proto/SchemaMark.astro";
+import { projects } from "../../../data/projects";
+import { writing } from "../../../data/writing";
+import { lab } from "../../../data/lab";
+
+interface Cell {
+	idx: string;
+	title: string;
+	blurb: string;
+	meta: string;
+	kicker: string;
+	href: string | null;
+	external: boolean;
+	variant: "stack" | "orbit" | "trace" | "nozzle";
+	accent: string;
+	cta: string;
+}
+
+const rows: { num: string; name: string; cells: Cell[] }[] = [
+	{
+		num: "01",
+		name: "Projects",
+		cells: projects.map((p) => ({
+			idx: p.idx,
+			title: p.name,
+			blurb: p.blurb,
+			meta: `${p.host} · ${p.tags.join(" / ")}`,
+			kicker: p.keyword,
+			href: p.href,
+			external: true,
+			variant: p.variant,
+			accent: p.accent,
+			cta: "Launch ↗",
+		})),
+	},
+	{
+		num: "02",
+		name: "Writing",
+		cells: writing.map((w) => ({
+			idx: w.idx,
+			title: w.title,
+			blurb: w.blurb,
+			meta: `${w.date} · ${w.minutes} min · ${w.kind}`,
+			kicker: w.kind,
+			href: w.href,
+			external: false,
+			variant: w.variant,
+			accent: "orange",
+			cta: "Read →",
+		})),
+	},
+	{
+		num: "03",
+		name: "Lab",
+		cells: lab.map((l, i) => ({
+			idx: l.idx,
+			title: l.name,
+			blurb: l.note,
+			meta: l.state === "built" ? "Demo available" : "Sketched — not yet built",
+			kicker: l.state,
+			href: l.href,
+			external: false,
+			variant: (["trace", "stack", "orbit", "nozzle"] as const)[i % 4],
+			accent: "blue",
+			cta: "Run →",
+		})),
+	},
+];
+---
+
+<Proto title="Hub / Option 8 — Console" section="hub" motion={false}>
+	<div class="con" data-frame aria-label="Cosmic Strawberry hub">
+		<!-- ============ top band ============ -->
+		<header class="con__band">
+			<span class="con__mark mono">
+				<span class="stripe con__stripe" aria-hidden="true">
+					<span></span><span></span><span></span>
+				</span>
+				Cosmic Strawberry
+			</span>
+
+			<nav class="tabs mono" aria-label="Sections">
+				{
+					rows.map((r) => (
+						<button type="button" data-section-dot data-cursor="Show">
+							<span class="tabs__num">{r.num}</span>
+							<span class="tabs__name">{r.name}</span>
+						</button>
+					))
+				}
+			</nav>
+
+			<span class="con__count mono">
+				<span data-rail-index>01</span> / <span data-rail-total>04</span>
+			</span>
+		</header>
+
+		<div class="con__body">
+			<!-- ---- left cell: reports on whatever is in the aperture ---- -->
+			<div class="con__cell con__cell--read" data-live-root>
+				<span class="read__section mono">
+					<span data-rail-section-num>01</span>
+					<span data-rail-section>Projects</span>
+				</span>
+
+				<span class="read__kicker mono" data-live="kicker"></span>
+				<h2 class="read__title" data-live="title"></h2>
+				<p class="read__blurb" data-live="blurb"></p>
+				<span class="read__meta mono" data-live="meta"></span>
+
+				<div class="pager">
+					<button type="button" data-go-prev aria-label="Previous item" data-cursor="Back">←</button>
+					<button type="button" data-go-next aria-label="Next item" data-cursor="Forward">→</button>
+				</div>
+			</div>
+
+			<!-- ---- the aperture: a 2D world moving under a still frame ---- -->
+			<div class="con__cell con__cell--aperture">
+				<div class="deck" data-deck>
+					<div class="deck__world" data-world>
+						{
+							rows.map((r) => (
+								<div class="deck__row" data-row data-section={r.name} data-num={r.num}>
+									{r.cells.map((c) => {
+										const Tag = c.href ? "a" : "div";
+										return (
+											<Tag
+												class="plate"
+												data-cell
+												data-accent={c.accent}
+												data-title={c.title}
+												data-blurb={c.blurb}
+												data-meta={c.meta}
+												data-kicker={c.kicker}
+												href={c.href ?? undefined}
+												target={c.external ? "_blank" : undefined}
+												rel={c.external ? "noopener" : undefined}
+												data-cursor={c.href ? c.cta : undefined}
+											>
+												<span class="plate__top mono">
+													<span class="marker__idx">{c.idx}</span>
+													<span>{c.kicker}</span>
+												</span>
+
+												<span class="plate__fig">
+													<SchemaMark variant={c.variant} label={`${c.title} schematic`} />
+												</span>
+
+												<span class="plate__name">{c.title}</span>
+
+												{c.href && <span class="plate__cta mono">{c.cta}</span>}
+											</Tag>
+										);
+									})}
+								</div>
+							))
+						}
+					</div>
+
+					<!-- the aperture's cross-hairs: what is centred is what is selected -->
+					<span class="hair hair--v" aria-hidden="true"></span>
+					<span class="hair hair--h" aria-hidden="true"></span>
+				</div>
+			</div>
+		</div>
+
+		<!-- ============ bottom band ============ -->
+		<footer class="con__band con__band--foot mono">
+			<span>← → ITEMS</span>
+			<button class="con__down" type="button" data-go-down data-cursor="Next section">
+				↑ ↓ SECTIONS
+			</button>
+			<span>DRAG THE APERTURE</span>
+		</footer>
+	</div>
+</Proto>
+
+<script>
+	import { initDeck } from "../../../lib/proto/hub/deck";
+	initDeck();
+</script>
+
+<style>
+	/* ================= the frame ================= */
+	.con {
+		position: fixed;
+		inset: 4.25rem var(--gutter) var(--gutter);
+		display: flex;
+		flex-direction: column;
+		border: var(--hair) solid var(--rule-strong);
+		overflow: hidden;
+	}
+
+	.con__band {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--s-3);
+		padding: var(--s-2) var(--s-3);
+		border-bottom: var(--hair) solid var(--rule-strong);
+		flex: none;
+	}
+
+	.con__band--foot {
+		border-bottom: 0;
+		border-top: var(--hair) solid var(--rule-strong);
+		color: var(--fg-faint);
+	}
+
+	.con__mark {
+		display: flex;
+		align-items: center;
+		gap: var(--s-2);
+		color: var(--fg);
+	}
+
+	.con__stripe {
+		--stripe-h: 10px;
+		width: 44px;
+		flex: 0 0 44px;
+	}
+
+	.con__count {
+		color: var(--fg);
+	}
+
+	.con__down {
+		cursor: pointer;
+		color: var(--fg-faint);
+		font: inherit;
+		transition: color 0.25s var(--ease);
+	}
+
+	.con__down:hover {
+		color: var(--fg);
+	}
+
+	.tabs {
+		display: flex;
+		gap: var(--s-4);
+	}
+
+	.tabs button {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 6px;
+		cursor: pointer;
+		color: var(--fg-faint);
+		font-family: var(--mono);
+		text-transform: uppercase;
+		letter-spacing: 0.16em;
+		font-size: 0.7rem;
+		transition: color 0.3s var(--ease);
+	}
+
+	.tabs button:hover,
+	.tabs button.is-current {
+		color: var(--fg);
+	}
+
+	.tabs button.is-current .tabs__num {
+		color: var(--cs-red);
+	}
+
+	.tabs__num {
+		color: var(--fg-faint);
+	}
+
+	/* ================= the two cells ================= */
+	.con__body {
+		flex: 1;
+		display: grid;
+		grid-template-columns: minmax(0, 24rem) minmax(0, 1fr);
+		min-height: 0;
+	}
+
+	.con__cell {
+		min-height: 0;
+	}
+
+	/* ---- the reading cell, which never moves ---- */
+	.con__cell--read {
+		padding: var(--s-3);
+		border-right: var(--hair) solid var(--rule);
+		display: flex;
+		flex-direction: column;
+		gap: var(--s-2);
+	}
+
+	.con__cell--read[data-accent="red"] {
+		--read-accent: var(--cs-red);
+	}
+	.con__cell--read[data-accent="orange"] {
+		--read-accent: var(--cs-orange);
+	}
+	.con__cell--read[data-accent="blue"] {
+		--read-accent: var(--cs-blue);
+	}
+
+	.read__section {
+		display: flex;
+		gap: var(--s-1);
+		color: var(--fg-faint);
+		padding-bottom: var(--s-2);
+		border-bottom: var(--hair) solid var(--rule);
+	}
+
+	.read__kicker {
+		color: var(--read-accent, var(--fg-mute));
+		margin-top: var(--s-2);
+	}
+
+	.read__title {
+		margin: 0;
+		font-weight: 800;
+		font-stretch: 118%;
+		text-transform: uppercase;
+		letter-spacing: -0.02em;
+		line-height: 0.86;
+		font-size: clamp(2rem, 3.8vw, 3.5rem);
+		transition: color 0.4s var(--ease);
+	}
+
+	.read__blurb {
+		margin: 0;
+		font-size: 1rem;
+		line-height: 1.55;
+		color: var(--fg-mute);
+		max-width: 36ch;
+	}
+
+	.read__meta {
+		color: var(--fg-faint);
+	}
+
+	.pager {
+		margin-top: auto;
+		display: flex;
+		gap: var(--hair);
+	}
+
+	.pager button {
+		width: 38px;
+		height: 30px;
+		border: var(--hair) solid var(--rule-strong);
+		color: var(--fg);
+		cursor: pointer;
+		transition: background-color 0.25s var(--ease);
+	}
+
+	.pager button:hover {
+		background: var(--bg-panel);
+	}
+
+	/* ---- the aperture ---- */
+	.con__cell--aperture {
+		position: relative;
+		background: var(--bg-panel);
+		overflow: hidden;
+	}
+
+	.deck {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+		cursor: grab;
+		touch-action: none;
+	}
+
+	.deck.is-dragging {
+		cursor: grabbing;
+	}
+
+	.deck:focus-visible {
+		outline: none;
+	}
+
+	.deck__world {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		will-change: transform;
+	}
+
+	.deck__row {
+		flex: 0 0 100%;
+		display: flex;
+		align-items: center;
+		will-change: transform;
+	}
+
+	/* the cross-hairs are the join between the two references: the frame is
+	   still, and whatever the world puts in the middle of it is selected */
+	.hair {
+		position: absolute;
+		background: var(--rule-strong);
+		z-index: 4;
+		pointer-events: none;
+	}
+
+	.hair--v {
+		left: 50%;
+		top: 0;
+		bottom: 0;
+		width: var(--hair);
+	}
+
+	.hair--h {
+		top: 50%;
+		left: 0;
+		right: 0;
+		height: var(--hair);
+	}
+
+	/* ---- the plates that travel ---- */
+	.plate {
+		position: relative;
+		z-index: 5;
+		flex: 0 0 46%;
+		margin-inline: 2%;
+		display: flex;
+		flex-direction: column;
+		gap: var(--s-1);
+		padding: var(--s-2);
+		background: var(--bg);
+		border: var(--hair) solid var(--rule);
+		height: min(74%, 24rem);
+		opacity: 0.3;
+		transform: scale(0.92);
+		transition: opacity 0.6s var(--ease), transform 0.6s var(--ease),
+			border-color 0.6s var(--ease);
+	}
+
+	.plate[data-accent="red"] {
+		--plate-accent: var(--cs-red);
+	}
+	.plate[data-accent="orange"] {
+		--plate-accent: var(--cs-orange);
+	}
+	.plate[data-accent="blue"] {
+		--plate-accent: var(--cs-blue);
+	}
+
+	.plate.is-active {
+		opacity: 1;
+		transform: scale(1);
+		border-color: var(--plate-accent, var(--fg));
+	}
+
+	.plate__top {
+		display: flex;
+		justify-content: space-between;
+		gap: var(--s-2);
+		font-family: var(--mono);
+		text-transform: uppercase;
+		letter-spacing: 0.16em;
+		font-size: 0.7rem;
+		color: var(--fg-mute);
+	}
+
+	.plate__fig {
+		flex: 1;
+		display: grid;
+		place-items: center;
+		padding: var(--s-2) 0;
+		min-height: 0;
+	}
+
+	.plate__fig :global(.schema) {
+		height: 100%;
+		width: auto;
+		max-width: 100%;
+	}
+
+	.plate__name {
+		font-weight: 700;
+		font-stretch: 112%;
+		text-transform: uppercase;
+		letter-spacing: -0.01em;
+		line-height: 1;
+		font-size: clamp(1.125rem, 1.8vw, 1.6rem);
+	}
+
+	.plate__cta {
+		color: var(--plate-accent, var(--fg));
+	}
+
+	/* ================= narrow ================= */
+	@media (max-width: 1080px) {
+		.con__body {
+			grid-template-columns: minmax(0, 1fr);
+			grid-template-rows: auto minmax(0, 1fr);
+		}
+
+		.con__cell--read {
+			border-right: 0;
+			border-bottom: var(--hair) solid var(--rule);
+		}
+
+		.plate {
+			flex: 0 0 76%;
+			margin-inline: 3%;
+		}
+
+		.tabs__name {
+			display: none;
+		}
+	}
+</style>

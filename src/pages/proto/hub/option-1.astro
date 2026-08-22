@@ -1,0 +1,450 @@
+---
+/**
+ * OPTION 1 — MISSION CONTROL BOARD
+ * Everything on one screen. No scroll. Projects are instrument panels,
+ * writing is a ticker, lab is a strip of readouts.
+ * Phase 1: structure only, no motion.
+ */
+import Proto from "../../../layouts/Proto.astro";
+import { projects } from "../../../data/projects";
+import { writing } from "../../../data/writing";
+import { lab } from "../../../data/lab";
+---
+
+<Proto title="Hub / Option 1 — Mission Control" section="hub" motion={false}>
+	<div class="board">
+		<header class="board__head">
+			<div class="board__id">
+				<span class="stripe" aria-hidden="true"><span></span><span></span><span></span></span>
+				<h1 class="board__title">Cosmic Strawberry</h1>
+			</div>
+			<dl class="board__stat mono">
+				<div><dt>Projects</dt><dd>{projects.length}</dd></div>
+				<div><dt>Writing</dt><dd>{writing.length}</dd></div>
+				<div><dt>Lab</dt><dd>{lab.length}</dd></div>
+				<div><dt>Status</dt><dd>◉ Nominal</dd></div>
+			</dl>
+		</header>
+
+		<div class="board__grid">
+			<!-- PROJECTS — the instrument panels -->
+			<section class="bay" aria-labelledby="bay-projects">
+				<div class="bay__head mono">
+					<span class="marker__idx">01</span>
+					<span id="bay-projects" class="bay__name">Projects</span>
+					<span class="bay__count">{projects.length} ACTIVE</span>
+				</div>
+
+				<div class="panels">
+					{
+						projects.map((p) => (
+							<a
+								class="panel"
+								href={p.href}
+								data-accent={p.accent}
+								data-cursor="Launch ↗"
+								target="_blank"
+								rel="noopener"
+							>
+								<div class="panel__head mono">
+									<span class="marker__idx">{p.idx}</span>
+									<span class="panel__led" data-state={p.status} />
+								</div>
+								<h3 class="panel__name h3">{p.name}</h3>
+								<p class="panel__key">{p.keyword}</p>
+								<p class="panel__blurb">{p.blurb}</p>
+								<div class="panel__foot mono">
+									<span>{p.host}</span>
+									<span class="panel__go">↗</span>
+								</div>
+							</a>
+						))
+					}
+				</div>
+			</section>
+
+			<!-- WRITING — the ticker down the side -->
+			<section class="bay bay--side" aria-labelledby="bay-writing">
+				<div class="bay__head mono">
+					<span class="marker__idx">02</span>
+					<span id="bay-writing" class="bay__name">Writing</span>
+					<span class="bay__count">{writing.length}</span>
+				</div>
+
+				<ul class="ticker">
+					{
+						writing.map((w) => (
+							<li>
+								<a href={w.href} data-cursor="Read">
+									<span class="mono ticker__meta">
+										{w.date} / {w.minutes} MIN
+									</span>
+									<span class="ticker__title">{w.title}</span>
+									<span class="mono ticker__kind">{w.kind}</span>
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</section>
+		</div>
+
+		<!-- LAB — the readout strip -->
+		<section class="bay bay--strip" aria-labelledby="bay-lab">
+			<div class="bay__head mono">
+				<span class="marker__idx">03</span>
+				<span id="bay-lab" class="bay__name">Lab</span>
+				<span class="bay__count">{lab.filter((l) => l.state === "built").length} / {lab.length} BUILT</span>
+			</div>
+
+			<ul class="readouts">
+				{
+					lab.map((l) => (
+						<li class="readout" data-state={l.state}>
+							{l.href ? (
+								<a href={l.href} data-cursor="Run">
+									<span class="mono readout__idx">{l.idx}</span>
+									<span class="readout__name">{l.name}</span>
+								</a>
+							) : (
+								<span>
+									<span class="mono readout__idx">{l.idx}</span>
+									<span class="readout__name">{l.name}</span>
+								</span>
+							)}
+						</li>
+					))
+				}
+			</ul>
+		</section>
+	</div>
+</Proto>
+
+<style>
+	.board {
+		width: min(100% - (var(--gutter) * 2), var(--maxw));
+		margin-inline: auto;
+		/* the whole point of this option: one screen, and it has to fit. */
+		height: 100svh;
+		overflow: hidden;
+		padding-block: 5.5rem var(--s-2);
+		display: flex;
+		flex-direction: column;
+		gap: var(--s-2);
+	}
+
+	/* ---- head ---- */
+	.board__head {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: var(--s-4);
+		flex-wrap: wrap;
+		border-bottom: var(--hair) solid var(--rule-strong);
+		padding-bottom: var(--s-2);
+	}
+
+	.board__id {
+		display: flex;
+		align-items: center;
+		gap: var(--s-2);
+	}
+
+	.board__id .stripe {
+		--stripe-h: 26px;
+		width: 64px;
+		flex: 0 0 64px;
+	}
+
+	.board__title {
+		margin: 0;
+		font-weight: 800;
+		font-stretch: 118%;
+		text-transform: uppercase;
+		letter-spacing: -0.015em;
+		line-height: 0.9;
+		font-size: clamp(1.5rem, 3vw, 2.5rem);
+	}
+
+	.board__stat {
+		display: flex;
+		gap: var(--s-4);
+		margin: 0;
+	}
+
+	.board__stat div {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.board__stat dt {
+		color: var(--fg-faint);
+	}
+
+	.board__stat dd {
+		margin: 0;
+		color: var(--fg);
+		font-size: 0.9rem;
+	}
+
+	/* ---- bays ---- */
+	.board__grid {
+		flex: 1;
+		display: grid;
+		grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+		gap: var(--s-3);
+		min-height: 0;
+		overflow: hidden;
+	}
+
+	.bay {
+		display: flex;
+		flex-direction: column;
+		gap: var(--s-2);
+		min-height: 0;
+	}
+
+	.bay--side {
+		border-left: var(--hair) solid var(--rule);
+		padding-left: var(--s-3);
+	}
+
+	.bay__head {
+		display: flex;
+		align-items: baseline;
+		gap: var(--s-2);
+		padding-bottom: 6px;
+		border-bottom: var(--hair) solid var(--rule-strong);
+	}
+
+	.bay__name {
+		flex: 1;
+		color: var(--fg);
+	}
+
+	.bay__count {
+		color: var(--fg-faint);
+	}
+
+	/* ---- project panels ---- */
+	.panels {
+		flex: 1;
+		min-height: 0;
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		grid-auto-rows: minmax(0, 1fr);
+		gap: var(--hair);
+		background: var(--rule);
+		border: var(--hair) solid var(--rule);
+	}
+
+	.panel {
+		background: var(--bg);
+		padding: var(--s-2);
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		position: relative;
+		isolation: isolate;
+		overflow: hidden;
+		transition: background-color 0.3s var(--ease);
+	}
+
+	.panel::before {
+		content: "";
+		position: absolute;
+		inset: auto 0 0 0;
+		height: 3px;
+		background: var(--panel-accent);
+		transform: scaleX(0);
+		transform-origin: left center;
+		transition: transform 0.4s var(--ease);
+	}
+
+	.panel:hover::before,
+	.panel:focus-visible::before {
+		transform: scaleX(1);
+	}
+
+	.panel:hover,
+	.panel:focus-visible {
+		background: var(--bg-panel);
+		outline: none;
+	}
+
+	.panel[data-accent="red"] {
+		--panel-accent: var(--cs-red);
+	}
+	.panel[data-accent="orange"] {
+		--panel-accent: var(--cs-orange);
+	}
+	.panel[data-accent="blue"] {
+		--panel-accent: var(--cs-blue);
+	}
+
+	.panel__head {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		font-family: var(--mono);
+		text-transform: uppercase;
+		letter-spacing: 0.16em;
+		font-size: 0.7rem;
+		color: var(--fg-mute);
+	}
+
+	.panel__led {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: var(--panel-accent);
+	}
+
+	.panel__led[data-state="parked"] {
+		background: var(--fg-faint);
+	}
+
+	.panel__name {
+		margin: 0;
+	}
+
+	.panel__key {
+		margin: 0;
+		font-weight: 800;
+		font-stretch: 118%;
+		text-transform: uppercase;
+		line-height: 0.9;
+		letter-spacing: -0.02em;
+		font-size: clamp(1.5rem, 3vw, 2.75rem);
+		color: var(--panel-accent);
+	}
+
+	.panel__blurb {
+		margin: 0;
+		font-size: 0.8125rem;
+		line-height: 1.5;
+		color: var(--fg-mute);
+		max-width: 34ch;
+	}
+
+	.panel__foot {
+		margin-top: auto;
+		display: flex;
+		justify-content: space-between;
+		padding-top: var(--s-1);
+		border-top: var(--hair) solid var(--rule);
+		font-family: var(--mono);
+		text-transform: uppercase;
+		letter-spacing: 0.16em;
+		font-size: 0.7rem;
+		color: var(--fg-mute);
+	}
+
+	.panel__go {
+		color: var(--fg);
+	}
+
+	/* ---- writing ticker ---- */
+	.ticker {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		overflow-y: auto;
+	}
+
+	.ticker a {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		padding-block: var(--s-2);
+		border-bottom: var(--hair) solid var(--rule);
+	}
+
+	.ticker__meta {
+		color: var(--fg-faint);
+	}
+
+	.ticker__title {
+		font-weight: 700;
+		font-stretch: 108%;
+		text-transform: uppercase;
+		font-size: 1rem;
+		line-height: 1.05;
+	}
+
+	.ticker__kind {
+		color: var(--fg-mute);
+	}
+
+	.ticker a:hover .ticker__title {
+		color: var(--cs-red);
+	}
+
+	/* ---- lab strip ---- */
+	.readouts {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		gap: var(--hair);
+		background: var(--rule);
+		border: var(--hair) solid var(--rule);
+		overflow-x: auto;
+	}
+
+	.readout {
+		flex: 1 0 auto;
+		background: var(--bg);
+	}
+
+	.readout > * {
+		display: flex;
+		align-items: baseline;
+		gap: var(--s-1);
+		padding: var(--s-1) var(--s-2);
+		white-space: nowrap;
+	}
+
+	.readout__idx {
+		color: var(--fg-faint);
+	}
+
+	.readout__name {
+		font-size: 0.8125rem;
+		letter-spacing: 0.02em;
+	}
+
+	.readout[data-state="sketched"] .readout__name {
+		color: var(--fg-faint);
+	}
+
+	.readout a:hover {
+		background: var(--bg-panel);
+	}
+
+	/* ---- responsive: the single screen gives up and scrolls ---- */
+	@media (max-width: 1080px) {
+		.board {
+			height: auto;
+			overflow: visible;
+		}
+
+		.board__grid {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.bay--side {
+			border-left: 0;
+			padding-left: 0;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.panels {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+</style>

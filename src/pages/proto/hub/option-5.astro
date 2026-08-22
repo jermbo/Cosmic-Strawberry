@@ -1,0 +1,577 @@
+---
+/**
+ * OPTION 5 — ORBITAL FIELD
+ *
+ * The four flat options were documents. This one is a system: projects travel
+ * elliptical paths around a core and cross in front of and behind the
+ * wordmark. Depth is the whole argument, so this option gets motion.
+ *
+ * Orbits are derived from the project's index, which means a fifth project
+ * gets a path of its own with no hand-placing — the same rule the other
+ * options follow for rows.
+ */
+import Proto from "../../../layouts/Proto.astro";
+import SchemaMark from "../../../components/proto/SchemaMark.astro";
+import { projects } from "../../../data/projects";
+import { writing } from "../../../data/writing";
+import { lab } from "../../../data/lab";
+
+/** Each successive project takes a wider, slower, more steeply tilted path. */
+const orbitOf = (i: number, n: number) => ({
+	rx: 250 + i * 102,
+	ry: 88 + i * 27,
+	tilt: -20 + i * 15,
+	phase: (360 / n) * i + 24,
+	period: 42 + i * 13,
+	depth: 1 - i / Math.max(n, 1),
+});
+
+const orbits = projects.map((p, i) => ({ project: p, ...orbitOf(i, projects.length) }));
+---
+
+<Proto title="Hub / Option 5 — Orbital Field" section="hub">
+	<!-- ================= THE FIELD ================= -->
+	<section class="field" data-field>
+		<div class="field__chrome">
+			<div class="shell field__bar mono">
+				<span>COSMIC STRAWBERRY / SYSTEM VIEW</span>
+				<span class="field__readout" data-readout>
+					{projects.length} BODIES IN ORBIT — HOVER TO HOLD
+				</span>
+			</div>
+		</div>
+
+		<div class="field__stage" data-stage>
+			<div class="system" data-system>
+				<!-- drawn paths: the same ellipses the orbiters actually travel -->
+				{
+					orbits.map((o) => (
+						<i
+							class="path"
+							aria-hidden="true"
+							style={`--rx:${o.rx}px; --ry:${o.ry}px; --tilt:${o.tilt}deg`}
+						/>
+					))
+				}
+
+				<!-- the core -->
+				<div class="core" aria-hidden="true">
+					<svg class="schema" viewBox="0 0 200 200" data-fig>
+						<circle class="ln ln--faint" cx="100" cy="100" r="74" />
+						<circle class="ln" cx="100" cy="100" r="42" />
+						<circle class="ln ln--faint" cx="100" cy="100" r="18" />
+						<line class="ln ln--dash" x1="100" y1="6" x2="100" y2="194" />
+						<line class="ln ln--dash" x1="6" y1="100" x2="194" y2="100" />
+						<circle class="fill-red" cx="100" cy="58" r="4" />
+						<circle class="fill-orange" cx="142" cy="100" r="4" />
+						<circle class="fill-blue" cx="100" cy="142" r="4" />
+					</svg>
+				</div>
+
+				<!-- the wordmark the orbiters cross -->
+				<h1 class="field__word display" data-reveal="lines">
+					<span>Cosmic</span><span>Strawberry</span>
+				</h1>
+
+				<!-- the bodies -->
+				{
+					orbits.map((o) => (
+						<a
+							class="orbiter"
+							data-orbiter
+							data-rx={o.rx}
+							data-ry={o.ry}
+							data-tilt={o.tilt}
+							data-phase={o.phase}
+							data-period={o.period}
+							data-depth={o.depth.toFixed(2)}
+							data-accent={o.project.accent}
+							data-readout={`${o.project.idx} · ${o.project.name.toUpperCase()} — ${o.project.blurb}`}
+							data-cursor="Launch ↗"
+							href={o.project.href}
+							target="_blank"
+							rel="noopener"
+						>
+							<span class="orbiter__fig">
+								<SchemaMark variant={o.project.variant} label={`${o.project.name} schematic`} />
+							</span>
+							<span class="orbiter__plate">
+								<span class="mono orbiter__idx">{o.project.idx}</span>
+								<span class="orbiter__name">{o.project.name}</span>
+								<span class="mono orbiter__key">{o.project.keyword}</span>
+							</span>
+						</a>
+					))
+				}
+			</div>
+		</div>
+
+		<div class="field__foot">
+			<div class="shell field__legend mono">
+				<span>DRAG NOTHING — THE SYSTEM RUNS ON ITS OWN</span>
+				<span>SCROLL TO PASS THROUGH ↓</span>
+			</div>
+		</div>
+	</section>
+
+	<!-- ================= WRITING ================= -->
+	<section class="section section--tight stratum">
+		<div class="shell">
+			<div class="marker mono">
+				<span class="marker__idx">§ 01</span>
+				<span class="marker__label">Writing</span>
+				<span class="marker__count">{writing.length} PIECES</span>
+			</div>
+
+			<div class="band" style="margin-bottom: var(--s-8);">
+				<h2 class="h2" data-reveal="lines">Crossings</h2>
+				<p class="lede" data-reveal>
+					The projects orbit. These sit still — longer pieces about the systems above and
+					what changed them.
+				</p>
+			</div>
+
+			<div class="cards" data-stagger>
+				{
+					writing.map((w) => (
+						<a class="card" href={w.href} data-cursor="Open →">
+							<div class="card__head mono">
+								<span class="marker__idx">{w.idx}</span>
+								<span>{w.date}</span>
+							</div>
+
+							<div class="card__fig">
+								<SchemaMark variant={w.variant} label={`${w.title} schematic`} />
+							</div>
+
+							<div class="card__title">
+								<h3 class="h3">{w.title}</h3>
+								<p class="card__blurb mono">{w.blurb}</p>
+							</div>
+
+							<div class="card__foot mono">
+								<span>
+									{w.minutes} MIN / {w.kind}
+								</span>
+								<span class="card__go">
+									READ
+									<svg viewBox="0 0 14 8" fill="none" aria-hidden="true">
+										<path d="M0 4h12" stroke="currentColor" stroke-width="1" />
+										<path d="M9 1l3 3-3 3" stroke="currentColor" stroke-width="1" />
+									</svg>
+								</span>
+							</div>
+
+							<span class="card__bar" aria-hidden="true">
+								<i /><i /><i />
+							</span>
+						</a>
+					))
+				}
+			</div>
+		</div>
+	</section>
+
+	<!-- ================= LAB ================= -->
+	<section class="section section--tight">
+		<div class="shell">
+			<div class="marker mono">
+				<span class="marker__idx">§ 02</span>
+				<span class="marker__label">Lab</span>
+				<span class="marker__count">
+					{lab.filter((l) => l.state === "built").length} / {lab.length} BUILT
+				</span>
+			</div>
+
+			<ul class="bench" data-stagger>
+				{
+					lab.map((l) => (
+						<li class="bench__item" data-state={l.state}>
+							{l.href ? (
+								<a href={l.href} data-cursor="Run">
+									<span class="mono bench__idx">{l.idx}</span>
+									<span class="bench__name">{l.name}</span>
+									<span class="bench__note">{l.note}</span>
+								</a>
+							) : (
+								<span>
+									<span class="mono bench__idx">{l.idx}</span>
+									<span class="bench__name">{l.name}</span>
+									<span class="bench__note">{l.note}</span>
+								</span>
+							)}
+						</li>
+					))
+				}
+			</ul>
+		</div>
+	</section>
+
+	<!-- ================= FLAT INDEX ================= -->
+	<section class="section section--tight">
+		<div class="shell">
+			<div class="marker mono">
+				<span class="marker__idx">§ 03</span>
+				<span class="marker__label">Manifest</span>
+				<span class="marker__count">NO MOTION REQUIRED</span>
+			</div>
+
+			<ol class="manifest">
+				{
+					projects.map((p) => (
+						<li class="manifest__row">
+							<a href={p.href} target="_blank" rel="noopener" data-cursor="Launch ↗">
+								<span class="mono manifest__idx">{p.idx}</span>
+								<span class="manifest__name">{p.name}</span>
+								<span class="manifest__blurb">{p.blurb}</span>
+								<span class="mono manifest__host">{p.host} ↗</span>
+							</a>
+						</li>
+					))
+				}
+			</ol>
+		</div>
+	</section>
+
+	<footer class="foot">
+		<div class="shell">
+			<div class="stripe foot__mark" aria-hidden="true">
+				<span></span><span></span><span></span>
+			</div>
+			<div class="foot__grid mono">
+				<span>COSMIC STRAWBERRY © 2026</span>
+				<span>HUB / OPTION 05 — ORBITAL FIELD</span>
+				<span>◉ SYSTEM RUNNING</span>
+			</div>
+		</div>
+	</footer>
+</Proto>
+
+<script>
+	import { initOrbitField } from "../../../lib/proto/hub/orbit";
+
+	if (document.fonts?.ready) {
+		document.fonts.ready.then(initOrbitField);
+	} else {
+		initOrbitField();
+	}
+</script>
+
+<style>
+	/* ================= the field ================= */
+	.field {
+		position: relative;
+		min-height: 100svh;
+		display: flex;
+		flex-direction: column;
+		padding-top: 5.5rem;
+		overflow: hidden;
+	}
+
+	/* the deep background: a drafting grid, and it never moves */
+	.field::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		background-image: linear-gradient(var(--rule) var(--hair), transparent var(--hair)),
+			linear-gradient(90deg, var(--rule) var(--hair), transparent var(--hair));
+		background-size: 96px 96px;
+		opacity: 0.55;
+		pointer-events: none;
+	}
+
+	.field__bar,
+	.field__legend {
+		display: flex;
+		justify-content: space-between;
+		gap: var(--s-4);
+		padding-block: var(--s-2);
+	}
+
+	.field__bar {
+		border-bottom: var(--hair) solid var(--rule-strong);
+	}
+
+	.field__readout {
+		color: var(--fg);
+		text-align: right;
+		max-width: 62ch;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.field__legend {
+		border-top: var(--hair) solid var(--rule);
+		color: var(--fg-faint);
+	}
+
+	.field__chrome,
+	.field__foot {
+		position: relative;
+		z-index: 40;
+	}
+
+	/* ================= the stage ================= */
+	.field__stage {
+		flex: 1;
+		position: relative;
+		min-height: 34rem;
+	}
+
+	.system {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		width: 0;
+		height: 0;
+		transform: scale(var(--unit, 1));
+	}
+
+	/* drawn orbit paths */
+	.path {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: calc(var(--rx) * 2);
+		height: calc(var(--ry) * 2);
+		margin-left: calc(var(--rx) * -1);
+		margin-top: calc(var(--ry) * -1);
+		border: var(--hair) dashed var(--rule);
+		border-radius: 50%;
+		transform: rotate(var(--tilt));
+		z-index: 1;
+	}
+
+	/* the core */
+	.core {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 260px;
+		height: 260px;
+		margin: -130px 0 0 -130px;
+		z-index: 2;
+		opacity: 0.72;
+	}
+
+	/* the wordmark — orbiters pass in front of it and behind it */
+	.field__word {
+		position: absolute;
+		left: 0;
+		top: 0;
+		/* wide enough for the long word, never wider than the field */
+		width: min(88vw, 46rem);
+		margin: 0;
+		transform: translate(-50%, -50%);
+		text-align: center;
+		font-size: clamp(3rem, 8.5vw, 7.5rem);
+		z-index: 10;
+		pointer-events: none;
+	}
+
+	.field__word span {
+		display: block;
+	}
+
+	/* ================= the bodies ================= */
+	.orbiter {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 172px;
+		margin: -56px 0 0 -86px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 4px;
+		will-change: transform, opacity;
+		transition: filter 0.4s var(--ease);
+	}
+
+	.orbiter[data-accent="red"] {
+		--orb-accent: var(--cs-red);
+	}
+	.orbiter[data-accent="orange"] {
+		--orb-accent: var(--cs-orange);
+	}
+	.orbiter[data-accent="blue"] {
+		--orb-accent: var(--cs-blue);
+	}
+
+	.orbiter__fig {
+		display: block;
+		width: 108px;
+	}
+
+	.orbiter__plate {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 2px;
+		padding: 5px 10px;
+		background: var(--bg);
+		border: var(--hair) solid var(--rule-strong);
+		white-space: nowrap;
+		transition: border-color 0.3s var(--ease), background-color 0.3s var(--ease);
+	}
+
+	.orbiter__idx {
+		color: var(--fg-faint);
+	}
+
+	.orbiter__name {
+		font-weight: 700;
+		font-stretch: 110%;
+		text-transform: uppercase;
+		font-size: 0.9375rem;
+		line-height: 1;
+	}
+
+	.orbiter__key {
+		color: var(--orb-accent);
+	}
+
+	/* focus: the hovered body holds, the rest of the system stands down */
+	.field.is-focused .orbiter {
+		filter: opacity(0.32);
+	}
+
+	.field.is-focused .orbiter.is-focused {
+		filter: none;
+	}
+
+	.orbiter.is-focused .orbiter__plate {
+		border-color: var(--orb-accent);
+		background: var(--bg-panel);
+	}
+
+	.orbiter:focus-visible {
+		outline: var(--hair) solid var(--fg);
+		outline-offset: 8px;
+	}
+
+	/* ================= strata below ================= */
+	.stratum {
+		border-top: var(--hair) solid var(--rule-strong);
+	}
+
+	.card__blurb {
+		margin: 0.75rem 0 0;
+		letter-spacing: 0.06em;
+		text-transform: none;
+		line-height: 1.5;
+		font-size: 0.8rem;
+	}
+
+	.bench {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+		gap: var(--hair);
+		background: var(--rule);
+		border: var(--hair) solid var(--rule);
+	}
+
+	.bench__item {
+		background: var(--bg);
+	}
+
+	.bench__item > * {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		padding: var(--s-2);
+		height: 100%;
+	}
+
+	.bench__idx {
+		color: var(--fg-faint);
+	}
+
+	.bench__name {
+		font-weight: 700;
+		font-stretch: 108%;
+		text-transform: uppercase;
+		font-size: 1rem;
+		line-height: 1.05;
+	}
+
+	.bench__note {
+		font-size: 0.8125rem;
+		color: var(--fg-mute);
+	}
+
+	.bench__item[data-state="sketched"] .bench__name,
+	.bench__item[data-state="sketched"] .bench__note {
+		color: var(--fg-faint);
+	}
+
+	.bench__item a:hover {
+		background: var(--bg-panel);
+	}
+
+	/* the same four projects, with nothing moving */
+	.manifest {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		border-top: var(--hair) solid var(--rule-strong);
+	}
+
+	.manifest__row {
+		border-bottom: var(--hair) solid var(--rule);
+	}
+
+	.manifest__row a {
+		display: grid;
+		grid-template-columns: 3.5rem minmax(0, 12rem) minmax(0, 1fr) auto;
+		gap: var(--s-3);
+		align-items: baseline;
+		padding-block: var(--s-2);
+	}
+
+	.manifest__row a:hover {
+		color: var(--cs-red);
+	}
+
+	.manifest__idx,
+	.manifest__host {
+		color: var(--fg-faint);
+	}
+
+	.manifest__name {
+		font-weight: 700;
+		font-stretch: 108%;
+		text-transform: uppercase;
+		font-size: 1.0625rem;
+	}
+
+	.manifest__blurb {
+		font-size: 0.9375rem;
+		color: var(--fg-mute);
+	}
+
+	/* ================= responsive ================= */
+	@media (max-width: 900px) {
+		.field__readout {
+			display: none;
+		}
+
+		.field__stage {
+			min-height: 30rem;
+		}
+
+		.manifest__row a {
+			grid-template-columns: 3rem minmax(0, 1fr);
+			row-gap: var(--s-1);
+		}
+
+		.manifest__blurb,
+		.manifest__host {
+			grid-column: 2;
+		}
+	}
+</style>

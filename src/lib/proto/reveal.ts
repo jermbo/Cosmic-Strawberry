@@ -245,3 +245,16 @@ export function initPinned(): void {
 
 	if (chunks[0]) setStep(chunks[0].dataset.step ?? "");
 }
+
+/**
+ * The no-motion path. Pages that opt out of animation still have to look
+ * finished: stripes and rules default to scale 0, and reveal targets default
+ * to opacity 0, both waiting on GSAP that is never going to run.
+ */
+export function settle(root: ParentNode = document): void {
+	root.querySelectorAll(".stripe").forEach((s) => s.classList.add("is-set"));
+	root.querySelectorAll(".rule").forEach((r) => r.classList.add("is-set"));
+	root.querySelectorAll<HTMLElement>("[data-reveal], [data-fig]").forEach((n) => {
+		n.style.opacity = "1";
+	});
+}

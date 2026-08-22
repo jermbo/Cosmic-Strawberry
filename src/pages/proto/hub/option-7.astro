@@ -1,0 +1,547 @@
+---
+/**
+ * OPTION 7 — VITRINE  (close translation of the Flor Keeps reference)
+ *
+ * One hairline frame filling the viewport, and it never moves. Header band,
+ * three cells, footer band. Sections are switched from the frame's own top
+ * band; specimens are traversed left and right inside the stage.
+ *
+ * Nothing scrolls. That is the whole point — the chrome is constant rather
+ * than merely repeated, which is what lets an internal page inherit the exact
+ * same frame with the stage given over to body copy.
+ */
+import Proto from "../../../layouts/Proto.astro";
+import SchemaMark from "../../../components/proto/SchemaMark.astro";
+import { projects } from "../../../data/projects";
+import { writing } from "../../../data/writing";
+import { lab } from "../../../data/lab";
+
+interface Specimen {
+	idx: string;
+	title: string;
+	kicker: string;
+	blurb: string;
+	meta: string;
+	href: string | null;
+	external: boolean;
+	variant: "stack" | "orbit" | "trace" | "nozzle";
+	accent: string;
+	cta: string;
+}
+
+const cases: { num: string; name: string; note: string; items: Specimen[] }[] = [
+	{
+		num: "01",
+		name: "Projects",
+		note: "Running on their own subdomains — each one its own build, its own life after launch.",
+		items: projects.map((p) => ({
+			idx: p.idx,
+			title: p.name,
+			kicker: p.keyword,
+			blurb: p.blurb,
+			meta: `${p.host} · ${p.tags.join(" / ")}`,
+			href: p.href,
+			external: true,
+			variant: p.variant,
+			accent: p.accent,
+			cta: "Launch",
+		})),
+	},
+	{
+		num: "02",
+		name: "Writing",
+		note: "Passages between two states — a system before and after the thing that changed it.",
+		items: writing.map((w) => ({
+			idx: w.idx,
+			title: w.title,
+			kicker: w.kind,
+			blurb: w.blurb,
+			meta: `${w.date} · ${w.minutes} min read`,
+			href: w.href,
+			external: false,
+			variant: w.variant,
+			accent: "orange",
+			cta: "Read",
+		})),
+	},
+	{
+		num: "03",
+		name: "Lab",
+		note: "Small motion studies. One idea each, no long-form attached.",
+		items: lab.map((l, i) => ({
+			idx: l.idx,
+			title: l.name,
+			kicker: l.state,
+			blurb: l.note,
+			meta: l.state === "built" ? "Demo available" : "Sketched — not yet built",
+			href: l.href,
+			external: false,
+			variant: (["stack", "trace", "orbit", "nozzle"] as const)[i % 4],
+			accent: "blue",
+			cta: "Run",
+		})),
+	},
+];
+---
+
+<Proto title="Hub / Option 7 — Vitrine" section="hub" motion={false}>
+	<div class="vit" data-vitrine aria-label="Cosmic Strawberry hub">
+		<!-- ============ top band ============ -->
+		<header class="vit__band">
+			<span class="vit__mark mono">
+				<span class="stripe vit__stripe" aria-hidden="true">
+					<span></span><span></span><span></span>
+				</span>
+				Cosmic Strawberry
+			</span>
+
+			<nav class="tabs mono" aria-label="Sections">
+				{
+					cases.map((c) => (
+						<button type="button" data-tab data-cursor="Show">
+							<span class="tabs__num">{c.num}</span>
+							<span class="tabs__name">{c.name}</span>
+						</button>
+					))
+				}
+			</nav>
+
+			<span class="vit__count mono" data-counter>01 / 04</span>
+		</header>
+
+		<!-- ============ the three cells ============ -->
+		<div class="vit__body">
+			<!-- left: the index of the current case -->
+			<div class="vit__cell vit__cell--index">
+				<p class="vit__note" data-note></p>
+
+				{
+					cases.map((c) => (
+						<div class="index" data-index-group>
+							<ol class="index__list mono">
+								{c.items.map((s) => (
+									<li>
+										<button type="button" data-entry data-cursor="Show">
+											<span class="index__idx">{s.idx}</span>
+											<span class="index__title">{s.title}</span>
+										</button>
+									</li>
+								))}
+							</ol>
+						</div>
+					))
+				}
+			</div>
+
+			<!-- centre: exactly one specimen -->
+			<div class="vit__cell vit__cell--stage" data-stage>
+				{
+					cases.map((c) => (
+						<div class="stage-group" data-case data-note={c.note}>
+						{c.items.map((s) => (
+							<article class="stage" data-slide data-title={s.title} data-accent={s.accent}>
+								<span class="stage__kicker mono" data-line>
+									{s.kicker}
+								</span>
+
+								<div class="stage__fig" data-line>
+									<SchemaMark variant={s.variant} label={`${s.title} schematic`} />
+								</div>
+
+								<h2 class="stage__title" data-line>
+									{s.title}
+								</h2>
+
+								<p class="stage__blurb" data-line>
+									{s.blurb}
+								</p>
+
+								<div class="stage__foot mono" data-line>
+									<span>{s.meta}</span>
+									{s.href ? (
+										<a
+											class="stage__cta"
+											href={s.href}
+											target={s.external ? "_blank" : undefined}
+											rel={s.external ? "noopener" : undefined}
+											data-cursor={s.cta}
+										>
+											{s.cta} {s.external ? "↗" : "→"}
+										</a>
+									) : (
+										<span class="stage__cta stage__cta--off">Not built</span>
+									)}
+								</div>
+							</article>
+						))}
+						</div>
+					))
+				}
+			</div>
+
+			<!-- right: what is next -->
+			<div class="vit__cell vit__cell--aside mono">
+				<span class="aside__label">Next</span>
+				<span class="aside__peek" data-peek></span>
+
+				<div class="pager">
+					<button type="button" data-prev aria-label="Previous" data-cursor="Back">←</button>
+					<button type="button" data-next aria-label="Next" data-cursor="Forward">→</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- ============ bottom band ============ -->
+		<footer class="vit__band vit__band--foot mono">
+			<span>← → SPECIMENS · ↑ ↓ SECTIONS</span>
+			<span class="vit__hint">DRAG THE STAGE</span>
+			<span>COSMIC STRAWBERRY © 2026</span>
+		</footer>
+	</div>
+</Proto>
+
+<script>
+	import { initVitrine } from "../../../lib/proto/hub/vitrine";
+	initVitrine();
+</script>
+
+<style>
+	/* ================= the frame ================= */
+	.vit {
+		position: fixed;
+		inset: 4.25rem var(--gutter) var(--gutter);
+		display: flex;
+		flex-direction: column;
+		border: var(--hair) solid var(--rule-strong);
+		overflow: hidden;
+	}
+
+	.vit:focus-visible {
+		outline: none;
+	}
+
+	.vit__band {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--s-3);
+		padding: var(--s-2) var(--s-3);
+		border-bottom: var(--hair) solid var(--rule-strong);
+		flex: none;
+	}
+
+	.vit__band--foot {
+		border-bottom: 0;
+		border-top: var(--hair) solid var(--rule-strong);
+		color: var(--fg-faint);
+	}
+
+	.vit__mark {
+		display: flex;
+		align-items: center;
+		gap: var(--s-2);
+		color: var(--fg);
+	}
+
+	.vit__stripe {
+		--stripe-h: 10px;
+		width: 44px;
+		flex: 0 0 44px;
+	}
+
+	.vit__count {
+		color: var(--fg);
+	}
+
+	.vit__hint {
+		color: var(--fg-faint);
+	}
+
+	/* ---- section tabs ---- */
+	.tabs {
+		display: flex;
+		gap: var(--s-4);
+	}
+
+	.tabs button {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 6px;
+		cursor: pointer;
+		color: var(--fg-faint);
+		font-family: var(--mono);
+		text-transform: uppercase;
+		letter-spacing: 0.16em;
+		font-size: 0.7rem;
+		transition: color 0.3s var(--ease);
+	}
+
+	.tabs button:hover,
+	.tabs button.is-current {
+		color: var(--fg);
+	}
+
+	.tabs button.is-current .tabs__num {
+		color: var(--cs-red);
+	}
+
+	.tabs__num {
+		color: var(--fg-faint);
+	}
+
+	/* ================= the cells ================= */
+	.vit__body {
+		flex: 1;
+		display: grid;
+		grid-template-columns: minmax(0, 19rem) minmax(0, 1fr) minmax(0, 12rem);
+		min-height: 0;
+	}
+
+	.vit__cell {
+		padding: var(--s-3);
+		min-height: 0;
+	}
+
+	.vit__cell--index {
+		border-right: var(--hair) solid var(--rule);
+		display: flex;
+		flex-direction: column;
+		gap: var(--s-3);
+		overflow-y: auto;
+	}
+
+	.vit__cell--aside {
+		border-left: var(--hair) solid var(--rule);
+		display: flex;
+		flex-direction: column;
+		gap: var(--s-1);
+	}
+
+	.vit__note {
+		margin: 0;
+		font-size: 0.9375rem;
+		line-height: 1.55;
+		color: var(--fg-mute);
+	}
+
+	/* ---- the index ---- */
+	.index {
+		display: none;
+	}
+
+	.index.is-current {
+		display: block;
+		margin-top: auto;
+	}
+
+	.index__list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		border-top: var(--hair) solid var(--rule);
+	}
+
+	.index__list li {
+		border-bottom: var(--hair) solid var(--rule);
+	}
+
+	.index__list button {
+		display: flex;
+		gap: var(--s-2);
+		width: 100%;
+		text-align: left;
+		padding: 11px 0;
+		cursor: pointer;
+		font-family: var(--mono);
+		text-transform: uppercase;
+		letter-spacing: 0.14em;
+		font-size: 0.7rem;
+		color: var(--fg-mute);
+		transition: color 0.25s var(--ease), padding-left 0.25s var(--ease);
+	}
+
+	.index__list button:hover {
+		color: var(--fg);
+		padding-left: 6px;
+	}
+
+	.index__list button.is-current {
+		color: var(--fg);
+	}
+
+	.index__list button.is-current .index__idx {
+		color: var(--cs-red);
+	}
+
+	.index__idx {
+		flex: 0 0 2.5rem;
+		color: var(--fg-faint);
+	}
+
+	/* every case's slides occupy the same stage cell */
+	.stage-group {
+		grid-area: 1 / 1;
+		display: grid;
+		min-height: 0;
+	}
+
+	/* ================= the stage ================= */
+	.vit__cell--stage {
+		position: relative;
+		background: var(--bg-panel);
+		display: grid;
+		padding: 0;
+		cursor: grab;
+	}
+
+	.vit__cell--stage:active {
+		cursor: grabbing;
+	}
+
+	.stage {
+		grid-area: 1 / 1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: var(--s-2);
+		padding: var(--s-4) var(--s-4);
+		text-align: center;
+		visibility: hidden;
+		opacity: 0;
+		min-height: 0;
+	}
+
+	.stage.is-current {
+		visibility: visible;
+		opacity: 1;
+	}
+
+	.stage[data-accent="red"] {
+		--stage-accent: var(--cs-red);
+	}
+	.stage[data-accent="orange"] {
+		--stage-accent: var(--cs-orange);
+	}
+	.stage[data-accent="blue"] {
+		--stage-accent: var(--cs-blue);
+	}
+
+	.stage__kicker {
+		color: var(--stage-accent, var(--fg-mute));
+	}
+
+	/* height-constrained, so the specimen can never crowd the title */
+	.stage__fig {
+		height: clamp(5rem, 20vh, 11rem);
+		display: grid;
+		place-items: center;
+	}
+
+	.stage__fig :global(.schema) {
+		height: 100%;
+		width: auto;
+		max-width: 100%;
+	}
+
+	.stage__title {
+		margin: 0;
+		font-weight: 800;
+		font-stretch: 118%;
+		text-transform: uppercase;
+		letter-spacing: -0.018em;
+		line-height: 0.88;
+		font-size: clamp(2rem, 5vw, 4.5rem);
+	}
+
+	.stage__blurb {
+		margin: 0;
+		max-width: 46ch;
+		font-size: 1rem;
+		line-height: 1.55;
+		color: var(--fg-mute);
+	}
+
+	.stage__foot {
+		margin-top: var(--s-2);
+		display: flex;
+		align-items: center;
+		gap: var(--s-3);
+		flex-wrap: wrap;
+		justify-content: center;
+		padding-top: var(--s-2);
+		border-top: var(--hair) solid var(--rule);
+		width: min(100%, 42rem);
+	}
+
+	.stage__cta {
+		color: var(--fg);
+		border-bottom: var(--hair) solid var(--stage-accent, var(--fg));
+		padding-bottom: 2px;
+	}
+
+	.stage__cta--off {
+		color: var(--fg-faint);
+		border-bottom-color: transparent;
+	}
+
+	/* ================= right cell ================= */
+	.aside__label {
+		color: var(--fg-faint);
+	}
+
+	.aside__peek {
+		font-family: var(--sans);
+		font-weight: 700;
+		font-stretch: 108%;
+		text-transform: uppercase;
+		letter-spacing: -0.005em;
+		font-size: 1.125rem;
+		line-height: 1.05;
+		color: var(--fg);
+	}
+
+	.pager {
+		margin-top: auto;
+		display: flex;
+		gap: var(--hair);
+	}
+
+	.pager button {
+		width: 38px;
+		height: 30px;
+		border: var(--hair) solid var(--rule-strong);
+		color: var(--fg);
+		cursor: pointer;
+		transition: background-color 0.25s var(--ease);
+	}
+
+	.pager button:hover {
+		background: var(--bg);
+	}
+
+	/* ================= narrow ================= */
+	@media (max-width: 1080px) {
+		.vit__body {
+			grid-template-columns: minmax(0, 1fr);
+			grid-template-rows: minmax(0, 1fr) auto;
+		}
+
+		.vit__cell--index,
+		.vit__cell--aside {
+			display: none;
+		}
+
+		.vit__cell--stage {
+			grid-row: 1;
+		}
+
+		.tabs {
+			gap: var(--s-2);
+		}
+
+		.tabs__name {
+			display: none;
+		}
+	}
+</style>

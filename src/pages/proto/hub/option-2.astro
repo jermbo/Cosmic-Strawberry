@@ -1,0 +1,419 @@
+---
+/**
+ * OPTION 2 — SINGLE-SCROLL MANIFEST
+ * One long document. Projects lead, writing follows, lab closes.
+ * Closest to the existing /proto rhythm. Phase 1: structure only, no motion.
+ */
+import Proto from "../../../layouts/Proto.astro";
+import SchemaMark from "../../../components/proto/SchemaMark.astro";
+import { projects } from "../../../data/projects";
+import { writing } from "../../../data/writing";
+import { lab } from "../../../data/lab";
+---
+
+<Proto title="Hub / Option 2 — Manifest" section="hub" motion={false}>
+	<!-- ===== MASTHEAD ===== -->
+	<section class="mast">
+		<div class="shell">
+			<div class="mast__meta mono">
+				<span>COSMIC STRAWBERRY / WORKS INDEX</span>
+				<span>{projects.length} PROJECTS · {writing.length} PIECES · {lab.length} STUDIES</span>
+			</div>
+			<div class="rule"></div>
+
+			<h1 class="display mast__word"><span>Every</span><span>Thing</span></h1>
+
+			<div class="stripe mast__stripe" aria-hidden="true">
+				<span></span><span></span><span></span>
+			</div>
+
+			<p class="lede mast__lede">
+				Four things running, a notebook, and a shelf of experiments. Everything is on this
+				page — you should never have to guess where the work is.
+			</p>
+		</div>
+	</section>
+
+	<!-- ===== PROJECTS ===== -->
+	<section class="section section--tight">
+		<div class="shell">
+			<div class="marker mono">
+				<span class="marker__idx">§ 01</span>
+				<span class="marker__label">Projects</span>
+				<span class="marker__count">{projects.length} LIVE</span>
+			</div>
+
+			<ol class="works">
+				{
+					projects.map((p) => (
+						<li class="work" data-accent={p.accent}>
+							<a class="work__link" href={p.href} target="_blank" rel="noopener" data-cursor="Launch ↗">
+								<span class="mono work__idx">{p.idx}</span>
+
+								<span class="work__body">
+									<span class="work__name">{p.name}</span>
+									<span class="work__blurb">{p.blurb}</span>
+								</span>
+
+								<span class="mono work__tags">
+									{p.tags.map((t) => (
+										<span class="tag">{t}</span>
+									))}
+								</span>
+
+								<span class="mono work__host">
+									{p.host}
+									<span class="work__arrow">↗</span>
+								</span>
+							</a>
+						</li>
+					))
+				}
+			</ol>
+
+			<p class="mono works__note">
+				NEW PROJECTS APPEND HERE — THE ROW IS THE UNIT, THE LIST HAS NO CEILING.
+			</p>
+		</div>
+	</section>
+
+	<!-- ===== WRITING ===== -->
+	<section class="section">
+		<div class="shell">
+			<div class="marker mono">
+				<span class="marker__idx">§ 02</span>
+				<span class="marker__label">Writing</span>
+				<span class="marker__count">{writing.length} PIECES</span>
+			</div>
+
+			<div class="band" style="margin-bottom: var(--s-8);">
+				<h2 class="h2">Crossings</h2>
+				<p class="lede">
+					Longer pieces. Each one is a passage between two states — a system before and after
+					the thing that changed it.
+				</p>
+			</div>
+
+			<div class="cards">
+				{
+					writing.map((w) => (
+						<a class="card" href={w.href} data-cursor="Open →">
+							<div class="card__head mono">
+								<span class="marker__idx">{w.idx}</span>
+								<span>{w.date}</span>
+							</div>
+
+							<div class="card__fig">
+								<SchemaMark variant={w.variant} label={`${w.title} schematic`} />
+							</div>
+
+							<div class="card__title">
+								<h3 class="h3">{w.title}</h3>
+								<p class="card__blurb mono">{w.blurb}</p>
+							</div>
+
+							<div class="card__foot mono">
+								<span>
+									{w.minutes} MIN / {w.kind}
+								</span>
+								<span class="card__go">
+									READ
+									<svg viewBox="0 0 14 8" fill="none" aria-hidden="true">
+										<path d="M0 4h12" stroke="currentColor" stroke-width="1" />
+										<path d="M9 1l3 3-3 3" stroke="currentColor" stroke-width="1" />
+									</svg>
+								</span>
+							</div>
+
+							<span class="card__bar" aria-hidden="true">
+								<i /><i /><i />
+							</span>
+						</a>
+					))
+				}
+			</div>
+		</div>
+	</section>
+
+	<!-- ===== LAB ===== -->
+	<section class="section section--tight">
+		<div class="shell">
+			<div class="marker mono">
+				<span class="marker__idx">§ 03</span>
+				<span class="marker__label">Lab</span>
+				<span class="marker__count">
+					{lab.filter((l) => l.state === "built").length} / {lab.length} BUILT
+				</span>
+			</div>
+
+			<ul class="bench">
+				{
+					lab.map((l) => (
+						<li class="bench__item" data-state={l.state}>
+							{l.href ? (
+								<a href={l.href} data-cursor="Run">
+									<span class="mono bench__idx">{l.idx}</span>
+									<span class="bench__name">{l.name}</span>
+									<span class="bench__note">{l.note}</span>
+								</a>
+							) : (
+								<span>
+									<span class="mono bench__idx">{l.idx}</span>
+									<span class="bench__name">{l.name}</span>
+									<span class="bench__note">{l.note}</span>
+								</span>
+							)}
+						</li>
+					))
+				}
+			</ul>
+		</div>
+	</section>
+
+	<footer class="foot">
+		<div class="shell">
+			<div class="stripe foot__mark" aria-hidden="true">
+				<span></span><span></span><span></span>
+			</div>
+			<div class="foot__grid mono">
+				<span>COSMIC STRAWBERRY © 2026</span>
+				<span>HUB / OPTION 02 — MANIFEST</span>
+				<span>◉ SIGNAL NOMINAL</span>
+			</div>
+		</div>
+	</footer>
+</Proto>
+
+<style>
+	/* ---- masthead ---- */
+	.mast {
+		padding-block: 9rem var(--s-8);
+	}
+
+	.mast__meta {
+		display: flex;
+		justify-content: space-between;
+		gap: var(--s-4);
+		flex-wrap: wrap;
+		padding-bottom: var(--s-2);
+	}
+
+	.mast__word {
+		margin-block: var(--s-4) var(--s-3);
+	}
+
+	.mast__word span {
+		display: block;
+	}
+
+	.mast__stripe {
+		--stripe-h: 18px;
+		max-width: 420px;
+	}
+
+	.mast__lede {
+		margin-top: var(--s-4);
+		max-width: 46ch;
+		color: var(--fg-mute);
+	}
+
+	/* ---- project rows ---- */
+	.works {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		border-top: var(--hair) solid var(--rule-strong);
+	}
+
+	.work {
+		border-bottom: var(--hair) solid var(--rule);
+	}
+
+	.work[data-accent="red"] {
+		--work-accent: var(--cs-red);
+	}
+	.work[data-accent="orange"] {
+		--work-accent: var(--cs-orange);
+	}
+	.work[data-accent="blue"] {
+		--work-accent: var(--cs-blue);
+	}
+
+	.work__link {
+		display: grid;
+		grid-template-columns: 4rem minmax(0, 1fr) auto auto;
+		align-items: center;
+		gap: var(--s-3);
+		padding-block: var(--s-3);
+		position: relative;
+		transition: padding-left 0.4s var(--ease);
+	}
+
+	.work__link::before {
+		content: "";
+		position: absolute;
+		left: 0;
+		top: 0;
+		bottom: 0;
+		width: 3px;
+		background: var(--work-accent);
+		transform: scaleY(0);
+		transform-origin: top center;
+		transition: transform 0.4s var(--ease);
+	}
+
+	.work__link:hover::before,
+	.work__link:focus-visible::before {
+		transform: scaleY(1);
+	}
+
+	.work__link:hover,
+	.work__link:focus-visible {
+		padding-left: var(--s-2);
+		outline: none;
+	}
+
+	.work__idx {
+		color: var(--fg-faint);
+		align-self: start;
+		padding-top: 0.4rem;
+	}
+
+	.work__body {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.work__name {
+		font-weight: 800;
+		font-stretch: 114%;
+		text-transform: uppercase;
+		letter-spacing: -0.012em;
+		line-height: 0.95;
+		font-size: clamp(1.75rem, 4vw, 3.25rem);
+		transition: color 0.3s var(--ease);
+	}
+
+	.work__link:hover .work__name {
+		color: var(--work-accent);
+	}
+
+	.work__blurb {
+		font-size: 0.9375rem;
+		line-height: 1.5;
+		color: var(--fg-mute);
+		max-width: 52ch;
+	}
+
+	.work__tags {
+		display: flex;
+		gap: var(--s-1);
+		flex-wrap: wrap;
+		justify-content: flex-end;
+		max-width: 16rem;
+	}
+
+	.tag {
+		border: var(--hair) solid var(--rule-strong);
+		padding: 5px 8px;
+		color: var(--fg-mute);
+	}
+
+	.work__host {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--s-1);
+		color: var(--fg);
+		white-space: nowrap;
+	}
+
+	.work__arrow {
+		display: inline-block;
+		transition: transform 0.35s var(--ease);
+	}
+
+	.work__link:hover .work__arrow {
+		transform: translate(3px, -3px);
+	}
+
+	.works__note {
+		margin-top: var(--s-3);
+		color: var(--fg-faint);
+	}
+
+	/* ---- writing card blurb (matches /proto's inline style, hoisted) ---- */
+	.card__blurb {
+		margin: 0.75rem 0 0;
+		letter-spacing: 0.06em;
+		text-transform: none;
+		line-height: 1.5;
+		font-size: 0.8rem;
+	}
+
+	/* ---- lab bench ---- */
+	.bench {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+		gap: var(--hair);
+		background: var(--rule);
+		border: var(--hair) solid var(--rule);
+	}
+
+	.bench__item {
+		background: var(--bg);
+	}
+
+	.bench__item > * {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		padding: var(--s-2);
+		height: 100%;
+	}
+
+	.bench__idx {
+		color: var(--fg-faint);
+	}
+
+	.bench__name {
+		font-weight: 700;
+		font-stretch: 108%;
+		text-transform: uppercase;
+		font-size: 1rem;
+		line-height: 1.05;
+	}
+
+	.bench__note {
+		font-size: 0.8125rem;
+		color: var(--fg-mute);
+	}
+
+	.bench__item[data-state="sketched"] {
+		color: var(--fg-faint);
+	}
+
+	.bench__item[data-state="sketched"] .bench__name,
+	.bench__item[data-state="sketched"] .bench__note {
+		color: var(--fg-faint);
+	}
+
+	.bench__item a:hover {
+		background: var(--bg-panel);
+	}
+
+	@media (max-width: 900px) {
+		.work__link {
+			grid-template-columns: 3rem minmax(0, 1fr);
+		}
+
+		.work__tags,
+		.work__host {
+			grid-column: 2;
+			justify-content: flex-start;
+		}
+	}
+</style>

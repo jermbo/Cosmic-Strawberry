@@ -1,0 +1,715 @@
+---
+/**
+ * OPTION 6 — THE DECK  (close translation of the DUB Studios reference)
+ *
+ * Full viewport, nothing scrolls. Chrome is fixed: wordmark, section rail,
+ * counter, drag control. The world moves under it.
+ *
+ *   left / right  →  items inside a section
+ *   up   / down   →  section to section
+ *
+ * Which is exactly the hub's IA: distinct sections, one page, traversed
+ * rather than scrolled. Each item alternates which side its figure sits on,
+ * and a ghosted word sits behind the whole cell.
+ */
+import Proto from "../../../layouts/Proto.astro";
+import SchemaMark from "../../../components/proto/SchemaMark.astro";
+import { projects } from "../../../data/projects";
+import { writing } from "../../../data/writing";
+import { lab } from "../../../data/lab";
+
+interface Cell {
+	idx: string;
+	kicker: string;
+	title: string;
+	blurb: string;
+	meta: string;
+	byline: string;
+	href: string | null;
+	external: boolean;
+	variant: "stack" | "orbit" | "trace" | "nozzle";
+	accent: string;
+	ghost: string;
+	cta: string;
+}
+
+const rows: { num: string; name: string; cells: Cell[] }[] = [
+	{
+		num: "01",
+		name: "Projects",
+		cells: projects.map((p) => ({
+			idx: p.idx,
+			kicker: "project",
+			title: p.name,
+			blurb: p.blurb,
+			meta: p.tags.join(" / "),
+			byline: p.host,
+			href: p.href,
+			external: true,
+			variant: p.variant,
+			accent: p.accent,
+			ghost: p.keyword,
+			cta: "Launch",
+		})),
+	},
+	{
+		num: "02",
+		name: "Writing",
+		cells: writing.map((w) => ({
+			idx: w.idx,
+			kicker: w.kind.toLowerCase(),
+			title: w.title,
+			blurb: w.blurb,
+			meta: `${w.minutes} min`,
+			byline: w.date,
+			href: w.href,
+			external: false,
+			variant: w.variant,
+			accent: "orange",
+			ghost: w.kind,
+			cta: "Read",
+		})),
+	},
+	{
+		num: "03",
+		name: "Lab",
+		cells: lab.map((l, i) => ({
+			idx: l.idx,
+			kicker: "study",
+			title: l.name,
+			blurb: l.note,
+			meta: l.state,
+			byline: l.state === "built" ? "demo up" : "on paper",
+			href: l.href,
+			external: false,
+			variant: (["trace", "stack", "orbit", "nozzle"] as const)[i % 4],
+			accent: "blue",
+			ghost: "Lab",
+			cta: "Run",
+		})),
+	},
+];
+---
+
+<Proto title="Hub / Option 6 — Deck" section="hub" motion={false}>
+	<div class="deck" data-deck aria-label="Cosmic Strawberry hub, use arrow keys to move">
+		<!-- ============ the world that moves ============ -->
+		<div class="deck__world" data-world>
+			{
+				rows.map((r) => (
+					<div class="deck__row" data-row data-section={r.name} data-num={r.num}>
+						{r.cells.map((c, i) => (
+							<div
+								class="cell"
+								data-cell
+								data-title={c.title}
+								data-accent={c.accent}
+								data-flip={i % 2 === 1 ? "true" : "false"}
+								data-cursor="Drag ↔"
+							>
+								<span class="cell__ghost" data-ghost aria-hidden="true">
+									<span class="cell__ghost-in" data-par="0.05">{c.ghost}</span>
+								</span>
+
+								<span class="cell__panel" data-panel>
+									<span class="cell__fig">
+										<SchemaMark variant={c.variant} label={`${c.title} schematic`} />
+									</span>
+									<span class="cell__stamp mono" data-line>
+										<span class="cell__kicker">{c.kicker}</span>
+										<span class="cell__byline">{c.byline}</span>
+									</span>
+								</span>
+
+								<span class="cell__type" data-par="0.018">
+									<span class="cell__title" data-line>{c.title}</span>
+									<span class="cell__blurb" data-line>{c.blurb}</span>
+
+									<span class="cell__meta mono" data-line>
+										<span>{c.meta}</span>
+									</span>
+
+									{/* the only thing that navigates — the rest is yours to drag */}
+									{c.href && (
+										<a
+											class="launch"
+											data-launch
+											data-magnet
+											data-no-drag
+											href={c.href}
+											target={c.external ? "_blank" : undefined}
+											rel={c.external ? "noopener" : undefined}
+											data-cursor={`${c.cta} \u2197`}
+										>
+											<span class="launch__dot" aria-hidden="true" />
+											<span class="launch__label">
+												{c.cta} {c.external ? "\u2197" : "\u2192"}
+											</span>
+											<span class="sr">{c.title}</span>
+										</a>
+									)}
+								</span>
+							</div>
+						))}
+					</div>
+				))
+			}
+		</div>
+
+		<!-- ============ fixed chrome ============ -->
+		<div class="rail">
+			<span class="rail__num mono" data-rail-index>01</span>
+			<span class="rail__line" aria-hidden="true"></span>
+			<span class="rail__num rail__num--dim mono" data-rail-total>04</span>
+		</div>
+
+		<div class="sections mono">
+			{
+				rows.map((r, i) => (
+					<button type="button" data-section-dot data-cursor={r.name}>
+						<span class="sections__num">{r.num}</span>
+						<span class="sections__name">{r.name}</span>
+					</button>
+				))
+			}
+		</div>
+
+		<div class="now mono">
+			<span class="now__num" data-rail-section-num>01</span>
+			<span class="now__name" data-rail-section>Projects</span>
+		</div>
+
+		<div class="drag mono">
+			<button type="button" data-go-prev aria-label="Previous item" data-cursor="Back">‹</button>
+			<span class="drag__label">drag</span>
+			<button type="button" data-go-next aria-label="Next item" data-cursor="Forward">›</button>
+		</div>
+
+		<button class="down mono" type="button" data-go-down data-cursor="Next section">
+			<span>scroll down to navigate</span>
+		</button>
+
+		{/* the stripe doubles as a progress bar through the current section */}
+		<div class="deck__progress" aria-hidden="true">
+			<div class="stripe deck__stripe" data-progress>
+				<span></span><span></span><span></span>
+			</div>
+		</div>
+
+		{/* one polite announcement per move, for anyone not watching it happen */}
+		<p class="sr" role="status" aria-live="polite" data-status></p>
+
+		<p class="sr">
+			Use the left and right arrow keys to move between items, up and down to move between
+			sections, Home and End for the first and last item in a section.
+		</p>
+	</div>
+</Proto>
+
+<script>
+	import { initDeck } from "../../../lib/proto/hub/deck";
+	import { initPlay } from "../../../lib/proto/hub/play";
+
+	initDeck();
+	initPlay();
+</script>
+
+<style>
+	/* ================= the deck ================= */
+	.deck {
+		position: fixed;
+		inset: 0;
+		overflow: hidden;
+		cursor: grab;
+		touch-action: none;
+	}
+
+	.deck.is-dragging {
+		cursor: grabbing;
+	}
+
+	/* a real focus ring — the deck is the thing arrow keys drive */
+	.deck:focus-visible {
+		outline: 2px solid var(--fg);
+		outline-offset: -4px;
+	}
+
+	/* the whole surface is the drag handle, so nothing may be text-selected */
+	.deck,
+	.cell {
+		user-select: none;
+		-webkit-user-select: none;
+	}
+
+	.sr {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: -1px;
+		padding: 0;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+		border: 0;
+	}
+
+	.deck__world {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		will-change: transform;
+	}
+
+	.deck__row {
+		flex: 0 0 100%;
+		display: flex;
+		align-items: stretch;
+		will-change: transform;
+	}
+
+	/* ================= a cell ================= */
+	.cell {
+		position: relative;
+		/* narrower than the viewport, so the next one peeks in at the edge */
+		flex: 0 0 86vw;
+		margin-right: 4vw;
+		display: grid;
+		grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+		align-items: center;
+		gap: clamp(1.5rem, 4vw, 4rem);
+		/* the inline padding is the margin the fixed rails live in */
+		padding: 7rem clamp(4.5rem, 8vw, 8rem) 8rem;
+		opacity: 0.24;
+		transition: opacity 0.7s var(--ease);
+	}
+
+	.cell.is-active {
+		opacity: 1;
+	}
+
+	.cell:focus-visible {
+		outline: 2px solid var(--fg);
+		outline-offset: -1rem;
+	}
+
+	.cell[data-accent="red"] {
+		--cell-accent: var(--cs-red);
+	}
+	.cell[data-accent="orange"] {
+		--cell-accent: var(--cs-orange);
+	}
+	.cell[data-accent="blue"] {
+		--cell-accent: var(--cs-blue);
+	}
+
+	/* every other item puts its type on the left */
+	.cell[data-flip="true"] {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+	}
+
+	.cell[data-flip="true"] .cell__panel {
+		order: 2;
+	}
+
+	.cell[data-flip="true"] .cell__type {
+		order: 1;
+		text-align: right;
+	}
+
+	.cell[data-flip="true"] .cell__meta {
+		justify-content: flex-end;
+	}
+
+	.cell[data-flip="true"] .cell__type {
+		align-items: flex-end;
+	}
+
+	/* ================= the launch zone ================= */
+
+	/*
+	 * The only navigating element in the cell. Everything else is drag
+	 * surface, which is the whole reason this is a small target rather than
+	 * the old full-cell anchor.
+	 */
+	.launch {
+		align-self: flex-start;
+		margin-top: var(--s-2);
+		display: inline-flex;
+		align-items: center;
+		gap: var(--s-2);
+		padding: 0.7rem 1.15rem;
+		border: var(--hair) solid var(--rule-strong);
+		font-family: var(--mono);
+		text-transform: uppercase;
+		letter-spacing: 0.16em;
+		font-size: 0.7rem;
+		color: var(--fg);
+		cursor: pointer;
+		transition: background-color 0.3s var(--ease), border-color 0.3s var(--ease),
+			color 0.3s var(--ease);
+	}
+
+	.cell[data-flip="true"] .launch {
+		align-self: flex-end;
+	}
+
+	.launch__dot {
+		width: 7px;
+		height: 7px;
+		background: var(--cell-accent, var(--cs-red));
+		transition: transform 0.35s var(--ease);
+	}
+
+	/* the magnet has noticed the cursor before it arrives */
+	.launch.is-near {
+		border-color: var(--cell-accent, var(--fg));
+		background: var(--bg-panel);
+	}
+
+	.launch.is-near .launch__dot {
+		transform: scale(1.8);
+	}
+
+	.launch:hover,
+	.launch:focus-visible {
+		background: var(--cell-accent, var(--cs-red));
+		border-color: var(--cell-accent, var(--cs-red));
+		color: var(--cs-ink);
+		outline: none;
+	}
+
+	.launch:focus-visible {
+		outline: 2px solid var(--fg);
+		outline-offset: 3px;
+	}
+
+	/* ================= parallax + lean ================= */
+
+	/* the schematic leans into the drag — the deck publishes --lean, the page
+	   decides what listens to it. See .cell__fig below. */
+	.cell__ghost-in,
+	.cell__type {
+		display: block;
+		will-change: transform;
+	}
+
+	/* the ghosted word behind everything */
+	.cell__ghost {
+		position: absolute;
+		left: 50%;
+		top: 12%;
+		transform: translateX(-50%);
+		font-weight: 900;
+		font-stretch: 125%;
+		text-transform: uppercase;
+		font-size: clamp(6rem, 17vw, 15rem);
+		line-height: 0.8;
+		letter-spacing: -0.03em;
+		color: var(--fg);
+		opacity: 0.05;
+		white-space: nowrap;
+		pointer-events: none;
+		z-index: 0;
+	}
+
+	/* ---- the panel ---- */
+	.cell__panel {
+		position: relative;
+		z-index: 1;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		gap: var(--s-4);
+		height: min(62vh, 34rem);
+		padding: var(--s-3);
+		background: var(--bg-panel);
+		border: var(--hair) solid var(--rule);
+	}
+
+	.cell__fig {
+		flex: 1;
+		display: grid;
+		place-items: center;
+		padding: var(--s-2);
+		transform: rotate(calc(var(--lean, 0) * -1.6deg))
+			translateX(calc(var(--lean, 0) * -10px));
+	}
+
+	.cell__fig :global(.schema) {
+		max-height: 100%;
+		width: min(100%, 26rem);
+	}
+
+	.cell__stamp {
+		display: flex;
+		align-items: baseline;
+		gap: var(--s-2);
+		padding-top: var(--s-2);
+		border-top: var(--hair) solid var(--rule);
+	}
+
+	.cell__kicker {
+		font-family: var(--sans);
+		font-weight: 400;
+		font-size: 1.5rem;
+		letter-spacing: -0.01em;
+		text-transform: lowercase;
+		color: var(--fg);
+	}
+
+	.cell__byline {
+		color: var(--fg-mute);
+		border-left: var(--hair) solid var(--rule-strong);
+		padding-left: var(--s-2);
+	}
+
+	/* ---- the type ---- */
+	.cell__type {
+		position: relative;
+		z-index: 2;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--s-3);
+	}
+
+	.cell__title {
+		font-weight: 800;
+		font-stretch: 118%;
+		text-transform: uppercase;
+		letter-spacing: -0.02em;
+		line-height: 0.86;
+		font-size: clamp(2.5rem, 6.4vw, 6rem);
+		/* the type overhangs the panel it sits beside */
+		margin-left: -0.5em;
+	}
+
+	.cell[data-flip="true"] .cell__title {
+		margin-left: 0;
+		margin-right: -0.5em;
+	}
+
+	.cell__blurb {
+		font-size: clamp(0.9375rem, 1.2vw, 1.0625rem);
+		line-height: 1.55;
+		color: var(--fg-mute);
+		max-width: 34ch;
+	}
+
+	.cell[data-flip="true"] .cell__blurb {
+		margin-left: auto;
+	}
+
+	.cell__meta {
+		display: flex;
+		gap: var(--s-3);
+		align-items: center;
+		padding-top: var(--s-2);
+		border-top: var(--hair) solid var(--rule);
+	}
+
+	/* ================= fixed chrome ================= */
+	.rail {
+		position: absolute;
+		left: clamp(1.25rem, 3vw, 3rem);
+		top: 50%;
+		transform: translateY(-50%);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--s-2);
+		z-index: 30;
+		pointer-events: none;
+	}
+
+	.rail__num {
+		color: var(--fg);
+		font-size: 0.8rem;
+	}
+
+	.rail__num--dim {
+		color: var(--fg-faint);
+	}
+
+	.rail__line {
+		width: var(--hair);
+		height: 4.5rem;
+		background: var(--rule-strong);
+	}
+
+	.sections {
+		position: absolute;
+		right: clamp(1.25rem, 3vw, 3rem);
+		top: 50%;
+		transform: translateY(-50%);
+		display: flex;
+		flex-direction: column;
+		gap: var(--s-2);
+		z-index: 30;
+		text-align: right;
+	}
+
+	.sections button {
+		display: flex;
+		flex-direction: column;
+		gap: 3px;
+		align-items: flex-end;
+		cursor: pointer;
+		color: var(--fg-faint);
+		font-family: var(--mono);
+		text-transform: uppercase;
+		letter-spacing: 0.16em;
+		font-size: 0.7rem;
+		transition: color 0.3s var(--ease);
+	}
+
+	.sections button:hover,
+	.sections button.is-current {
+		color: var(--fg);
+	}
+
+	.sections button.is-current .sections__num {
+		color: var(--cs-red);
+	}
+
+	.sections__name {
+		font-size: 0.625rem;
+		letter-spacing: 0.2em;
+	}
+
+	.now {
+		position: absolute;
+		left: clamp(1.25rem, 3vw, 3rem);
+		top: 6.5rem;
+		display: flex;
+		align-items: baseline;
+		gap: var(--s-1);
+		z-index: 30;
+		pointer-events: none;
+	}
+
+	.now__num {
+		color: var(--cs-red);
+	}
+
+	.now__name {
+		color: var(--fg);
+	}
+
+	.drag {
+		position: absolute;
+		left: 50%;
+		bottom: var(--s-4);
+		transform: translateX(-50%);
+		display: flex;
+		align-items: center;
+		gap: var(--s-3);
+		z-index: 30;
+	}
+
+	.drag button {
+		width: 30px;
+		height: 26px;
+		color: var(--fg);
+		cursor: pointer;
+		font-size: 1rem;
+		line-height: 1;
+	}
+
+	.drag button:hover {
+		color: var(--cs-red);
+	}
+
+	.drag__label {
+		color: var(--fg-mute);
+		font-family: var(--sans);
+		text-transform: lowercase;
+		letter-spacing: 0;
+		font-size: 1rem;
+	}
+
+	.down {
+		position: absolute;
+		right: clamp(1.25rem, 3vw, 3rem);
+		bottom: var(--s-4);
+		z-index: 30;
+		cursor: pointer;
+		color: var(--fg-faint);
+		writing-mode: vertical-rl;
+		font-family: var(--mono);
+		text-transform: uppercase;
+		letter-spacing: 0.2em;
+		font-size: 0.625rem;
+		transition: color 0.3s var(--ease);
+	}
+
+	.down:hover {
+		color: var(--fg);
+	}
+
+	.deck__progress {
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		width: 100%;
+		height: 5px;
+		background: var(--rule);
+		z-index: 30;
+		pointer-events: none;
+	}
+
+	.deck__stripe {
+		--stripe-h: 5px;
+		width: 100%;
+		transform-origin: left center;
+	}
+
+	/* ================= narrow ================= */
+	@media (max-width: 900px) {
+		.cell {
+			grid-template-columns: minmax(0, 1fr);
+			align-content: center;
+			gap: var(--s-3);
+			padding: 6rem 1.25rem 7rem;
+		}
+
+		.cell[data-flip="true"] {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.cell[data-flip="true"] .cell__panel {
+			order: 1;
+		}
+
+		.cell[data-flip="true"] .cell__type {
+			order: 2;
+			text-align: left;
+		}
+
+		.cell[data-flip="true"] .cell__meta {
+			justify-content: flex-start;
+		}
+
+		.cell__panel {
+			height: min(34vh, 16rem);
+		}
+
+		.cell__title {
+			margin-left: 0;
+		}
+
+		.cell[data-flip="true"] .cell__title {
+			margin-right: 0;
+		}
+
+		.cell[data-flip="true"] .cell__blurb {
+			margin-left: 0;
+		}
+
+		.sections,
+		.rail {
+			display: none;
+		}
+	}
+</style>

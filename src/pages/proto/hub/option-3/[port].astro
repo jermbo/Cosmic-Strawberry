@@ -1,0 +1,218 @@
+---
+/**
+ * OPTION 3 — a spoke. One page per port, all three from the same template so
+ * a fourth section is a data entry, not a new file.
+ */
+import Proto from "../../../../layouts/Proto.astro";
+import { projects } from "../../../../data/projects";
+import { writing } from "../../../../data/writing";
+import { lab } from "../../../../data/lab";
+
+interface Row {
+	idx: string;
+	name: string;
+	href: string | null;
+	note: string;
+	meta: string;
+	external: boolean;
+}
+
+export function getStaticPaths() {
+	return [
+		{
+			params: { port: "projects" },
+			props: {
+				idx: "A",
+				name: "Projects",
+				lede: "Four things running on their own subdomains. Each one is its own build, its own stack, its own life after launch.",
+				rows: projects.map((p) => ({
+					idx: p.idx,
+					name: p.name,
+					href: p.href,
+					note: p.blurb,
+					meta: `${p.host} / ${p.status}`,
+					external: true,
+				})),
+			},
+		},
+		{
+			params: { port: "writing" },
+			props: {
+				idx: "B",
+				name: "Writing",
+				lede: "Longer pieces. Each one is a passage between two states — a system before and after the thing that changed it.",
+				rows: writing.map((w) => ({
+					idx: w.idx,
+					name: w.title,
+					href: w.href,
+					note: w.blurb,
+					meta: `${w.date} / ${w.minutes} min / ${w.kind}`,
+					external: false,
+				})),
+			},
+		},
+		{
+			params: { port: "lab" },
+			props: {
+				idx: "C",
+				name: "Lab",
+				lede: "Small motion studies. One idea each, no long-form attached. Some are built, most are still on paper.",
+				rows: lab.map((l) => ({
+					idx: l.idx,
+					name: l.name,
+					href: l.href,
+					note: l.note,
+					meta: l.state,
+					external: false,
+				})),
+			},
+		},
+	];
+}
+
+interface Props {
+	idx: string;
+	name: string;
+	lede: string;
+	rows: Row[];
+}
+
+const { idx, name, lede, rows } = Astro.props;
+---
+
+<Proto title={`Hub / Option 3 — ${name}`} section="hub" motion={false}>
+	<div class="spoke">
+		<div class="shell">
+			<a class="spoke__back mono" href="/proto/hub/option-3" data-cursor="Back">← DOCKING BAY</a>
+
+			<div class="spoke__head">
+				<span class="mono spoke__idx">PORT {idx}</span>
+				<h1 class="h2">{name}</h1>
+				<p class="lede">{lede}</p>
+			</div>
+
+			<div class="stripe spoke__stripe" aria-hidden="true">
+				<span></span><span></span><span></span>
+			</div>
+
+			<ol class="rows">
+				{
+					rows.map((r) => (
+						<li class="row">
+							{r.href ? (
+								<a
+									href={r.href}
+									target={r.external ? "_blank" : undefined}
+									rel={r.external ? "noopener" : undefined}
+									data-cursor={r.external ? "Launch ↗" : "Open →"}
+								>
+									<span class="mono row__idx">{r.idx}</span>
+									<span class="row__name">{r.name}</span>
+									<span class="row__note">{r.note}</span>
+									<span class="mono row__meta">{r.meta}</span>
+								</a>
+							) : (
+								<span class="row__inert">
+									<span class="mono row__idx">{r.idx}</span>
+									<span class="row__name">{r.name}</span>
+									<span class="row__note">{r.note}</span>
+									<span class="mono row__meta">{r.meta}</span>
+								</span>
+							)}
+						</li>
+					))
+				}
+			</ol>
+		</div>
+	</div>
+</Proto>
+
+<style>
+	.spoke {
+		padding-block: 7rem var(--s-12);
+	}
+
+	.spoke__back {
+		display: inline-block;
+		margin-bottom: var(--s-6);
+		color: var(--fg-mute);
+	}
+
+	.spoke__back:hover {
+		color: var(--fg);
+	}
+
+	.spoke__head {
+		display: flex;
+		flex-direction: column;
+		gap: var(--s-2);
+		max-width: 52ch;
+	}
+
+	.spoke__idx {
+		color: var(--fg-faint);
+	}
+
+	.spoke__stripe {
+		--stripe-h: 12px;
+		max-width: 280px;
+		margin-block: var(--s-4) var(--s-6);
+	}
+
+	.rows {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		border-top: var(--hair) solid var(--rule-strong);
+	}
+
+	.row {
+		border-bottom: var(--hair) solid var(--rule);
+	}
+
+	.row > * {
+		display: grid;
+		grid-template-columns: 4rem minmax(0, 14rem) minmax(0, 1fr) auto;
+		gap: var(--s-3);
+		align-items: baseline;
+		padding-block: var(--s-3);
+	}
+
+	.row a:hover {
+		color: var(--cs-red);
+	}
+
+	.row__idx,
+	.row__meta {
+		color: var(--fg-faint);
+	}
+
+	.row__name {
+		font-weight: 700;
+		font-stretch: 108%;
+		text-transform: uppercase;
+		font-size: 1.125rem;
+		line-height: 1.05;
+	}
+
+	.row__note {
+		font-size: 0.9375rem;
+		color: var(--fg-mute);
+	}
+
+	.row__inert {
+		opacity: 0.5;
+	}
+
+	@media (max-width: 900px) {
+		.row > * {
+			grid-template-columns: 3.5rem minmax(0, 1fr);
+			row-gap: var(--s-1);
+		}
+
+		.row__note,
+		.row__meta {
+			grid-column: 2;
+		}
+	}
+</style>
