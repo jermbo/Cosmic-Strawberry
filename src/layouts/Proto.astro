@@ -66,6 +66,12 @@ const path = Astro.url.pathname;
 						aria-current={path.includes("/crossings/") ? "page" : undefined}
 						data-cursor="Read">Crossings</a
 					>
+					<a
+						class="nav__link mono"
+						href="/proto/kit"
+						aria-current={path.includes("/kit") ? "page" : undefined}
+						data-cursor="Inspect">Kit</a
+					>
 					<span class="nav__sep" aria-hidden="true"></span>
 					<span class="mono mono-sm nav__link--hide" data-clock>--:--:-- UTC</span>
 					<button
@@ -99,7 +105,7 @@ const path = Astro.url.pathname;
 
 		<div class="wipe" aria-hidden="true"><i></i><i></i><i></i></div>
 
-		<div class="cursor" aria-hidden="true">
+		<div class="cursor" data-cursor-root aria-hidden="true">
 			<span class="cursor__ring"></span>
 			<span class="cursor__dot"></span>
 			<span class="cursor__arm cursor__arm--h"></span>

@@ -1,0 +1,689 @@
+---
+import Proto from "../../layouts/Proto.astro";
+import SchemaMark from "../../components/proto/SchemaMark.astro";
+import SchemaCore from "../../components/proto/SchemaCore.astro";
+import "../../styles/kit.css";
+
+const swatches = [
+	{ token: "--cs-cream", name: "Cream", light: "#F3EDD8", dark: "— text in dark" },
+	{ token: "--cs-ink", name: "Ink", light: "#070707", dark: "— base in dark" },
+	{ token: "--cs-red", name: "Accent A", light: "#D8402F", dark: "#E8503D" },
+	{ token: "--cs-orange", name: "Accent B", light: "#E8892B", dark: "#F09A3A" },
+	{ token: "--cs-blue", name: "Accent C", light: "#2B4C9B", dark: "#4468BD" },
+];
+
+const semantic = [
+	{ token: "--bg", use: "Page ground" },
+	{ token: "--fg", use: "Primary text, line-work" },
+	{ token: "--fg-mute", use: "Body copy, mono chrome" },
+	{ token: "--fg-faint", use: "Secondary metadata, ticks" },
+	{ token: "--rule", use: "Hairlines at rest" },
+	{ token: "--rule-strong", use: "Section-level hairlines" },
+];
+
+const space = [
+	{ token: "--s-1", px: 8 },
+	{ token: "--s-2", px: 16 },
+	{ token: "--s-3", px: 24 },
+	{ token: "--s-4", px: 32 },
+	{ token: "--s-6", px: 48 },
+	{ token: "--s-8", px: 64 },
+	{ token: "--s-12", px: 96 },
+	{ token: "--s-16", px: 128 },
+];
+
+const motion = [
+	["Wordmark", "SplitText lines, masked", "yPercent 112 → 0", "1.05s", "expo.out", "0.085s"],
+	["Stripe assemble", "scaleX per segment", "0 → 1", "0.62s", "power4.out", "0.085s"],
+	["Line-work draw", "DrawSVG on .ln", "0% 0% → 0% 100%", "0.85s", "power2.inOut", "0.035s"],
+	["Annotation fade", ".txt + fills", "opacity 0 → 1", "0.40s", "none", "0.02s"],
+	["Hairline rule", "scaleX from left", "0 → 1", "0.90s", "expo.out", "—"],
+	["Copy block", "opacity + y", "y 16 → 0", "0.80s", "power3.out", "—"],
+	["Group stagger", "cards, steps", "y 22 → 0", "0.85s", "power3.out", "0.09s"],
+	["Theme wipe", "3 bands, both directions", "scaleX 0 → 1 → 0", "0.42s ×2", "power3.inOut", "0.055s"],
+	["Cursor follow", "quickTo x/y", "pointer position", "0.22s", "power3.out", "—"],
+];
+---
+
+<Proto title="CS-KIT — Cosmic Strawberry" section="kit">
+	<!-- ================= HEAD ================= -->
+	<header class="kit-head">
+		<div class="shell">
+			<div class="kit-head__meta mono">
+				<span>CS-KIT 0.0.1</span>
+				<span>DESIGN SYSTEM / PROTOTYPE</span>
+				<span>SHEET 03 / 03</span>
+				<span>◉ LIVE</span>
+			</div>
+
+			<h1 class="h2" style="margin-top: var(--s-4); max-width: 20ch;">
+				The kit
+			</h1>
+
+			<div class="stripe kit-head__stripe" aria-hidden="true">
+				<span></span><span></span><span></span>
+			</div>
+
+			<p class="lede" data-reveal>
+				Every value, mark and motion used in the prototype, rendered live from the same
+				stylesheet. If something looks wrong here, it is wrong everywhere.
+			</p>
+		</div>
+	</header>
+
+	<!-- ================= 01 FOUNDATIONS ================= -->
+	<section class="kit-sec">
+		<div class="shell">
+			<div class="marker mono">
+				<span class="marker__idx">§ 01</span>
+				<span class="marker__label">Foundations — colour</span>
+				<span class="marker__count">5 + 6</span>
+			</div>
+
+			<div class="kit-swatches">
+				{
+					swatches.map((s) => (
+						<div class="kit-swatch">
+							<div class="kit-swatch__chip" style={`background: var(${s.token})`} />
+							<div class="kit-swatch__body mono mono-sm">
+								<b>{s.name}</b>
+								<span>{s.token}</span>
+								<span>L {s.light}</span>
+								<span>D {s.dark}</span>
+							</div>
+						</div>
+					))
+				}
+			</div>
+
+			<div class="kit-row" style="margin-top: var(--s-4);">
+				<div class="kit-row__label mono mono-sm">
+					<b>Semantic tokens</b>
+					<span class="kit-row__note">
+						Components never reference a raw colour. They reference role.
+					</span>
+				</div>
+				<table class="kit-table">
+					<tbody>
+						{
+							semantic.map((s) => (
+								<tr>
+									<td style="width: 180px;">
+										<b>{s.token}</b>
+									</td>
+									<td>{s.use}</td>
+								</tr>
+							))
+						}
+					</tbody>
+				</table>
+			</div>
+
+			<div class="kit-row">
+				<div class="kit-row__label mono mono-sm">
+					<b>Space scale</b>
+					<span class="kit-row__note">8px base. Nothing between steps.</span>
+				</div>
+				<div class="kit-space">
+					{
+						space.map((s) => (
+							<div class="kit-space__row">
+								<span class="kit-space__bar" style={`width:${s.px}px`} />
+								<span class="mono mono-sm">
+									{s.token} — {s.px}px
+								</span>
+							</div>
+						))
+					}
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- ================= 02 THE STRIPE ================= -->
+	<section class="kit-sec">
+		<div class="shell">
+			<div class="marker mono">
+				<span class="marker__idx">§ 02</span>
+				<span class="marker__label">The stripe</span>
+				<span class="marker__count">1 device</span>
+			</div>
+
+			<div class="band" style="margin-bottom: var(--s-6);">
+				<div class="stripe" style="--stripe-h:22px;" aria-hidden="true">
+					<span></span><span></span><span></span>
+				</div>
+				<div class="prose" data-reveal>
+					<span class="drop">Rule</span>
+					<p style="margin:0;">
+						Three flat colours, equal widths, hard stops, no gradient and no blend. It
+						appears once per screen as a single graphic accent — a divider, a section
+						marker, a hover bar. It is never a background, never a wash, never behind
+						text.
+					</p>
+				</div>
+			</div>
+
+			<div class="kit-row">
+				<div class="kit-row__label mono mono-sm">
+					<b>Horizontal</b>
+					<span class="kit-row__note">.stripe — default</span>
+				</div>
+				<div>
+					<div class="stripe" style="--stripe-h:14px;" aria-hidden="true">
+						<span></span><span></span><span></span>
+					</div>
+					<pre class="kit-code" style="margin-top: var(--s-2);">{`<span class="stripe" style="--stripe-h:14px">
+  <span></span><span></span><span></span>
+</span>`}</pre>
+				</div>
+			</div>
+
+			<div class="kit-row">
+				<div class="kit-row__label mono mono-sm">
+					<b>Vertical</b>
+					<span class="kit-row__note">.stripe--v — margin note marker</span>
+				</div>
+				<div style="display:flex; gap: var(--s-2); min-height: 90px;">
+					<span class="stripe stripe--v" style="--stripe-h:4px; flex:0 0 4px;" aria-hidden="true">
+						<span></span><span></span><span></span>
+					</span>
+					<p class="mono" style="text-transform:none; letter-spacing:.05em; font-size:.8rem; line-height:1.6; margin:0; max-width:44ch;">
+						Used beside a block of standing copy. Assembles top-to-bottom instead of
+						left-to-right.
+					</p>
+				</div>
+			</div>
+
+			<div class="kit-row">
+				<div class="kit-row__label mono mono-sm">
+					<b>Hover bar</b>
+					<span class="kit-row__note">.card__bar — slides up on card hover</span>
+				</div>
+				<div>
+					<div style="position:relative; border:1px solid var(--rule); height:76px; overflow:hidden;">
+						<span class="card__bar" style="transform:translateY(0)" aria-hidden="true">
+							<i></i><i></i><i></i>
+						</span>
+						<span class="mono mono-sm" style="position:absolute; left:12px; top:12px;">
+							RESTING STATE SHOWN ENGAGED
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- ================= 03 TYPE ================= -->
+	<section class="kit-sec">
+		<div class="shell">
+			<div class="marker mono">
+				<span class="marker__idx">§ 03</span>
+				<span class="marker__label">Typography — two voices</span>
+				<span class="marker__count">2 families</span>
+			</div>
+
+			<div class="kit-row">
+				<div class="kit-row__label mono mono-sm">
+					<b>.display</b>
+					<span class="kit-row__note">
+						Archivo 800 / wdth 118 / lh 0.84 / -0.018em<br />clamp 3.5 → 12.5rem
+					</span>
+				</div>
+				<div class="kit-spec-block">
+					<span class="display" style="font-size: clamp(2.5rem, 8vw, 6rem);">Cosmic</span>
+				</div>
+			</div>
+
+			<div class="kit-row">
+				<div class="kit-row__label mono mono-sm">
+					<b>.h2</b>
+					<span class="kit-row__note">Archivo 700 / wdth 112 / lh 0.92</span>
+				</div>
+				<div class="kit-spec-block">
+					<span class="h2">Precision is generosity</span>
+				</div>
+			</div>
+
+			<div class="kit-row">
+				<div class="kit-row__label mono mono-sm">
+					<b>.h3</b>
+					<span class="kit-row__note">Archivo 700 / wdth 108 / lh 1</span>
+				</div>
+				<div class="kit-spec-block">
+					<span class="h3">Throat Diameter</span>
+				</div>
+			</div>
+
+			<div class="kit-row">
+				<div class="kit-row__label mono mono-sm">
+					<b>.lede</b>
+					<span class="kit-row__note">Archivo 400 / lh 1.42 / max 34ch</span>
+				</div>
+				<div class="kit-spec-block">
+					<p class="lede">
+						A working notebook about building things that have to survive contact with
+						the real world.
+					</p>
+				</div>
+			</div>
+
+			<div class="kit-row">
+				<div class="kit-row__label mono mono-sm">
+					<b>.prose p</b>
+					<span class="kit-row__note">Archivo 400 / lh 1.66 / max 62ch</span>
+				</div>
+				<div class="kit-spec-block prose">
+					<span class="drop">Drop label</span>
+					<p style="margin:0;">
+						Most of what gets called craft is really just refusal — refusal to ship the
+						version that only works when you are in the room. The interesting work starts
+						at the handoff.
+					</p>
+				</div>
+			</div>
+
+			<div class="kit-row">
+				<div class="kit-row__label mono mono-sm">
+					<b>.mono</b>
+					<span class="kit-row__note">
+						Share Tech Mono / 0.7rem / +0.16em<br />uppercase, tabular
+					</span>
+				</div>
+				<div class="kit-spec-block" style="display:flex; flex-wrap:wrap; gap: var(--s-3);">
+					<span class="mono">CS-NAV / FW 0.0.1</span>
+					<span class="mono">FILED 2026.04.11</span>
+					<span class="mono">◉ SIGNAL NOMINAL</span>
+					<span class="mono mono-sm">.MONO-SM — 0.625REM / +0.2EM</span>
+				</div>
+			</div>
+
+			<div class="kit-row">
+				<div class="kit-row__label mono mono-sm">
+					<b>.pull</b>
+					<span class="kit-row__note">Archivo 600 / orange 3px keyline</span>
+				</div>
+				<div class="kit-spec-block">
+					<p class="pull" style="margin:0;">
+						The mouth is designed last and blamed first.
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- ================= 04 LINE-WORK ================= -->
+	<section class="kit-sec">
+		<div class="shell">
+			<div class="marker mono">
+				<span class="marker__idx">§ 04</span>
+				<span class="marker__label">Schematic line-work</span>
+				<span class="marker__count">1px, always</span>
+			</div>
+
+			<div class="kit-row">
+				<div class="kit-row__label mono mono-sm">
+					<b>Stroke classes</b>
+					<span class="kit-row__note">
+						All strokes are 1px with vector-effect: non-scaling-stroke, so weight never
+						changes with figure size.
+					</span>
+				</div>
+				<div class="kit-lines">
+					<figure>
+						<svg class="schema" viewBox="0 0 160 12"><line class="ln" x1="0" y1="6" x2="160" y2="6" /></svg>
+						<figcaption class="mono mono-sm">.ln — primary edge</figcaption>
+					</figure>
+					<figure>
+						<svg class="schema" viewBox="0 0 160 12"><line class="ln ln--faint" x1="0" y1="6" x2="160" y2="6" /></svg>
+						<figcaption class="mono mono-sm">.ln--faint — internal detail</figcaption>
+					</figure>
+					<figure>
+						<svg class="schema" viewBox="0 0 160 12"><line class="ln ln--dash" x1="0" y1="6" x2="160" y2="6" /></svg>
+						<figcaption class="mono mono-sm">.ln--dash — construction / centreline</figcaption>
+					</figure>
+					<figure>
+						<svg class="schema" viewBox="0 0 160 12"><line class="ln ln--red" x1="0" y1="6" x2="160" y2="6" /></svg>
+						<figcaption class="mono mono-sm">.ln--red — active callout only</figcaption>
+					</figure>
+				</div>
+			</div>
+
+			<div class="kit-row">
+				<div class="kit-row__label mono mono-sm">
+					<b>Callout anatomy</b>
+					<span class="kit-row__note">
+						Terminal dot on the part, one elbow, one horizontal run, label above the run.
+						Never a straight diagonal into text.
+					</span>
+				</div>
+				<div>
+					<svg class="schema" viewBox="0 0 420 150" data-fig>
+						<rect class="ln" x="30" y="60" width="110" height="70" />
+						<line class="ln ln--dash" x1="85" y1="40" x2="85" y2="145" />
+						<circle class="fill-fg" cx="120" cy="76" r="2.6" />
+						<polyline class="ln" points="120,76 210,36 400,36" />
+						<text class="txt txt--lead" x="400" y="28" text-anchor="end">01 / LABEL</text>
+						<g class="ln ln--faint">
+							<line x1="120" y1="90" x2="150" y2="90" />
+							<line x1="210" y1="36" x2="210" y2="60" />
+						</g>
+						<text class="txt" x="156" y="93">TERMINAL DOT</text>
+						<text class="txt" x="216" y="60">ELBOW</text>
+					</svg>
+				</div>
+			</div>
+
+			<div class="kit-row">
+				<div class="kit-row__label mono mono-sm">
+					<b>Mark library</b>
+					<span class="kit-row__note">
+						&lt;SchemaMark variant="…" /&gt;<br />One idea per mark.
+					</span>
+				</div>
+				<div class="kit-marks">
+					<figure>
+						<SchemaMark variant="stack" label="Exploded stack" />
+						<figcaption class="mono mono-sm">stack — exploded assembly</figcaption>
+					</figure>
+					<figure>
+						<SchemaMark variant="orbit" label="Orbit" />
+						<figcaption class="mono mono-sm">orbit — path and node</figcaption>
+					</figure>
+					<figure>
+						<SchemaMark variant="trace" label="Trace" />
+						<figcaption class="mono mono-sm">trace — measurement</figcaption>
+					</figure>
+					<figure>
+						<SchemaMark variant="nozzle" label="Nozzle" />
+						<figcaption class="mono mono-sm">nozzle — section detail</figcaption>
+					</figure>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- ================= 05 COMPONENTS ================= -->
+	<section class="kit-sec">
+		<div class="shell">
+			<div class="marker mono">
+				<span class="marker__idx">§ 05</span>
+				<span class="marker__label">Components</span>
+				<span class="marker__count">chrome</span>
+			</div>
+
+			<div class="kit-row">
+				<div class="kit-row__label mono mono-sm">
+					<b>.marker</b>
+					<span class="kit-row__note">Section head. Index, label, position.</span>
+				</div>
+				<div>
+					<div class="marker mono" style="margin-bottom:0;">
+						<span class="marker__idx">§ 04</span>
+						<span class="marker__label">Section name</span>
+						<span class="marker__count">B / C</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="kit-row">
+				<div class="kit-row__label mono mono-sm">
+					<b>.spec</b>
+					<span class="kit-row__note">Metadata pair. Rule above, mono below.</span>
+				</div>
+				<dl class="hero__specs mono" style="margin:0;">
+					<div class="spec">
+						<dt>Operator</dt>
+						<dd>Jermbo</dd>
+					</div>
+					<div class="spec">
+						<dt>Cadence</dt>
+						<dd>Irregular, deliberate</dd>
+					</div>
+				</dl>
+			</div>
+
+			<div class="kit-row">
+				<div class="kit-row__label mono mono-sm">
+					<b>.toggle</b>
+					<span class="kit-row__note">
+						Mode switch. The knob travels; the three accent bands sit behind it at 28%
+						until the wipe fires.
+					</span>
+				</div>
+				<div style="display:flex; gap: var(--s-3); align-items:center; flex-wrap:wrap;">
+					<span class="toggle" aria-hidden="true">
+						<span class="toggle__label">LT</span>
+						<span class="toggle__track">
+							<i></i><i></i><i></i>
+							<span class="toggle__knob"></span>
+						</span>
+					</span>
+					<span class="mono mono-sm kit-row__note">Live control sits in the nav ↗</span>
+				</div>
+			</div>
+
+			<div class="kit-row">
+				<div class="kit-row__label mono mono-sm">
+					<b>.cursor</b>
+					<span class="kit-row__note">
+						Two states. Difference blend, so it reads on both grounds without a colour
+						of its own.
+					</span>
+				</div>
+				<div class="kit-cursors">
+					<div class="kit-cursor">
+						<span class="cursor" aria-hidden="true">
+							<span class="cursor__ring"></span>
+							<span class="cursor__dot"></span>
+						</span>
+						<span class="kit-cursor__cap mono mono-sm">DEFAULT — 34PX RING + DOT</span>
+					</div>
+					<div class="kit-cursor">
+						<span class="cursor is-hover" aria-hidden="true">
+							<span class="cursor__ring"></span>
+							<span class="cursor__dot"></span>
+							<span class="cursor__arm cursor__arm--h"></span>
+							<span class="cursor__arm cursor__arm--v"></span>
+							<span class="cursor__tag">Open →</span>
+						</span>
+						<span class="kit-cursor__cap mono mono-sm">HOVER — 54PX SQUARE + CROSSHAIR</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="kit-row">
+				<div class="kit-row__label mono mono-sm">
+					<b>Cursor labels</b>
+					<span class="kit-row__note">Set per element. Verb, not noun.</span>
+				</div>
+				<pre class="kit-code">{`<a href="…" data-cursor="Open →">…</a>
+<button data-cursor="Invert">…</button>`}</pre>
+			</div>
+		</div>
+	</section>
+
+	<!-- ================= 06 MOTION ================= -->
+	<section class="kit-sec">
+		<div class="shell">
+			<div class="marker mono">
+				<span class="marker__idx">§ 06</span>
+				<span class="marker__label">Motion</span>
+				<span class="marker__count">9 moves</span>
+			</div>
+
+			<div class="prose" data-reveal style="margin-bottom: var(--s-4);">
+				<span class="drop">Principle</span>
+				<p>
+					Things assemble; they do not appear. Every reveal is a construction —
+					line-work draws along its own path, stripe segments land in sequence,
+					headlines rise out of a mask. Nothing scales up, nothing bounces, nothing
+					blurs. One direction per element, and it is always the direction the eye
+					already reads.
+				</p>
+			</div>
+
+			<table class="kit-table">
+				<thead>
+					<tr>
+						<th>Move</th>
+						<th>Mechanism</th>
+						<th>From → to</th>
+						<th>Dur</th>
+						<th>Ease</th>
+						<th>Stagger</th>
+					</tr>
+				</thead>
+				<tbody>
+					{
+						motion.map((row) => (
+							<tr>
+								<td>
+									<b>{row[0]}</b>
+								</td>
+								<td>{row[1]}</td>
+								<td>{row[2]}</td>
+								<td>{row[3]}</td>
+								<td>{row[4]}</td>
+								<td>{row[5]}</td>
+							</tr>
+						))
+					}
+				</tbody>
+			</table>
+
+			<div style="margin-top: var(--s-4);">
+				<button class="kit-btn" type="button" data-replay data-cursor="Replay">
+					<i aria-hidden="true"></i> Replay assembly
+				</button>
+
+				<div class="kit-stage">
+					<div class="kit-stage__col">
+						<span class="mono mono-sm">STRIPE — SEGMENT ASSEMBLY</span>
+						<span class="stripe" aria-hidden="true">
+							<span></span><span></span><span></span>
+						</span>
+						<span class="mono mono-sm" style="margin-top: var(--s-2);">RULE — SCALE FROM LEFT</span>
+						<span class="rule"></span>
+					</div>
+					<div>
+						<SchemaMark variant="orbit" label="Replayable line-work" />
+					</div>
+				</div>
+			</div>
+
+			<div class="kit-row" style="margin-top: var(--s-4);">
+				<div class="kit-row__label mono mono-sm">
+					<b>Reduced motion</b>
+					<span class="kit-row__note">Not a degraded path — a designed one.</span>
+				</div>
+				<div class="prose">
+					<p style="margin:0;">
+						Under <code style="font-family:var(--mono); font-size:.85em;">prefers-reduced-motion</code>,
+						every element is placed in its final state at paint: stripes set, rules full
+						width, callouts all lit, custom cursor off. Nothing is hidden waiting for a
+						trigger that will never fire.
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- ================= 07 DISCIPLINE ================= -->
+	<section class="kit-sec">
+		<div class="shell">
+			<div class="marker mono">
+				<span class="marker__idx">§ 07</span>
+				<span class="marker__label">Discipline</span>
+				<span class="marker__count">the whole point</span>
+			</div>
+
+			<div class="kit-rules">
+				<div class="kit-rules--do">
+					<h3 class="mono">Do</h3>
+					<ul>
+						<li>Let hairlines and whitespace do the dividing. A rule is cheaper than a box.</li>
+						<li>Keep the stripe to one appearance per screen, as an accent on an edge.</li>
+						<li>Set metadata in mono and content in the sans. The two voices never trade jobs.</li>
+						<li>Draw new figures with the existing stroke classes so they inherit both modes and the draw-in for free.</li>
+						<li>Anchor type flush left on the grid. Centred text is a different design system.</li>
+					</ul>
+				</div>
+				<div class="kit-rules--dont">
+					<h3 class="mono">Don't</h3>
+					<ul>
+						<li>No glow, bloom, neon, or coloured shadow. The palette is flat and stays flat.</li>
+						<li>No gradient between the three accent colours — hard stops only.</li>
+						<li>No accent colour on body text, and no accent-coloured backgrounds behind copy.</li>
+						<li>No rounded corners on structure. The only curves are in the drawings.</li>
+						<li>No fade-only reveals. If something appears, it should have been built.</li>
+						<li>No fourth colour. If a state needs one, it needs a different signal instead.</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- ================= SPECIMEN ================= -->
+	<section class="kit-sec">
+		<div class="shell">
+			<div class="marker mono">
+				<span class="marker__idx">§ 08</span>
+				<span class="marker__label">Specimen</span>
+				<span class="marker__count">fig. 1</span>
+			</div>
+
+			<div class="band">
+				<figure style="margin:0; max-width:480px;">
+					<SchemaCore />
+					<figcaption class="mono" style="display:flex; justify-content:space-between; gap:var(--s-2); margin-top:var(--s-2); padding-top:var(--s-1); border-top:1px solid var(--rule);">
+						<span>FIG. 1 — CORE SECTION</span>
+						<span>REV. C</span>
+					</figcaption>
+				</figure>
+
+				<div class="prose" data-reveal>
+					<span class="drop">Reading the figure</span>
+					<p>
+						Registration marks at the corners, construction axes through the centre,
+						section hatch on the cut quadrant, dimension run along the bottom with a
+						break for the label. Three callouts, numbered clockwise from the top.
+					</p>
+					<p>
+						That inventory — marks, axes, hatch, dimension, callout — is the whole
+						vocabulary. A new figure is a new arrangement of it, not a new style.
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<footer class="foot">
+		<div class="shell">
+			<div class="stripe foot__mark" aria-hidden="true">
+				<span></span><span></span><span></span>
+			</div>
+			<div class="foot__grid mono">
+				<span>COSMIC STRAWBERRY © 2026</span>
+				<span>CS-KIT 0.0.1 / PROTOTYPE BUILD</span>
+				<a href="/proto" data-cursor="Back">← RETURN TO INDEX</a>
+			</div>
+		</div>
+	</footer>
+
+	<script>
+		import { drawFigure, assembleStripe } from "../../lib/proto/reveal";
+		import gsap from "gsap";
+
+		const stage = document.querySelector(".kit-stage");
+		const replay = document.querySelector("[data-replay]");
+
+		replay?.addEventListener("click", () => {
+			if (!stage) return;
+			stage.querySelectorAll(".stripe").forEach((s) => assembleStripe(s));
+			stage.querySelectorAll("[data-fig]").forEach((f) => drawFigure(f));
+			const rule = stage.querySelector(".rule");
+			if (rule) gsap.fromTo(rule, { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: "expo.out" });
+		});
+	</script>
+</Proto>

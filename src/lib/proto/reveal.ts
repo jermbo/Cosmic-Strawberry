@@ -8,7 +8,7 @@ gsap.registerPlugin(ScrollTrigger, DrawSVGPlugin, SplitText);
 const reduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /** Strokes draw themselves; labels, ticks and solids fade in behind them. */
-function drawFigure(fig: Element, delay = 0): gsap.core.Timeline {
+export function drawFigure(fig: Element, delay = 0): gsap.core.Timeline {
 	const tl = gsap.timeline({ delay });
 	const strokes = fig.querySelectorAll<SVGElement>(".ln");
 	const marks = fig.querySelectorAll<SVGElement>(".txt, [class*='fill-']");
@@ -42,7 +42,7 @@ function drawFigure(fig: Element, delay = 0): gsap.core.Timeline {
 }
 
 /** Three flat bars land one after another, left to right (or top to bottom). */
-function assembleStripe(stripe: Element, delay = 0): gsap.core.Tween {
+export function assembleStripe(stripe: Element, delay = 0): gsap.core.Tween {
 	const bars = stripe.querySelectorAll<HTMLElement>("span");
 	const axis = stripe.classList.contains("stripe--v") ? "scaleY" : "scaleX";
 	return gsap.fromTo(

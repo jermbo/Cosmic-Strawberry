@@ -2,6 +2,13 @@
 
 Working notes for the landing page. Structure is provisional; reorganize freely.
 
+## Design system
+
+[**docs/design/**](design/README.md) — the written half of the `/proto`
+prototype: design intent, colour, typography, the schematic line-work language,
+animation principles, component inventory, and how it is wired. The live half is
+the kit page at `/proto/kit`.
+
 ## Ideas
 
 Each file is one self-contained concept: what it is, how it would be built, and

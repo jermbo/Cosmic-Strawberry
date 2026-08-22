@@ -8,7 +8,9 @@ import gsap from "gsap";
 export function initCursor(): void {
 	if (window.matchMedia("(pointer: coarse)").matches) return;
 
-	const el = document.querySelector<HTMLElement>(".cursor");
+	// Not `.cursor` — the kit page renders static copies of this markup to
+	// document the two states, and they appear earlier in the document.
+	const el = document.querySelector<HTMLElement>("[data-cursor-root]");
 	if (!el) return;
 
 	const tag = el.querySelector<HTMLElement>(".cursor__tag");
