@@ -1,0 +1,260 @@
+---
+import Proto from "../../layouts/Proto.astro";
+import SchemaCore from "../../components/proto/SchemaCore.astro";
+import SchemaMark from "../../components/proto/SchemaMark.astro";
+
+const crossings = [
+	{
+		idx: "001",
+		title: "Hard Vacuum",
+		meta: "18 MIN / FIELD NOTE",
+		date: "2026.04.11",
+		blurb: "What survives the space between two systems that were never meant to touch.",
+		variant: "trace" as const,
+		href: "/proto/crossings/hard-vacuum",
+	},
+	{
+		idx: "002",
+		title: "Second Stage",
+		meta: "11 MIN / ESSAY",
+		date: "2026.03.02",
+		blurb: "On discarding the thing that got you off the ground, on schedule, without ceremony.",
+		variant: "orbit" as const,
+		href: "/proto/crossings/hard-vacuum",
+	},
+	{
+		idx: "003",
+		title: "Throat Diameter",
+		meta: "24 MIN / TEARDOWN",
+		date: "2026.01.27",
+		blurb: "Constraint as a design surface. The narrowest point does the most work.",
+		variant: "nozzle" as const,
+		href: "/proto/crossings/hard-vacuum",
+	},
+];
+---
+
+<Proto title="Cosmic Strawberry — Index" section="index">
+	<!-- ================= HERO ================= -->
+	<section class="hero">
+		<div class="shell">
+			<div class="hero__meta mono">
+				<span data-reveal>COSMIC STRAWBERRY / PERSONAL TRANSMISSION</span>
+				<span data-reveal>EST. 2026 — 41.4993 N / 81.6944 W</span>
+				<span data-reveal>SIG ◉ LOCKED</span>
+			</div>
+			<div class="rule"></div>
+
+			<div class="hero__word">
+				<h1 class="display" data-reveal><span>Cosmic</span><span>Strawberry</span></h1>
+			</div>
+
+			<div class="stripe hero__stripe" aria-hidden="true">
+				<span></span><span></span><span></span>
+			</div>
+
+			<div class="hero__body">
+				<div class="hero__thesis">
+					<p class="lede" data-reveal>
+						A working notebook about building things that have to survive contact with the
+						real world — software, systems, and the people who have to run them after you
+						leave.
+					</p>
+
+					<dl class="hero__specs mono">
+						<div class="spec" data-reveal>
+							<dt>Operator</dt>
+							<dd>Jermbo</dd>
+						</div>
+						<div class="spec" data-reveal>
+							<dt>Discipline</dt>
+							<dd>Front-of-house eng.</dd>
+						</div>
+						<div class="spec" data-reveal>
+							<dt>Output</dt>
+							<dd>Essays / teardowns</dd>
+						</div>
+						<div class="spec" data-reveal>
+							<dt>Cadence</dt>
+							<dd>Irregular, deliberate</dd>
+						</div>
+					</dl>
+				</div>
+
+				<figure class="hero__figure">
+					<SchemaCore />
+					<figcaption class="mono">
+						<span>FIG. 1 — CORE SECTION</span>
+						<span>SHEET 01 / 03</span>
+					</figcaption>
+				</figure>
+			</div>
+		</div>
+	</section>
+
+	<!-- ================= THESIS ================= -->
+	<section class="section section--tight">
+		<div class="shell">
+			<div class="marker mono">
+				<span class="marker__idx">§ 01</span>
+				<span class="marker__label">Thesis</span>
+				<span class="marker__count">A / C</span>
+			</div>
+
+			<div class="band">
+				<h2 class="h2" data-reveal="lines">
+					Precision is a form of<br /> generosity toward<br /> whoever comes next.
+				</h2>
+
+				<div class="band__note">
+					<span class="stripe stripe--v" aria-hidden="true">
+						<span></span><span></span><span></span>
+					</span>
+					<div class="prose" data-reveal>
+						<span class="drop">Standing order</span>
+						<p>
+							Most of what gets called craft is really just refusal — refusal to ship the
+							version that only works when you are in the room. The interesting work starts
+							at the handoff, where a decision has to explain itself without you standing
+							next to it.
+						</p>
+						<p>
+							This is where that gets written down: the teardowns, the constraints that
+							turned out to be load-bearing, and the occasional thing that broke in a way
+							worth documenting.
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- ================= METHOD ================= -->
+	<section class="section">
+		<div class="shell">
+			<div class="marker mono">
+				<span class="marker__idx">§ 02</span>
+				<span class="marker__label">Method</span>
+				<span class="marker__count">B / C</span>
+			</div>
+
+			<div class="steps" data-stagger>
+				<div class="step">
+					<div class="step__head mono">
+						<span class="marker__idx">A</span>
+						<span>DISASSEMBLE</span>
+					</div>
+					<div class="step__fig">
+						<SchemaMark variant="stack" label="Exploded stack diagram" />
+					</div>
+					<p>
+						Take the thing apart on the bench before arguing about it. Most disagreements
+						are really about two different mental models of the same part.
+					</p>
+				</div>
+
+				<div class="step">
+					<div class="step__head mono">
+						<span class="marker__idx">B</span>
+						<span>MEASURE</span>
+					</div>
+					<div class="step__fig">
+						<SchemaMark variant="trace" label="Signal trace against threshold" />
+					</div>
+					<p>
+						Numbers before adjectives. A trace that crosses the threshold twice is a
+						different problem than one that crosses it once and stays.
+					</p>
+				</div>
+
+				<div class="step">
+					<div class="step__head mono">
+						<span class="marker__idx">C</span>
+						<span>REASSEMBLE</span>
+					</div>
+					<div class="step__fig">
+						<SchemaMark variant="nozzle" label="Nozzle section with seal callout" />
+					</div>
+					<p>
+						Put it back with fewer parts than you started with, and leave the drawing
+						where the next person will actually look for it.
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- ================= CROSSINGS ================= -->
+	<section class="section">
+		<div class="shell">
+			<div class="marker mono">
+				<span class="marker__idx">§ 03</span>
+				<span class="marker__label">Crossings</span>
+				<span class="marker__count">C / C</span>
+			</div>
+
+			<div class="band" style="margin-bottom: var(--s-8);">
+				<h2 class="h2" data-reveal="lines">Crossings</h2>
+				<p class="lede" data-reveal>
+					Longer pieces. Each one is a passage between two states — a system before and
+					after the thing that changed it.
+				</p>
+			</div>
+
+			<div class="cards" data-stagger>
+				{
+					crossings.map((c) => (
+						<a class="card" href={c.href} data-cursor="Open →">
+							<div class="card__head mono">
+								<span class="marker__idx">{c.idx}</span>
+								<span>{c.date}</span>
+							</div>
+
+							<div class="card__fig">
+								<SchemaMark variant={c.variant} label={`${c.title} schematic`} />
+							</div>
+
+							<div class="card__title">
+								<h3 class="h3">{c.title}</h3>
+								<p class="mono" style="margin:.75rem 0 0; letter-spacing:.06em; text-transform:none; line-height:1.5; font-size:.8rem;">
+									{c.blurb}
+								</p>
+							</div>
+
+							<div class="card__foot mono">
+								<span>{c.meta}</span>
+								<span class="card__go">
+									READ
+									<svg viewBox="0 0 14 8" fill="none" aria-hidden="true">
+										<path d="M0 4h12" stroke="currentColor" stroke-width="1" />
+										<path d="M9 1l3 3-3 3" stroke="currentColor" stroke-width="1" />
+									</svg>
+								</span>
+							</div>
+
+							<span class="card__bar" aria-hidden="true">
+								<i />
+								<i />
+								<i />
+							</span>
+						</a>
+					))
+				}
+			</div>
+		</div>
+	</section>
+
+	<!-- ================= FOOTER ================= -->
+	<footer class="foot">
+		<div class="shell">
+			<div class="stripe foot__mark" aria-hidden="true">
+				<span></span><span></span><span></span>
+			</div>
+			<div class="foot__grid mono">
+				<span>COSMIC STRAWBERRY © 2026</span>
+				<span>CS-NAV / FW 0.0.1 / PROTOTYPE BUILD</span>
+				<span>◉ SIGNAL NOMINAL</span>
+			</div>
+		</div>
+	</footer>
+</Proto>

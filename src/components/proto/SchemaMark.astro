@@ -1,0 +1,128 @@
+---
+/**
+ * Small recurring schematic marks. Same drafting language as the hero
+ * figure, reduced to a single idea each.
+ */
+interface Props {
+	variant: "stack" | "orbit" | "trace" | "nozzle";
+	label?: string;
+}
+
+const { variant, label } = Astro.props;
+
+const plate = (y: number) => `M 48 ${y} L 110 ${y - 22} L 172 ${y} L 110 ${y + 22} Z`;
+const plates = [40, 78, 116];
+
+const trace = [
+	[26, 108],
+	[46, 96],
+	[62, 100],
+	[80, 62],
+	[98, 74],
+	[116, 40],
+	[134, 58],
+	[152, 32],
+	[172, 46],
+	[192, 24],
+]
+	.map((p) => p.join(","))
+	.join(" ");
+---
+
+<svg
+	class="schema"
+	viewBox="0 0 220 150"
+	role="img"
+	aria-label={label ?? `Schematic mark: ${variant}`}
+	data-fig
+>
+	{
+		variant === "stack" && (
+			<g>
+				<line class="ln ln--dash" x1="110" y1="8" x2="110" y2="142" />
+				{plates.map((y) => (
+					<path class="ln" d={plate(y)} />
+				))}
+				<path class="ln ln--faint" d="M48 40 L48 116" />
+				<path class="ln ln--faint" d="M172 40 L172 116" />
+				<g class="ln ln--faint">
+					<line x1="24" y1="18" x2="24" y2="138" />
+					<line x1="18" y1="18" x2="30" y2="18" />
+					<line x1="18" y1="138" x2="30" y2="138" />
+				</g>
+				<circle class="fill-orange" cx="110" cy="40" r="3" />
+				<text class="txt" x="200" y="43" text-anchor="end">
+					A
+				</text>
+				<text class="txt" x="200" y="81" text-anchor="end">
+					B
+				</text>
+				<text class="txt" x="200" y="119" text-anchor="end">
+					C
+				</text>
+			</g>
+		)
+	}
+
+	{
+		variant === "orbit" && (
+			<g>
+				<line class="ln ln--dash" x1="10" y1="75" x2="210" y2="75" />
+				<ellipse class="ln" cx="110" cy="75" rx="88" ry="30" />
+				<ellipse class="ln ln--faint" cx="110" cy="75" rx="88" ry="30" transform="rotate(34 110 75)" />
+				<circle class="ln" cx="110" cy="75" r="24" />
+				<circle class="ln ln--faint" cx="110" cy="75" r="11" />
+				<rect class="fill-blue" x="194" y="71" width="8" height="8" />
+				<polyline class="ln" points="198,71 198,40 172,40" />
+				<text class="txt" x="168" y="37" text-anchor="end">
+					APO
+				</text>
+			</g>
+		)
+	}
+
+	{
+		variant === "trace" && (
+			<g>
+				<polyline class="ln ln--faint" points="26,18 26,124 200,124" />
+				<line class="ln ln--dash" x1="26" y1="66" x2="200" y2="66" />
+				<polyline class="ln ln--red" points={trace} />
+				<g class="ln ln--faint">
+					<line x1="22" y1="40" x2="26" y2="40" />
+					<line x1="22" y1="66" x2="26" y2="66" />
+					<line x1="22" y1="92" x2="26" y2="92" />
+					<line x1="70" y1="124" x2="70" y2="128" />
+					<line x1="114" y1="124" x2="114" y2="128" />
+					<line x1="158" y1="124" x2="158" y2="128" />
+				</g>
+				<circle class="fill-red" cx="192" cy="24" r="3" />
+				<text class="txt" x="200" y="60" text-anchor="end">
+					THRESHOLD
+				</text>
+			</g>
+		)
+	}
+
+	{
+		variant === "nozzle" && (
+			<g>
+				<line class="ln ln--dash" x1="14" y1="75" x2="206" y2="75" />
+				<path class="ln" d="M46 52 L46 98 L146 128 L182 116 L182 34 L146 22 Z" />
+				<path class="ln ln--faint" d="M60 58 L60 92" />
+				<path class="ln ln--faint" d="M86 64 L86 86" />
+				<path class="ln ln--faint" d="M146 22 L146 128" />
+				<path class="ln ln--faint" d="M112 70 L112 80" />
+				<rect class="fill-blue" x="28" y="70" width="10" height="10" />
+				<polyline class="ln" points="146,22 146,12 118,12" />
+				<text class="txt" x="114" y="15" text-anchor="end">
+					SEAL
+				</text>
+				<g class="ln ln--faint">
+					<line x1="46" y1="140" x2="182" y2="140" />
+					<line x1="46" y1="134" x2="46" y2="146" />
+					<line x1="182" y1="134" x2="182" y2="146" />
+				</g>
+			</g>
+		)
+	}
+</svg>

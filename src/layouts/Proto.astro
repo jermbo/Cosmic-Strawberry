@@ -1,0 +1,140 @@
+---
+import "../styles/proto.css";
+
+interface Props {
+	title: string;
+	desc?: string;
+	section: string;
+	progress?: boolean;
+}
+
+const { title, desc = "Cosmic Strawberry — prototype", section, progress = false } = Astro.props;
+const path = Astro.url.pathname;
+---
+
+<html lang="en" data-theme="light">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content={desc} />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<title>{title}</title>
+
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Share+Tech+Mono&display=swap"
+			rel="stylesheet"
+		/>
+
+		<script is:inline>
+			document.documentElement.classList.add("js");
+			(function () {
+				var mode = null;
+				try {
+					mode = localStorage.getItem("cs-proto-theme");
+				} catch (e) {
+					/* no storage */
+				}
+				if (mode !== "light" && mode !== "dark") {
+					mode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+				}
+				document.documentElement.setAttribute("data-theme", mode);
+			})();
+		</script>
+	</head>
+
+	<body>
+		<header class="nav">
+			<div class="shell nav__in">
+				<a class="nav__id mono" href="/proto" data-cursor="Home">
+					<span>CS-NAV</span>
+					<span class="nav__dot" aria-hidden="true"></span>
+					<span class="mono-sm">FW 0.0.1</span>
+				</a>
+
+				<nav class="nav__links">
+					<a
+						class="nav__link mono"
+						href="/proto"
+						aria-current={path === "/proto" || path === "/proto/" ? "page" : undefined}
+						data-cursor="Index">Index</a
+					>
+					<a
+						class="nav__link mono nav__link--hide"
+						href="/proto/crossings/hard-vacuum"
+						aria-current={path.includes("/crossings/") ? "page" : undefined}
+						data-cursor="Read">Crossings</a
+					>
+					<span class="nav__sep" aria-hidden="true"></span>
+					<span class="mono mono-sm nav__link--hide" data-clock>--:--:-- UTC</span>
+					<button
+						class="toggle"
+						type="button"
+						aria-pressed="false"
+						aria-label="Switch colour mode"
+						data-cursor="Invert"
+					>
+						<span class="toggle__label toggle__label--mode">LT</span>
+						<span class="toggle__track" aria-hidden="true">
+							<i></i><i></i><i></i>
+							<span class="toggle__knob"></span>
+						</span>
+					</button>
+				</nav>
+			</div>
+		</header>
+
+		{
+			progress && (
+				<div class="progress" aria-hidden="true">
+					<i /><i /><i />
+				</div>
+			)
+		}
+
+		<main data-section={section}>
+			<slot />
+		</main>
+
+		<div class="wipe" aria-hidden="true"><i></i><i></i><i></i></div>
+
+		<div class="cursor" aria-hidden="true">
+			<span class="cursor__ring"></span>
+			<span class="cursor__dot"></span>
+			<span class="cursor__arm cursor__arm--h"></span>
+			<span class="cursor__arm cursor__arm--v"></span>
+			<span class="cursor__tag"></span>
+		</div>
+
+		<script>
+			import { initCursor } from "../lib/proto/cursor";
+			import { initTheme } from "../lib/proto/theme";
+			import { playHero, initReveals, initProgress, initPinned } from "../lib/proto/reveal";
+
+			const start = () => {
+				initTheme();
+				initCursor();
+				playHero();
+				initReveals();
+				initProgress();
+				initPinned();
+			};
+
+			if (document.fonts?.ready) {
+				document.fonts.ready.then(start);
+			} else {
+				start();
+			}
+
+			const clock = document.querySelector("[data-clock]");
+			if (clock) {
+				const tick = () => {
+					clock.textContent = `${new Date().toISOString().slice(11, 19)} UTC`;
+				};
+				tick();
+				setInterval(tick, 1000);
+			}
+		</script>
+	</body>
+</html>

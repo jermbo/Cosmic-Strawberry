@@ -1,0 +1,109 @@
+---
+/**
+ * Hero schematic — sectioned core with transfer orbit.
+ * Aerospace cutaway conventions: hairlines, radial section hatch,
+ * leader lines with terminal dots, dimension run along the bottom.
+ */
+const CX = 170;
+const CY = 190;
+
+const rad = (deg: number) => (deg * Math.PI) / 180;
+const px = (r: number, deg: number) => (CX + r * Math.cos(rad(deg))).toFixed(2);
+const py = (r: number, deg: number) => (CY + r * Math.sin(rad(deg))).toFixed(2);
+
+// section hatch between the inner and outer shells, lower-left quadrant
+const hatch = Array.from({ length: 19 }, (_, i) => {
+	const a = 100 + i * 5;
+	return { x1: px(47, a), y1: py(47, a), x2: px(78, a), y2: py(78, a) };
+});
+
+// seed cells on the mid shell
+const seeds = [20, 65, 110, 155, 200, 245, 290, 335].map((a) => ({
+	x: px(60, a),
+	y: py(60, a),
+	a: a + 90,
+}));
+---
+
+<svg
+	class="schema"
+	viewBox="0 0 400 400"
+	role="img"
+	aria-label="Sectioned core diagram with transfer orbit and numbered callouts"
+	data-fig
+>
+	<!-- registration marks -->
+	<g class="ln ln--faint">
+		<path d="M8 22 V8 H22" />
+		<path d="M378 8 H392 V22" />
+		<path d="M392 378 V392 H378" />
+		<path d="M22 392 H8 V378" />
+	</g>
+
+	<!-- construction axes -->
+	<line class="ln ln--dash" x1="8" y1={CY} x2="392" y2={CY} />
+	<line class="ln ln--dash" x1={CX} y1="14" x2={CX} y2="366" />
+
+	<!-- transfer orbit, inclined -->
+	<ellipse
+		class="ln ln--dash"
+		cx={CX}
+		cy={CY}
+		rx="150"
+		ry="58"
+		transform={`rotate(-18 ${CX} ${CY})`}
+	/>
+	<ellipse
+		class="ln ln--faint"
+		cx={CX}
+		cy={CY}
+		rx="118"
+		ry="118"
+	/>
+
+	<!-- shells -->
+	<circle class="ln" cx={CX} cy={CY} r="78" />
+	<circle class="ln" cx={CX} cy={CY} r="47" />
+	<circle class="ln" cx={CX} cy={CY} r="18" />
+
+	<!-- section hatch -->
+	<g class="ln ln--faint">
+		{hatch.map((h) => <line x1={h.x1} y1={h.y1} x2={h.x2} y2={h.y2} />)}
+	</g>
+
+	<!-- seed cells -->
+	<g class="ln">
+		{
+			seeds.map((s) => (
+				<ellipse cx={s.x} cy={s.y} rx="3.2" ry="5.8" transform={`rotate(${s.a} ${s.x} ${s.y})`} />
+			))
+		}
+	</g>
+
+	<!-- orbital node -->
+	<rect class="fill-red" x="306" y="246" width="7" height="7" />
+	<circle class="ln ln--red" cx="309.5" cy="249.5" r="13" />
+
+	<!-- callout 01 -->
+	<polyline class="ln" points="200,155 268,88 392,88" />
+	<circle class="fill-fg" cx="200" cy="155" r="2.4" />
+	<text class="txt txt--lead" x="392" y="80" text-anchor="end">01 / CORE</text>
+
+	<!-- callout 02 -->
+	<polyline class="ln" points="246,174 300,146 392,146" />
+	<circle class="fill-fg" cx="246" cy="174" r="2.4" />
+	<text class="txt" x="392" y="138" text-anchor="end">02 / SEED SHELL</text>
+
+	<!-- callout 03 -->
+	<polyline class="ln" points="313,249 350,302 392,302" />
+	<text class="txt" x="392" y="294" text-anchor="end">03 / TRANSFER NODE</text>
+
+	<!-- dimension run -->
+	<g class="ln ln--faint">
+		<line x1="10" y1="360" x2="10" y2="376" />
+		<line x1="330" y1="360" x2="330" y2="376" />
+		<line x1="10" y1="368" x2="146" y2="368" />
+		<line x1="194" y1="368" x2="330" y2="368" />
+	</g>
+	<text class="txt" x="170" y="371" text-anchor="middle">R 1.000 AU</text>
+</svg>

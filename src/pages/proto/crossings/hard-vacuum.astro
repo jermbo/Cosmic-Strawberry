@@ -1,0 +1,151 @@
+---
+import Proto from "../../../layouts/Proto.astro";
+import SchemaCutaway from "../../../components/proto/SchemaCutaway.astro";
+
+const chunks = [
+	{
+		step: "1",
+		idx: "01",
+		label: "Aperture",
+		readout: "SEC 01 — APERTURE / INTAKE STACK",
+		paras: [
+			"Every system has a mouth. It is the part everyone designs last and blames first, because it is the only place where the outside is allowed in on its own terms. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+			"The intake stack below it exists to slow that arrival down — three plates, each one taking a little of the shock the previous one refused. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+		],
+		pull: "The mouth is designed last and blamed first.",
+	},
+	{
+		step: "2",
+		idx: "02",
+		label: "Resonator",
+		readout: "SEC 02 — RESONATOR / PRIMARY ASSEMBLY",
+		paras: [
+			"Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. The resonator is the only moving part that is allowed to be loud, and it earns that by being the one component nobody can substitute with a workaround.",
+			"Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.",
+			"Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo, which is the polite way of saying the tolerances here are not negotiable and everyone downstream has agreed to live with that.",
+		],
+		pull: null,
+	},
+	{
+		step: "3",
+		idx: "03",
+		label: "Lattice",
+		readout: "SEC 03 — LATTICE / DISTRIBUTION BAY",
+		paras: [
+			"Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit. Fifteen cells, identical by drawing and never identical in service — the lattice is where a single decision gets multiplied until it becomes a property of the whole vessel.",
+			"Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.",
+		],
+		pull: "A single decision, multiplied fifteen times, stops being a decision and becomes a material.",
+	},
+	{
+		step: "4",
+		idx: "04",
+		label: "Exit Plane",
+		readout: "SEC 04 — EXIT PLANE / RELEASE",
+		paras: [
+			"Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam. The exit plane is not a part. It is an agreement about where the vessel stops being responsible for what it made.",
+			"Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur. At vero eos et accusamus et iusto odio dignissimos ducimus.",
+		],
+		pull: null,
+	},
+];
+---
+
+<Proto title="Hard Vacuum — Cosmic Strawberry" section="crossing" progress={true}>
+	<!-- ================= HEAD ================= -->
+	<header class="essay-head">
+		<div class="shell">
+			<div class="essay-head__meta mono">
+				<span data-reveal>CROSSING 001</span>
+				<span data-reveal>FIELD NOTE / 18 MIN</span>
+				<span data-reveal>FILED 2026.04.11</span>
+				<span data-reveal>◉ SHEET 02 / 03</span>
+			</div>
+
+			<h1 class="display essay-head__title" data-reveal>Hard Vacuum</h1>
+
+			<div class="stripe essay-head__stripe" aria-hidden="true">
+				<span></span><span></span><span></span>
+			</div>
+
+			<div class="essay-head__sub">
+				<p class="lede" data-reveal>
+					What survives the space between two systems that were never designed to touch —
+					and what the crossing itself costs, measured in parts.
+				</p>
+				<div class="prose" data-reveal>
+					<span class="drop">Abstract</span>
+					<p style="margin:0;">
+						A longitudinal teardown of a single passage, section by section, from intake
+						to release. The diagram tracks the reading position; each callout activates as
+						its section comes up.
+					</p>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<!-- ================= PINNED PANEL ================= -->
+	<section class="section section--tight" style="padding-top: var(--s-4);">
+		<div class="shell">
+			<div class="pinned">
+				<!-- sticky diagram -->
+				<div class="pinned__panel">
+					<div class="pinned__bar mono">
+						<span>FIG. 2 — LONGITUDINAL SECTION</span>
+						<span>1:24</span>
+					</div>
+
+					<div class="pinned__frame">
+						<SchemaCutaway />
+					</div>
+
+					<div class="pinned__readout mono">
+						<span><b data-readout>SEC 01 — APERTURE / INTAKE STACK</b></span>
+						<span>REV. C</span>
+					</div>
+				</div>
+
+				<!-- scrolling prose -->
+				<div class="pinned__prose">
+					{
+						chunks.map((c) => (
+							<article class="chunk" data-step={c.step} data-readout={c.readout}>
+								<div class="chunk__head mono">
+									<span class="chunk__idx">{c.idx}</span>
+									<span>{c.label}</span>
+								</div>
+
+								<div class="prose" data-reveal>
+									{c.paras.map((p) => (
+										<p>{p}</p>
+									))}
+									{c.pull && <p class="pull">{c.pull}</p>}
+								</div>
+							</article>
+						))
+					}
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- ================= FOOT ================= -->
+	<section class="essay-foot">
+		<div class="shell" style="display:flex; justify-content:space-between; gap:var(--s-4); flex-wrap:wrap; align-items:end;">
+			<div>
+				<span class="mono" style="display:block; margin-bottom:var(--s-2);">NEXT CROSSING — 002</span>
+				<a href="/proto/crossings/hard-vacuum" data-cursor="Open →">
+					<h2 class="h2">Second Stage</h2>
+				</a>
+			</div>
+
+			<div style="display:flex; flex-direction:column; gap:var(--s-2); align-items:flex-end;">
+				<span class="stripe" style="--stripe-h:8px; width:120px;" aria-hidden="true">
+					<span></span><span></span><span></span>
+				</span>
+				<a class="mono" href="/proto" data-cursor="Back">← RETURN TO INDEX</a>
+			</div>
+		</div>
+	</section>
+</Proto>
