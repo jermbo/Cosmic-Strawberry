@@ -6,8 +6,15 @@ interface Props {
 	desc?: string;
 	section: string;
 	progress?: boolean;
-	/** Off for the IA exploration pages, which are judged on structure alone. */
-	motion?: boolean;
+	/**
+	 * `true`  — the standard load: hero timeline plus scroll reveals.
+	 * `false` — no motion at all; everything is placed in its final state.
+	 * `"manual"` — the page owns its own motion end to end. The layout still
+	 *   brings up the theme and the cursor, then gets out of the way. Used by
+	 *   pages whose load is not a document load and cannot be expressed as a
+	 *   hero timeline plus scroll triggers.
+	 */
+	motion?: boolean | "manual";
 }
 
 const {
@@ -52,7 +59,7 @@ const path = Astro.url.pathname;
 		</script>
 	</head>
 
-	<body data-motion={motion ? "on" : "off"}>
+	<body data-motion={motion === "manual" ? "manual" : motion ? "on" : "off"}>
 		<header class="nav">
 			<div class="shell nav__in">
 				<a class="nav__id mono" href="/proto" data-cursor="Home">
@@ -141,6 +148,9 @@ const path = Astro.url.pathname;
 			const start = () => {
 				initTheme();
 				initCursor();
+
+				/* the page runs its own load; touching anything here would fight it */
+				if (document.body.dataset.motion === "manual") return;
 
 				if (document.body.dataset.motion === "off") {
 					settle();

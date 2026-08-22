@@ -1,6 +1,6 @@
 # 05 — Motion
 
-**Source of truth:** `src/lib/proto/reveal.ts`, `cursor.ts`, `theme.ts`
+**Source of truth:** `src/lib/proto/reveal.ts`, `cursor.ts`, `theme.ts`, `hub/boot.ts`
 **Live:** [`/proto/kit`](../../src/pages/proto/kit.astro) § 06, with a replay control
 
 ## Principles
@@ -76,6 +76,57 @@ animates against a fallback face and reflows.
 The figure starts drawing *before* the stripe lands, so the two are on screen
 together — the page is being drafted, not listed.
 
+## Deck load sequence — hub option 06
+
+The hub deck is fixed and never scrolls, so it cannot express its load as a
+hero timeline plus scroll triggers. It runs `motion="manual"` on the layout,
+which brings up theme and cursor and then leaves the page alone, and owns the
+whole sequence in `src/lib/proto/hub/boot.ts`.
+
+Two beats, deliberately overlapped so the whole thing is ~1.75s rather than
+two sequential loads:
+
+```
+REGISTER
+0.00s  world descends 30% of a viewport into the frame        1.20s expo.out
+0.00s  ghost word slides in from the left                     1.40s expo.out
+0.06s  section rail and down-affordance land, 0.05s apart     0.60s power4.out
+0.20s  progress stripe assembles, 0.085s apart                0.62s power4.out
+
+DRAFT
+0.40s  mono meta lines fade up, 0.06s apart                   0.50s power4.out
+0.46s  hairline rule scales from left                         0.95s expo.out
+0.52s  wordmark lines rise out of mask, 0.085s apart          1.05s expo.out
+0.76s  core section begins drawing itself                     0.85s power2.inOut
+0.86s  stripe segments land, 0.085s apart                     0.62s power4.out
+1.04s  lede and spec table fade up, 0.07s apart               0.70s power4.out
+1.06s  figure caption fades in behind its drawing             0.50s none
+```
+
+**Why the world moves first.** The register is the deck's own gesture,
+performed once before anyone has touched it. It is the only part of the load
+that teaches the interaction: this surface translates, it does not scroll. The
+travel is downward — content descending into the frame, never rising over the
+fold — and it is deliberately a third of a viewport rather than a full row, so
+the Projects cells are never flashed on the way past.
+
+**Why the masthead drafts second.** Row 00 *is* the index hero, so it gets the
+index hero's vocabulary: rule from the left, wordmark out of a mask, line-work
+drawing itself, stripe landing, copy last. Continuity with `/proto` is the
+point.
+
+**The rest of the deck.** Every other row draws its line-work the first time
+that row is entered — the whole row at once, not just the active cell, because
+the neighbours peeking in at the margins would otherwise read as blank panels.
+`initDeck({ drawFigures: true })`.
+
+**The pre-boot frame.** `.deck.is-booting` is in the markup and removed one
+frame after the timeline is built. It holds the masthead copy at `opacity: 0`
+and suppresses the cell and chrome transitions, so the first painted frame is
+already the pre-boot state. Without it the deck cross-fades into itself twice:
+the masthead transitioning up from the inactive `0.24`, and the fixed chrome
+fading out as `data-accent` resolves to `mast`.
+
 ## Scroll reveals
 
 All handled by `initReveals()`, keyed off attributes rather than a manifest:
@@ -144,5 +195,8 @@ Under reduced motion the tokens swap directly, with a 0.5s CSS transition on
 
 - Does the essay want a chunk-to-chunk transition on the callout, or is the
   straight cross-fade correct?
+- `deck.ts` springs the drag-lean back with `elastic.out(1, 0.5)`, which the
+  easing rule above bans outright. Keep it as a deliberate exception for
+  physical drag feedback, or bring it back to `power3.out`?
 - Should the hero figure redraw on theme change, or is that a gimmick that gets
   old on the second toggle?

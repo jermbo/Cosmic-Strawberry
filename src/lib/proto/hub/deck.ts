@@ -12,6 +12,7 @@
  * All motion is transitional. Nothing here starts on a timer.
  */
 import gsap from "gsap";
+import { drawFigure } from "../reveal";
 
 const reduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));
@@ -30,7 +31,24 @@ const WHEEL_THRESHOLD = 40;
 const EASE = "expo.out";
 const DUR = 0.78;
 
-export function initDeck(): void {
+export interface DeckOptions {
+	/**
+	 * Play the arrival tween for the starting cell. Pages that run their own
+	 * load sequence turn this off so the boot is one timeline rather than two
+	 * competing ones; every later move still animates normally.
+	 */
+	intro?: boolean;
+	/**
+	 * Draw each row's line-work the first time that row is entered, rather
+	 * than having it present from the start. Off by default: pages that route
+	 * through `initReveals()` already own their figures.
+	 */
+	drawFigures?: boolean;
+}
+
+export function initDeck(opts: DeckOptions = {}): void {
+	const { intro = true, drawFigures = false } = opts;
+
 	const deck = document.querySelector<HTMLElement>("[data-deck]");
 	if (!deck) return;
 
@@ -141,11 +159,34 @@ export function initDeck(): void {
 	/* --------------------------------------------------------------- animation */
 
 	/**
+	 * Line-work draws itself the first time a row comes into view — the whole
+	 * row at once, not just the active cell, because the neighbours peeking in
+	 * at the margins would otherwise be visibly blank panels.
+	 */
+	function drawRow(r: number): void {
+		if (!drawFigures) return;
+		const el = rows[r];
+		if (el.dataset.drawn === "true") return;
+		el.dataset.drawn = "true";
+
+		const figs = Array.from(el.querySelectorAll<HTMLElement>("[data-fig]"));
+		if (!figs.length) return;
+
+		if (reduced()) {
+			figs.forEach((f) => (f.style.opacity = "1"));
+			return;
+		}
+
+		figs.forEach((f, i) => drawFigure(f, i * 0.09));
+	}
+
+	/**
 	 * The arrival. Layers land at different rates — ghost word slowest, panel
 	 * next, copy last — which is what reads as depth without anything
 	 * literally moving in Z.
 	 */
 	function arrive(dir: number): void {
+		drawRow(row);
 		if (reduced()) return;
 
 		const cell = cellsOf(row)[cols[row]];
@@ -485,5 +526,11 @@ export function initDeck(): void {
 	 * rAF is throttled, so that tween would not run and the copy would sit
 	 * invisible until the tab was focused — skip it and keep the CSS default.
 	 */
+	if (!intro) {
+		/* the page's own load owns the first arrival; still paint the readouts */
+		return;
+	}
+
 	if (document.visibilityState === "visible") arrive(1);
+	else drawRow(row);
 }

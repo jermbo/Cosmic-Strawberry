@@ -14,6 +14,7 @@
  */
 import Proto from "../../../layouts/Proto.astro";
 import SchemaMark from "../../../components/proto/SchemaMark.astro";
+import SchemaCore from "../../../components/proto/SchemaCore.astro";
 import { projects } from "../../../data/projects";
 import { writing } from "../../../data/writing";
 import { lab } from "../../../data/lab";
@@ -89,12 +90,94 @@ const rows: { num: string; name: string; cells: Cell[] }[] = [
 		})),
 	},
 ];
+
+/*
+ * The rail lists the masthead alongside the three content sections — it is a
+ * row like any other as far as the deck is concerned, so it has to be one
+ * here too or the dots stop lining up with what they drive.
+ */
+const nav = [{ num: "00", name: "Masthead" }, ...rows.map((r) => ({ num: r.num, name: r.name }))];
 ---
 
-<Proto title="Hub / Option 6 — Deck" section="hub" motion={false}>
-	<div class="deck" data-deck aria-label="Cosmic Strawberry hub, use arrow keys to move">
+<Proto title="Hub / Option 6 — Deck" section="hub" motion="manual">
+	<div
+		class="deck is-booting"
+		data-deck
+		data-accent="mast"
+		aria-label="Cosmic Strawberry hub, use arrow keys to move"
+	>
 		<!-- ============ the world that moves ============ -->
 		<div class="deck__world" data-world>
+			{/* ---- 00 / the masthead: the front door, before any of the work ---- */}
+			<div class="deck__row" data-row data-section="Masthead" data-num="00">
+				<div
+					class="cell cell--mast"
+					data-cell
+					data-title="Cosmic Strawberry"
+					data-accent="mast"
+					data-cursor="Scroll ↓"
+				>
+					<span class="cell__ghost" data-ghost aria-hidden="true">
+						<span class="cell__ghost-in" data-par="0.05">Hub</span>
+					</span>
+
+					<div class="mast">
+						<div class="mast__meta mono" data-line>
+							<span>COSMIC STRAWBERRY / PERSONAL TRANSMISSION</span>
+							<span>EST. 2026 &mdash; 41.4993 N / 81.6944 W</span>
+							<span>SIG ◉ LOCKED</span>
+						</div>
+						<div class="rule"></div>
+
+						<div class="mast__word" data-par="0.018">
+							<h1 class="display" data-line>
+								<span>Cosmic</span><span>Strawberry</span>
+							</h1>
+						</div>
+
+						<div class="stripe mast__stripe" aria-hidden="true">
+							<span></span><span></span><span></span>
+						</div>
+
+						<div class="mast__body">
+							<div class="mast__thesis">
+								<p class="lede" data-line>
+									Projects, writing, and the bench work in between &mdash; three
+									sections, one screen, traversed rather than scrolled.
+								</p>
+
+								<dl class="mast__specs mono" data-line>
+									<div class="spec">
+										<dt>Operator</dt>
+										<dd>Jermbo</dd>
+									</div>
+									<div class="spec">
+										<dt>Sections</dt>
+										<dd>{rows.length}</dd>
+									</div>
+									<div class="spec">
+										<dt>Entries</dt>
+										<dd>{rows.reduce((n, r) => n + r.cells.length, 0)}</dd>
+									</div>
+									<div class="spec">
+										<dt>Traverse</dt>
+										<dd>&larr; &rarr; &uarr; &darr;</dd>
+									</div>
+								</dl>
+							</div>
+
+							<figure class="mast__figure" data-line>
+								<SchemaCore />
+								<figcaption class="mono">
+									<span>FIG. 1 &mdash; CORE SECTION</span>
+									<span>SHEET 01 / 03</span>
+								</figcaption>
+							</figure>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			{
 				rows.map((r) => (
 					<div class="deck__row" data-row data-section={r.name} data-num={r.num}>
@@ -165,7 +248,7 @@ const rows: { num: string; name: string; cells: Cell[] }[] = [
 
 		<div class="sections mono">
 			{
-				rows.map((r, i) => (
+				nav.map((r) => (
 					<button type="button" data-section-dot data-cursor={r.name}>
 						<span class="sections__num">{r.num}</span>
 						<span class="sections__name">{r.name}</span>
@@ -175,8 +258,8 @@ const rows: { num: string; name: string; cells: Cell[] }[] = [
 		</div>
 
 		<div class="now mono">
-			<span class="now__num" data-rail-section-num>01</span>
-			<span class="now__name" data-rail-section>Projects</span>
+			<span class="now__num" data-rail-section-num>00</span>
+			<span class="now__name" data-rail-section>Masthead</span>
 		</div>
 
 		<div class="drag mono">
@@ -209,9 +292,31 @@ const rows: { num: string; name: string; cells: Cell[] }[] = [
 <script>
 	import { initDeck } from "../../../lib/proto/hub/deck";
 	import { initPlay } from "../../../lib/proto/hub/play";
+	import { playDeckBoot } from "../../../lib/proto/hub/boot";
 
-	initDeck();
-	initPlay();
+	/*
+	 * `motion="manual"` means the layout has settled nothing — this page owns
+	 * its load end to end. The deck wires itself up without playing its own
+	 * arrival, the boot performs that first arrival as one timeline, and every
+	 * row after this one draws its line-work when it is first entered.
+	 */
+	const start = () => {
+		initDeck({ intro: false, drawFigures: true });
+		initPlay();
+		playDeckBoot();
+
+		/* transitions were suppressed so the first paint could not cross-fade */
+		requestAnimationFrame(() => {
+			document.querySelector("[data-deck]")?.classList.remove("is-booting");
+		});
+	};
+
+	/* the wordmark is split into lines, so it must not be split against a fallback face */
+	if (document.fonts?.ready) {
+		document.fonts.ready.then(start);
+	} else {
+		start();
+	}
 </script>
 
 <style>
@@ -261,8 +366,16 @@ const rows: { num: string; name: string; cells: Cell[] }[] = [
 		will-change: transform;
 	}
 
+	/*
+	 * Exactly one viewport tall, never more. The deck steps the world by
+	 * deck.clientHeight, so a row that grows to fit its content — the
+	 * masthead is the only one that can — silently desyncs every row below
+	 * it. The cap is what keeps that arithmetic true.
+	 */
 	.deck__row {
 		flex: 0 0 100%;
+		min-height: 0;
+		max-height: 100%;
 		display: flex;
 		align-items: stretch;
 		will-change: transform;
@@ -323,6 +436,165 @@ const rows: { num: string; name: string; cells: Cell[] }[] = [
 
 	.cell[data-flip="true"] .cell__type {
 		align-items: flex-end;
+	}
+
+	/* ================= 00 / the masthead ================= */
+
+	/*
+	 * Row 00 is the proto index hero, re-cut to live inside a cell: full
+	 * viewport width rather than 86vw, because there is no next item in this
+	 * section to peek in at the edge, and centred vertically because the
+	 * deck never scrolls to reveal what a page hero would put below the fold.
+	 */
+	.cell--mast {
+		flex: 0 0 100vw;
+		margin-right: 0;
+		height: 100%;
+		overflow: hidden;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		align-content: center;
+		padding: 5rem clamp(2rem, 6vw, 6rem) 5.5rem;
+	}
+
+	.mast {
+		position: relative;
+		z-index: 2;
+		width: min(100%, var(--maxw));
+		margin-inline: auto;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.mast__meta {
+		display: flex;
+		justify-content: space-between;
+		gap: var(--s-3);
+		padding-bottom: var(--s-2);
+		flex-wrap: wrap;
+	}
+
+	.mast__word {
+		position: relative;
+		margin-top: var(--s-3);
+	}
+
+	/*
+	 * The index hero can afford 13.5vw because the page scrolls. Here the
+	 * wordmark, the stripe, the lede and the spec table all have to clear one
+	 * viewport, so the type is capped against height as well as width.
+	 */
+	.mast__word .display {
+		font-size: clamp(2.5rem, min(10.5vw, 13.5vh), 9rem);
+	}
+
+	.mast__word .display,
+	.mast__word .display span {
+		display: block;
+	}
+
+	.mast__stripe {
+		--stripe-h: clamp(10px, 1.3vw, 16px);
+		margin: var(--s-3) 0 var(--s-4);
+	}
+
+	.mast__body {
+		display: grid;
+		grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+		gap: clamp(1.5rem, 5vw, 5rem);
+		align-items: start;
+	}
+
+	.mast__thesis {
+		display: flex;
+		flex-direction: column;
+		gap: var(--s-3);
+	}
+
+	.mast__figure {
+		margin: 0;
+		width: 100%;
+		max-width: 22rem;
+		margin-left: auto;
+		/* the schematic answers the drag exactly as the cell panels do */
+		transform: rotate(calc(var(--lean, 0) * -1.6deg))
+			translateX(calc(var(--lean, 0) * -10px));
+	}
+
+	.mast__figure :global(.schema) {
+		width: 100%;
+		max-height: 26vh;
+	}
+
+	.mast__figure figcaption {
+		margin-top: var(--s-2);
+		padding-top: var(--s-1);
+		border-top: var(--hair) solid var(--rule);
+		display: flex;
+		justify-content: space-between;
+		gap: var(--s-2);
+	}
+
+	.mast__specs {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: var(--s-2) var(--s-3);
+		margin: var(--s-2) 0 0;
+		max-width: 34ch;
+	}
+
+	/*
+	 * On row 00 the item rail, the drag prompt and the "you are here" readout
+	 * all describe a section of one, so they say nothing true. The down
+	 * affordance is the only control that means anything here, and it stays.
+	 */
+	.deck[data-accent="mast"] .rail,
+	.deck[data-accent="mast"] .drag,
+	.deck[data-accent="mast"] .now {
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.rail,
+	.drag,
+	.now {
+		transition: opacity 0.5s var(--ease);
+	}
+
+	.cell[data-accent="mast"] {
+		--cell-accent: var(--cs-red);
+	}
+
+	/*
+	 * The first painted frame must already be the pre-boot state. Without this
+	 * the deck cross-fades into itself: the masthead transitions up from the
+	 * inactive 0.24, and the chrome fades out as `data-accent` resolves —
+	 * two fades, in a load whose whole point is that nothing fades.
+	 */
+	.deck.is-booting .cell,
+	.deck.is-booting .rail,
+	.deck.is-booting .drag,
+	.deck.is-booting .now {
+		transition: none;
+	}
+
+	.deck.is-booting .cell--mast {
+		opacity: 1;
+	}
+
+	/*
+	 * The masthead's copy is hidden for exactly as long as it takes the boot
+	 * to claim it. Without this the type paints, then snaps out when the
+	 * timeline applies its from-states — visible on any slow font load.
+	 * Same bargain the rest of the system makes with `html.js [data-reveal]`:
+	 * hidden only while scripting is expected to arrive.
+	 */
+	html.js .deck.is-booting .mast__meta span,
+	html.js .deck.is-booting .display,
+	html.js .deck.is-booting .lede,
+	html.js .deck.is-booting .mast__specs,
+	html.js .deck.is-booting .mast__figure figcaption {
+		opacity: 0;
 	}
 
 	/* ================= the launch zone ================= */
@@ -710,6 +982,23 @@ const rows: { num: string; name: string; cells: Cell[] }[] = [
 		.sections,
 		.rail {
 			display: none;
+		}
+
+		.cell--mast {
+			padding: 5.5rem 1.25rem 6.5rem;
+		}
+
+		.mast__body {
+			grid-template-columns: minmax(0, 1fr);
+			gap: var(--s-3);
+		}
+
+		.mast__figure {
+			display: none;
+		}
+
+		.mast__specs {
+			margin-top: var(--s-3);
 		}
 	}
 </style>
