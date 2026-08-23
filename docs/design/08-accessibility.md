@@ -38,7 +38,7 @@ the same repair.
 |---------|------|
 | Ctrl+wheel zoom | The deck's wheel handler returns before `preventDefault()` |
 | Pinch zoom | `touch-action: pinch-zoom`, never `none` |
-| Text zoom | Cells scroll internally when content outgrows them |
+| Text zoom | Cells scroll internally when content outgrows them; the wheel yields only to real overflow containers, not transform-sized ancestors like `.deck__world` |
 | System pointer | The drawn cursor is disabled under `prefers-reduced-motion` |
 | Arrow keys | The deck answers only when focus is loose or inside it |
 

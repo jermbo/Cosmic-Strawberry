@@ -389,14 +389,23 @@ export function initDeck(opts: DeckOptions = {}): void {
 	 * Can anything between the pointer and the deck still scroll this way? If so
 	 * the wheel belongs to it, not to the deck. This is what lets a cell whose
 	 * content is taller than the viewport — a zoomed-in masthead — be read.
+	 *
+	 * Only real overflow containers count. `.deck__world` is taller than the
+	 * viewport because the rows are stacked, but it moves by transform — treating
+	 * its scrollHeight as room stole the wheel and left section moves dead.
 	 */
 	function scrollableUnder(target: Element | null, dy: number): boolean {
 		let el: Element | null = target;
 		while (el && el !== deck) {
-			const room = el.scrollHeight - el.clientHeight;
-			if (room > 1) {
-				const top = el.scrollTop;
-				if (dy > 0 ? top < room - 1 : top > 1) return true;
+			if (el instanceof HTMLElement) {
+				const oy = getComputedStyle(el).overflowY;
+				if (oy === "auto" || oy === "scroll" || oy === "overlay") {
+					const room = el.scrollHeight - el.clientHeight;
+					if (room > 1) {
+						const top = el.scrollTop;
+						if (dy > 0 ? top < room - 1 : top > 1) return true;
+					}
+				}
 			}
 			el = el.parentElement;
 		}
