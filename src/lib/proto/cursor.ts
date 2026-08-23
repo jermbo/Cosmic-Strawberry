@@ -4,9 +4,20 @@ import gsap from "gsap";
  * Two-state instrument cursor: a trailing ring that snaps from circle to
  * crosshair-square over anything interactive, plus a mono tag read from
  * `data-cursor` on the target.
+ *
+ * Two states, and it stays two. The reticle means one thing — *you can hit
+ * this* — and it only means that for as long as nothing else wears it. Surfaces
+ * that are merely draggable do not set `data-cursor`; they leave the cursor at
+ * rest, which is itself the honest signal.
  */
 export function initCursor(): void {
 	if (window.matchMedia("(pointer: coarse)").matches) return;
+
+	/*
+	 * Replacing the system pointer costs anyone who relies on it to aim. This
+	 * is motion, so it answers to the switch people already have.
+	 */
+	if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
 	// Not `.cursor` — the kit page renders static copies of this markup to
 	// document the two states, and they appear earlier in the document.

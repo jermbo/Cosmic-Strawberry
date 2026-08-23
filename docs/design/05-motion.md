@@ -24,6 +24,10 @@ No `back` or `elastic` easing anywhere. The easing set is `expo.out`,
 `power4.out`, `power3.out`, `power2.inOut`, `power3.inOut`, `none`. Motion
 decelerates into place and stops — the way a plotter arm does.
 
+The one exception is `steps()`, used only by the hub deck's signal lock. A
+dropped frame reads as a fault; a smooth slide reads as decoration. If something
+is meant to look broken for 140ms it must not ease.
+
 ### Sequence over duration
 
 Almost everything is fast (0.4–1.05s). The feeling of deliberateness comes from
@@ -59,6 +63,19 @@ this is a correctness requirement, not a nicety.
 Shared easing token: `--ease: cubic-bezier(0.22, 1, 0.36, 1)` for CSS-side
 transitions (hover states, the toggle knob, cursor shape changes).
 
+**SplitText hands back the accessible name.** The mask wrappers carry
+`aria-hidden="true"`, so a masked `<h1>` announces as an empty level-1 heading.
+`maskLines()` captures the name before the split and pins it back on with
+`aria-label`. Separate the child spans with whitespace in the markup, or
+`textContent` runs the words together ("CosmicStrawberry").
+
+**DrawSVG hands back its properties.** The draw works by writing
+`stroke-dasharray` and `stroke-dashoffset` inline, which outrank the stylesheet
+— so a drawn `.ln--dash` finishes *solid* and every centreline and construction
+line quietly stops reading as one. `drawFigure()` clears both props on complete
+so CSS takes the dash pattern back. Any future stroke effect that touches those
+properties owes the same courtesy.
+
 ## Hero load sequence
 
 One timeline, `playHero()`, fired after `document.fonts.ready` so nothing
@@ -93,12 +110,18 @@ REGISTER
 0.06s  section rail and down-affordance land, 0.05s apart     0.60s power4.out
 0.20s  progress stripe assembles, 0.085s apart                0.62s power4.out
 
+SIGNAL LOCK
+0.30s  scanline crosses the deck, top to bottom, fading       0.45s none
+0.30s  whole masthead displaces 5px and corrects              0.14s steps(3)
+
 DRAFT
 0.40s  mono meta lines fade up, 0.06s apart                   0.50s power4.out
+0.40s  ...and resolve out of noise, same stagger              0.60s scrambleText
 0.46s  hairline rule scales from left                         0.95s expo.out
 0.52s  wordmark lines rise out of mask, 0.085s apart          1.05s expo.out
 0.76s  core section begins drawing itself                     0.85s power2.inOut
 0.86s  stripe segments land, 0.085s apart                     0.62s power4.out
+0.92s  stripe off register by 4px, corrected                  0.16s steps(2)
 1.04s  lede and spec table fade up, 0.07s apart               0.70s power4.out
 1.06s  figure caption fades in behind its drawing             0.50s none
 ```
@@ -110,6 +133,15 @@ travel is downward — content descending into the frame, never rising over the
 fold — and it is deliberately a third of a viewport rather than a full row, so
 the Projects cells are never flashed on the way past.
 
+**Why there is a glitch at all, and why only here.** The masthead claims `SIG ◉
+LOCKED`, so the load earns it: one scanline, one hard displacement, and the mono
+readouts resolving out of noise. `SIG ◉ LOCKED` is the third and last meta line,
+so the lock is literally the last thing to resolve — which is the only order
+that means anything. This is the single place the "nothing plays on a timer"
+rule is spent, and it is spent on a *transition*: it happens once, on arrival,
+and can never happen again. A permanent scanline is wallpaper you stop seeing on
+the second visit; that would be the `cold-boot` pivot, not this.
+
 **Why the masthead drafts second.** Row 00 *is* the index hero, so it gets the
 index hero's vocabulary: rule from the left, wordmark out of a mask, line-work
 drawing itself, stripe landing, copy last. Continuity with `/proto` is the
@@ -119,6 +151,46 @@ point.
 that row is entered — the whole row at once, not just the active cell, because
 the neighbours peeking in at the margins would otherwise read as blank panels.
 `initDeck({ drawFigures: true })`.
+
+**Per-move, after the boot.** Three things the deck does on every arrival:
+
+| Move | Mechanism | Notes |
+|------|-----------|-------|
+| Axis-matched depth | ghost `110` / panel `44` / copy `20`, applied on the axis you travelled | A section change used to slide the whole cell as one plane. Running the horizontal ratios vertically is what gives the vertical move real depth. |
+| Ghost resolve | `scrambleText` over 0.7s, `revealDelay: 0.12` | The largest element on screen participates in the move instead of being swapped. `initDeck({ scrambleGhost: true })`. |
+| Grid parallax | `--travel-x` / `--travel-y` published by the deck, consumed at 1/12 rate | Same publish-don't-apply bargain as `--lean`. The deck states how far it went; the page decides what listens. |
+
+**The construction grid.** A 40px minor / 200px major drafting grid behind the
+world, fixed like the chrome. It drifts against the world at a twelfth of its
+rate and shears 22px under `--lean`, so the deck reads as a surface being moved
+over rather than a stack of panels being swapped. Opacity 0.6 light, 0.3 dark —
+the same alpha reads far weaker as ink on cream than as cream on ink.
+
+Its travel transition is `cubic-bezier(0.16, 1, 0.3, 1)`, *not* the shared
+`--ease` token. `--ease` is a quint-ish curve and the deck moves on GSAP's
+`expo.out`; matching only the duration left the grid visibly drifting against
+the world for most of the move. Anything CSS-transitioned alongside a GSAP move
+has to match the curve, not just the clock.
+
+**Past the ends.** Travel beyond the first or last item is rubber-banded with
+diminishing returns, capped at 10% of the span, and a drag that commits at an
+edge still springs back — `goCol`/`goRow` report a refused move so `endDrag` can
+settle rather than leaving the world parked wherever the pointer was released.
+Past the end is a hint that there is nothing there, not somewhere you get to go.
+
+**A spring back is not an arrival.** `settle(0)` returns a cell that did not
+move. It does not replay the arrival tween. If it did, an aborted drag on the
+masthead would look like the page had reloaded.
+
+**Mouse dragging is off; the swipe stays.** `initDeck({ drag: "touch" })`. On a
+mouse the drag competed with the wheel and the arrow keys for the same job. On a
+phone there is no wheel and no arrow keys, so the swipe is the only continuous
+control and cannot be given up.
+
+**The type blocks are not drag handles.** `.mast` and `.cell__type` carry
+`data-no-drag` and keep `user-select: text`. A deck that is one unbroken drag
+surface cannot be read by text-to-speech, because the user must select a
+paragraph to have it read aloud.
 
 **The pre-boot frame.** `.deck.is-booting` is in the markup and removed one
 frame after the timeline is built. It holds the masthead copy at `opacity: 0`
@@ -176,12 +248,21 @@ colour of its own.
   label fades in beside it from the element's `data-cursor` value.
 - **Down** — ring contracts to 26px. A physical click.
 
+**Two, and it stays two.** The reticle means exactly one thing — *you can hit
+this* — and it only keeps meaning that for as long as nothing else wears it. A
+draggable surface is not a target, so it does not set `data-cursor` at all: it
+leaves the cursor at rest, which is the honest signal. Where an affordance needs
+saying out loud, the chrome says it (`drag ‹ ›`, `scroll down to navigate`)
+rather than the pointer growing a new shape.
+
+This replaced a three-shape system — target / surface / field — that was tried
+and removed. Each shape was individually defensible and the set was not: more
+cursor vocabulary reads as inconsistency, not precision. The original problem it
+solved (a reticle sitting over a 100vw panel you cannot click) is better solved
+by removing the trigger than by adding a mode.
+
 Labels are verbs: `Open →`, `Invert`, `Read`, `Back`, `Inspect`, `Replay`. The
 shape change is CSS transition; only the position is GSAP.
-
-Disabled entirely on coarse pointers, and `cursor: none` is applied via
-`html.has-cursor` — set by JS, so the real cursor never disappears if the script
-fails.
 
 ## Theme wipe
 

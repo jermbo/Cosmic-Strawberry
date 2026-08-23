@@ -60,6 +60,8 @@ const path = Astro.url.pathname;
 	</head>
 
 	<body data-motion={motion === "manual" ? "manual" : motion ? "on" : "off"}>
+		<a class="skip" href="#main">Skip to content</a>
+
 		<header class="nav">
 			<div class="shell nav__in">
 				<a class="nav__id mono" href="/proto" data-cursor="Home">
@@ -94,7 +96,6 @@ const path = Astro.url.pathname;
 						data-cursor="Inspect">Kit</a
 					>
 					<span class="nav__sep" aria-hidden="true"></span>
-					<span class="mono mono-sm nav__link--hide" data-clock>--:--:-- UTC</span>
 					<button
 						class="toggle"
 						type="button"
@@ -120,7 +121,7 @@ const path = Astro.url.pathname;
 			)
 		}
 
-		<main data-section={section}>
+		<main id="main" data-section={section}>
 			<slot />
 		</main>
 
@@ -167,15 +168,6 @@ const path = Astro.url.pathname;
 				document.fonts.ready.then(start);
 			} else {
 				start();
-			}
-
-			const clock = document.querySelector("[data-clock]");
-			if (clock) {
-				const tick = () => {
-					clock.textContent = `${new Date().toISOString().slice(11, 19)} UTC`;
-				};
-				tick();
-				setInterval(tick, 1000);
 			}
 		</script>
 	</body>

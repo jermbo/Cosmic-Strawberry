@@ -23,7 +23,8 @@
 	--bg-panel: var(--cs-cream-deep);
 	--fg: var(--cs-ink);
 	--fg-mute: color-mix(in srgb, var(--cs-ink) 52%, var(--cs-cream));
-	--fg-faint: color-mix(in srgb, var(--cs-ink) 30%, var(--cs-cream));
+	/* 58%, not 30%: at 30% this measured 1.98:1 on cream and failed AA outright */
+	--fg-faint: color-mix(in srgb, var(--cs-ink) 58%, var(--cs-cream));
 	--rule: color-mix(in srgb, var(--cs-ink) 20%, transparent);
 	--rule-strong: color-mix(in srgb, var(--cs-ink) 42%, transparent);
 	--grain: 0.05;
@@ -56,7 +57,8 @@
 	--bg-panel: #0e0e0e;
 	--fg: var(--cs-cream);
 	--fg-mute: color-mix(in srgb, var(--cs-cream) 58%, var(--cs-ink));
-	--fg-faint: color-mix(in srgb, var(--cs-cream) 32%, var(--cs-ink));
+	/* 50%, not 32%: at 32% this measured 2.52:1 on ink and failed AA outright */
+	--fg-faint: color-mix(in srgb, var(--cs-cream) 50%, var(--cs-ink));
 	--rule: color-mix(in srgb, var(--cs-cream) 22%, transparent);
 	--rule-strong: color-mix(in srgb, var(--cs-cream) 46%, transparent);
 	--cs-red: #e8503d;
@@ -217,8 +219,9 @@ body::after {
 	font-feature-settings: "tnum";
 }
 
+/* 12px, not 10px. The old size was unreadable for anyone who had to work at it. */
 .mono-sm {
-	font-size: 0.625rem;
+	font-size: 0.75rem;
 	letter-spacing: 0.2em;
 }
 
@@ -302,6 +305,32 @@ body::after {
 
 .marker__count {
 	color: var(--fg-faint);
+}
+
+/* ---------- 6b. skip link ---------- */
+
+.skip {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 600;
+	transform: translateY(-120%);
+	padding: 0.75rem 1.25rem;
+	background: var(--bg);
+	color: var(--fg);
+	border: var(--hair) solid var(--rule-strong);
+	border-bottom-width: 2px;
+	font-family: var(--mono);
+	text-transform: uppercase;
+	letter-spacing: 0.16em;
+	font-size: 0.8125rem;
+	transition: transform 0.24s var(--ease);
+}
+
+.skip:focus-visible {
+	transform: translateY(0);
+	outline: 2px solid var(--cs-orange);
+	outline-offset: -4px;
 }
 
 /* ---------- 7. nav ---------- */
@@ -590,6 +619,17 @@ body::after {
 }
 
 @media (hover: none), (pointer: coarse) {
+	.cursor {
+		display: none;
+	}
+}
+
+/*
+ * Hiding the system pointer is a real cost for anyone who needs it to aim.
+ * `prefers-reduced-motion` is the switch people already have, and this cursor
+ * is motion, so it answers to it.
+ */
+@media (prefers-reduced-motion: reduce) {
 	.cursor {
 		display: none;
 	}

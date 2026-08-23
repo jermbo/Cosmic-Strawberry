@@ -101,7 +101,9 @@ figure lifts 4px, and the arrow advances 5px. Three tells, all small.
 ### `.cursor`
 
 Built once in the layout, driven by `cursor.ts`. See
-[Motion § Cursor](05-motion.md#cursor). Any element can set its label:
+[Motion § Cursor](05-motion.md#cursor). Any element can set its label — but only
+set `data-cursor` on something that is genuinely a target, because that is the
+whole meaning of the reticle:
 
 ```html
 <a href="…" data-cursor="Open →">…</a>

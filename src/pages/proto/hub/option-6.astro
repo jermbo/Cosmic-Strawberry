@@ -104,27 +104,31 @@ const nav = [{ num: "00", name: "Masthead" }, ...rows.map((r) => ({ num: r.num, 
 		class="deck is-booting"
 		data-deck
 		data-accent="mast"
+		role="region"
+		tabindex="0"
 		aria-label="Cosmic Strawberry hub, use arrow keys to move"
 	>
+		{/* the drafting table the world moves over — parallaxes, never scrolls */}
+		<div class="deck__grid" aria-hidden="true"></div>
+
 		<!-- ============ the world that moves ============ -->
 		<div class="deck__world" data-world>
 			{/* ---- 00 / the masthead: the front door, before any of the work ---- */}
-			<div class="deck__row" data-row data-section="Masthead" data-num="00">
+			<div class="deck__row" id="deck-row-00" data-row data-section="Masthead" data-num="00">
 				<div
 					class="cell cell--mast"
 					data-cell
 					data-title="Cosmic Strawberry"
 					data-accent="mast"
-					data-cursor="Scroll ↓"
 				>
 					<span class="cell__ghost" data-ghost aria-hidden="true">
 						<span class="cell__ghost-in" data-par="0.05">Hub</span>
 					</span>
 
-					<div class="mast">
+					<div class="mast" data-no-drag>
 						<div class="mast__meta mono" data-line>
 							<span>COSMIC STRAWBERRY / PERSONAL TRANSMISSION</span>
-							<span>EST. 2026 &mdash; 41.4993 N / 81.6944 W</span>
+							<span>EST. 2026 &mdash; RA 14H 29M / DEC &minus;62&deg; 40&prime;</span>
 							<span>SIG ◉ LOCKED</span>
 						</div>
 						<div class="rule"></div>
@@ -180,7 +184,8 @@ const nav = [{ num: "00", name: "Masthead" }, ...rows.map((r) => ({ num: r.num, 
 
 			{
 				rows.map((r) => (
-					<div class="deck__row" data-row data-section={r.name} data-num={r.num}>
+					<div class="deck__row" id={`deck-row-${r.num}`} data-row data-section={r.name} data-num={r.num}>
+						<h2 class="sr">{r.name}</h2>
 						{r.cells.map((c, i) => (
 							<div
 								class="cell"
@@ -188,31 +193,30 @@ const nav = [{ num: "00", name: "Masthead" }, ...rows.map((r) => ({ num: r.num, 
 								data-title={c.title}
 								data-accent={c.accent}
 								data-flip={i % 2 === 1 ? "true" : "false"}
-								data-cursor="Drag ↔"
 							>
-								<span class="cell__ghost" data-ghost aria-hidden="true">
+								<div class="cell__ghost" data-ghost aria-hidden="true">
 									<span class="cell__ghost-in" data-par="0.05">{c.ghost}</span>
-								</span>
+								</div>
 
-								<span class="cell__panel" data-panel>
+								<div class="cell__panel" data-panel>
 									<span class="cell__fig">
 										<SchemaMark variant={c.variant} label={`${c.title} schematic`} />
 									</span>
-									<span class="cell__stamp mono" data-line>
+									<div class="cell__stamp mono" data-line>
 										<span class="cell__kicker">{c.kicker}</span>
 										<span class="cell__byline">{c.byline}</span>
-									</span>
-								</span>
+									</div>
+								</div>
 
-								<span class="cell__type" data-par="0.018">
-									<span class="cell__title" data-line>{c.title}</span>
-									<span class="cell__blurb" data-line>{c.blurb}</span>
+								<div class="cell__type" data-par="0.018" data-no-drag>
+									<h3 class="cell__title" data-line>{c.title}</h3>
+									<p class="cell__blurb" data-line>{c.blurb}</p>
 
-									<span class="cell__meta mono" data-line>
+									<div class="cell__meta mono" data-line>
 										<span>{c.meta}</span>
-									</span>
+									</div>
 
-									{/* the only thing that navigates — the rest is yours to drag */}
+									{/* the only control in the cell; the copy around it is selectable */}
 									{c.href && (
 										<a
 											class="launch"
@@ -226,12 +230,13 @@ const nav = [{ num: "00", name: "Masthead" }, ...rows.map((r) => ({ num: r.num, 
 										>
 											<span class="launch__dot" aria-hidden="true" />
 											<span class="launch__label">
-												{c.cta} {c.external ? "\u2197" : "\u2192"}
+												{c.cta}
+												<span aria-hidden="true">{c.external ? "\u2197" : "\u2192"}</span>
 											</span>
-											<span class="sr">{c.title}</span>
+											<span class="sr">{c.title}{c.external ? " (opens in a new tab)" : ""}</span>
 										</a>
 									)}
-								</span>
+								</div>
 							</div>
 						))}
 					</div>
@@ -246,16 +251,25 @@ const nav = [{ num: "00", name: "Masthead" }, ...rows.map((r) => ({ num: r.num, 
 			<span class="rail__num rail__num--dim mono" data-rail-total>04</span>
 		</div>
 
-		<div class="sections mono">
-			{
-				nav.map((r) => (
-					<button type="button" data-section-dot data-cursor={r.name}>
-						<span class="sections__num">{r.num}</span>
-						<span class="sections__name">{r.name}</span>
-					</button>
-				))
-			}
-		</div>
+		<nav class="sections mono" aria-label="Hub sections">
+			<ul>
+				{
+					nav.map((r) => (
+						<li>
+							<button
+								type="button"
+								data-section-dot
+								data-cursor={r.name}
+								aria-controls={`deck-row-${r.num}`}
+							>
+								<span class="sections__num" aria-hidden="true">{r.num}</span>
+								<span class="sections__name">{r.name}</span>
+							</button>
+						</li>
+					))
+				}
+			</ul>
+		</nav>
 
 		<div class="now mono">
 			<span class="now__num" data-rail-section-num>00</span>
@@ -264,7 +278,7 @@ const nav = [{ num: "00", name: "Masthead" }, ...rows.map((r) => ({ num: r.num, 
 
 		<div class="drag mono">
 			<button type="button" data-go-prev aria-label="Previous item" data-cursor="Back">‹</button>
-			<span class="drag__label">drag</span>
+			<span class="drag__label">move</span>
 			<button type="button" data-go-next aria-label="Next item" data-cursor="Forward">›</button>
 		</div>
 
@@ -278,6 +292,9 @@ const nav = [{ num: "00", name: "Masthead" }, ...rows.map((r) => ({ num: r.num, 
 				<span></span><span></span><span></span>
 			</div>
 		</div>
+
+		{/* the signal-lock sweep — boot only, never on a loop */}
+		<div class="deck__scan" data-scan aria-hidden="true"></div>
 
 		{/* one polite announcement per move, for anyone not watching it happen */}
 		<p class="sr" role="status" aria-live="polite" data-status></p>
@@ -301,7 +318,7 @@ const nav = [{ num: "00", name: "Masthead" }, ...rows.map((r) => ({ num: r.num, 
 	 * row after this one draws its line-work when it is first entered.
 	 */
 	const start = () => {
-		initDeck({ intro: false, drawFigures: true });
+		initDeck({ intro: false, drawFigures: true, scrambleGhost: true, drag: "touch" });
 		initPlay();
 		playDeckBoot();
 
@@ -325,12 +342,12 @@ const nav = [{ num: "00", name: "Masthead" }, ...rows.map((r) => ({ num: r.num, 
 		position: fixed;
 		inset: 0;
 		overflow: hidden;
-		cursor: grab;
-		touch-action: none;
-	}
-
-	.deck.is-dragging {
-		cursor: grabbing;
+		/*
+		 * `pinch-zoom`, not `none`. The swipe still reaches our handler, but
+		 * the browser keeps the pinch — taking that away from a touch user is
+		 * taking away their magnifier.
+		 */
+		touch-action: pinch-zoom;
 	}
 
 	/* a real focus ring — the deck is the thing arrow keys drive */
@@ -339,11 +356,23 @@ const nav = [{ num: "00", name: "Masthead" }, ...rows.map((r) => ({ num: r.num, 
 		outline-offset: -4px;
 	}
 
-	/* the whole surface is the drag handle, so nothing may be text-selected */
+	/*
+	 * The drag surface cannot be selected, or every pan would smear a selection
+	 * across the copy. But the copy itself must stay selectable: a text-to-speech
+	 * user selects a paragraph to have it read aloud, and a deck that is one
+	 * unbroken drag handle takes that away. So the type blocks opt out of the
+	 * drag with `data-no-drag` and keep normal selection; the panel, the ghost
+	 * word and the margins remain the handle.
+	 */
 	.deck,
 	.cell {
 		user-select: none;
 		-webkit-user-select: none;
+	}
+
+	.cell [data-no-drag] {
+		user-select: text;
+		-webkit-user-select: text;
 	}
 
 	.sr {
@@ -358,12 +387,96 @@ const nav = [{ num: "00", name: "Masthead" }, ...rows.map((r) => ({ num: r.num, 
 		border: 0;
 	}
 
+	/*
+	 * The construction grid. Fixed like the rest of the chrome, but drifting
+	 * against the world at a twelfth of its rate, so the deck reads as a
+	 * surface being moved over rather than a stack of panels being swapped.
+	 * `--travel-*` and `--lean` are published by the deck; the rates are the
+	 * page's decision.
+	 */
+	.deck__grid {
+		position: absolute;
+		/* overscan, so parallax and drag never expose an edge */
+		inset: -12%;
+		z-index: 0;
+		pointer-events: none;
+		/*
+		 * Faint enough that the line-work always wins; it is ground, not figure.
+		 * Light needs more of it: the same alpha reads far weaker as ink on
+		 * cream than it does as cream on ink.
+		 */
+		opacity: 0.6;
+		/*
+		 * Travel only. Transitioned at the deck's own 0.78s so the grid and the
+		 * world arrive together.
+		 */
+		transform: translate3d(
+			calc(var(--travel-x, 0px) / 12),
+			calc(var(--travel-y, 0px) / 12),
+			0
+		);
+		/*
+		 * `--ease` is a quint-ish curve; the deck moves on GSAP's `expo.out`.
+		 * Matching only the duration left the grid visibly drifting against the
+		 * world for most of the move, so this is the CSS approximation of
+		 * expo-out rather than the shared token.
+		 */
+		transition: transform 0.78s cubic-bezier(0.16, 1, 0.3, 1);
+		will-change: transform;
+	}
+
+	/*
+	 * The drafting grid itself, on its own layer so lean can be applied without
+	 * a transition. `--lean` is rewritten every frame of a drag and is already
+	 * spring-smoothed by the deck; a 0.78s transition on top of that would
+	 * smooth a smoothed value and the grid would lag the hand holding it.
+	 */
+	.deck__grid::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		background-image: /* minor rule */ linear-gradient(
+				var(--rule) var(--hair),
+				transparent var(--hair)
+			),
+			linear-gradient(90deg, var(--rule) var(--hair), transparent var(--hair)),
+			/* major rule, every fifth */ linear-gradient(
+				var(--rule-strong) var(--hair),
+				transparent var(--hair)
+			), linear-gradient(90deg, var(--rule-strong) var(--hair), transparent var(--hair));
+		background-size: 40px 40px, 40px 40px, 200px 200px, 200px 200px;
+		transform: translate3d(calc(var(--lean, 0) * 22px), 0, 0);
+		will-change: transform;
+	}
+
+	:global([data-theme="dark"]) .deck__grid {
+		opacity: 0.3;
+	}
+
 	.deck__world {
 		position: absolute;
 		inset: 0;
+		z-index: 1;
 		display: flex;
 		flex-direction: column;
 		will-change: transform;
+	}
+
+	/*
+	 * One sweep, during the boot's register beat, and then it is gone. The
+	 * exception to "nothing plays on a timer" is bought here and nowhere else —
+	 * a permanent scanline is wallpaper you stop seeing on the second visit.
+	 */
+	.deck__scan {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: var(--hair);
+		background: var(--fg);
+		opacity: 0;
+		z-index: 40;
+		pointer-events: none;
 	}
 
 	/*
@@ -399,6 +512,18 @@ const nav = [{ num: "00", name: "Masthead" }, ...rows.map((r) => ({ num: r.num, 
 
 	.cell.is-active {
 		opacity: 1;
+	}
+
+	/*
+	 * At 200% text zoom the masthead needs 1343px in a 512px box, and
+	 * `overflow: hidden` simply cut it off — WCAG 1.4.4 and 1.4.10, failed. The
+	 * cell scrolls itself when its content does not fit. The wheel handler
+	 * checks for exactly this and yields rather than moving the deck.
+	 */
+	.cell {
+		overflow-x: hidden;
+		overflow-y: auto;
+		overscroll-behavior: contain;
 	}
 
 	.cell:focus-visible {
@@ -450,7 +575,6 @@ const nav = [{ num: "00", name: "Masthead" }, ...rows.map((r) => ({ num: r.num, 
 		flex: 0 0 100vw;
 		margin-right: 0;
 		height: 100%;
-		overflow: hidden;
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
 		align-content: center;
@@ -615,7 +739,7 @@ const nav = [{ num: "00", name: "Masthead" }, ...rows.map((r) => ({ num: r.num, 
 		font-family: var(--mono);
 		text-transform: uppercase;
 		letter-spacing: 0.16em;
-		font-size: 0.7rem;
+		font-size: 0.8125rem;
 		color: var(--fg);
 		cursor: pointer;
 		transition: background-color 0.3s var(--ease), border-color 0.3s var(--ease),
@@ -747,22 +871,23 @@ const nav = [{ num: "00", name: "Masthead" }, ...rows.map((r) => ({ num: r.num, 
 	}
 
 	.cell__title {
+		/* it is an <h3> now; the UA margin is not part of the design */
+		margin: 0 0 0 -0.5em;
 		font-weight: 800;
 		font-stretch: 118%;
 		text-transform: uppercase;
 		letter-spacing: -0.02em;
 		line-height: 0.86;
 		font-size: clamp(2.5rem, 6.4vw, 6rem);
-		/* the type overhangs the panel it sits beside */
-		margin-left: -0.5em;
 	}
 
+	/* the type overhangs the panel it sits beside, on whichever side that is */
 	.cell[data-flip="true"] .cell__title {
-		margin-left: 0;
-		margin-right: -0.5em;
+		margin: 0 -0.5em 0 0;
 	}
 
 	.cell__blurb {
+		margin: 0;
 		font-size: clamp(0.9375rem, 1.2vw, 1.0625rem);
 		line-height: 1.55;
 		color: var(--fg-mute);
@@ -822,6 +947,15 @@ const nav = [{ num: "00", name: "Masthead" }, ...rows.map((r) => ({ num: r.num, 
 		text-align: right;
 	}
 
+	.sections ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: var(--s-2);
+	}
+
 	.sections button {
 		display: flex;
 		flex-direction: column;
@@ -832,7 +966,7 @@ const nav = [{ num: "00", name: "Masthead" }, ...rows.map((r) => ({ num: r.num, 
 		font-family: var(--mono);
 		text-transform: uppercase;
 		letter-spacing: 0.16em;
-		font-size: 0.7rem;
+		font-size: 0.8125rem;
 		transition: color 0.3s var(--ease);
 	}
 
@@ -846,7 +980,7 @@ const nav = [{ num: "00", name: "Masthead" }, ...rows.map((r) => ({ num: r.num, 
 	}
 
 	.sections__name {
-		font-size: 0.625rem;
+		font-size: 0.75rem;
 		letter-spacing: 0.2em;
 	}
 
@@ -912,7 +1046,7 @@ const nav = [{ num: "00", name: "Masthead" }, ...rows.map((r) => ({ num: r.num, 
 		font-family: var(--mono);
 		text-transform: uppercase;
 		letter-spacing: 0.2em;
-		font-size: 0.625rem;
+		font-size: 0.75rem;
 		transition: color 0.3s var(--ease);
 	}
 
@@ -967,12 +1101,9 @@ const nav = [{ num: "00", name: "Masthead" }, ...rows.map((r) => ({ num: r.num, 
 			height: min(34vh, 16rem);
 		}
 
-		.cell__title {
-			margin-left: 0;
-		}
-
+		.cell__title,
 		.cell[data-flip="true"] .cell__title {
-			margin-right: 0;
+			margin: 0;
 		}
 
 		.cell[data-flip="true"] .cell__blurb {

@@ -34,3 +34,4 @@ disagree, the kit page is right and this folder is stale.**
 - Archivo is standing in for the worm-family headline face. Licensed alternative?
 - Does the stripe order (red → orange → blue) ever reverse, or is it fixed like
   a livery?
+- [08 — Accessibility](08-accessibility.md) — what the deck audit changed, and the rules that came out of it

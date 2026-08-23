@@ -24,6 +24,14 @@ export function drawFigure(fig: Element, delay = 0): gsap.core.Timeline {
 				duration: 0.85,
 				ease: "power2.inOut",
 				stagger: { each: 0.035, from: "start" },
+				/*
+				 * DrawSVG draws by writing `stroke-dasharray` inline, which
+				 * outranks the stylesheet — so a drawn `.ln--dash` finishes
+				 * SOLID and the construction lines stop reading as construction
+				 * lines. Hand the property back to CSS once the draw is done.
+				 */
+				onComplete: () =>
+					gsap.set(strokes, { clearProps: "strokeDasharray,strokeDashoffset" }),
 			},
 			0
 		);
@@ -77,13 +85,34 @@ function whenVisible(el: Element, ratio: number, run: () => void): void {
 	});
 }
 
-/** Wrap each split line so the mask clips the incoming line. */
-function maskLines(el: Element): SplitText {
-	return new SplitText(el, {
+/**
+ * The text a split element should still announce as. Child elements are block
+ * level, so `textContent` runs their words together ("CosmicStrawberry") unless
+ * the markup separates them.
+ */
+export function accessibleText(el: Element): string {
+	const parts = Array.from(el.children).map((c) => c.textContent?.trim() ?? "");
+	const text = parts.filter(Boolean).join(" ") || el.textContent || "";
+	return text.replace(/\s+/g, " ").trim();
+}
+
+/**
+ * Wrap each split line so the mask clips the incoming line.
+ *
+ * SplitText's mask wrappers carry `aria-hidden="true"`, which leaves the split
+ * element with no accessible name at all — a masked `<h1>` announces as an
+ * empty level-1 heading. The name is captured before the split and pinned back
+ * on afterwards.
+ */
+export function maskLines(el: Element): SplitText {
+	const label = el.getAttribute("aria-label") || accessibleText(el);
+	const split = new SplitText(el, {
 		type: "lines",
 		linesClass: "cs-line",
 		mask: "lines",
 	});
+	if (label) el.setAttribute("aria-label", label);
+	return split;
 }
 
 export function playHero(): void {
