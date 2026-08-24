@@ -1,0 +1,28 @@
+---
+/**
+ * Grid of blocks, each optionally wrapped in a reveal step.
+ */
+import type { TalkBlock, TalkAccent } from "../../../lib/proto/talks/ast";
+import { pickMotion } from "../../../lib/proto/talks/ast";
+import Block from "../Block.astro";
+import Step from "../Step.astro";
+
+interface Props {
+	items: TalkBlock[];
+	accent: TalkAccent;
+	class: string;
+	molecule: string;
+}
+
+const { items, accent, class: className, molecule } = Astro.props;
+---
+
+<div class={className} data-molecule={molecule}>
+	{
+		items.map((child) => (
+			<Step on={!!child.step} motion={pickMotion(child.attrs)}>
+				<Block block={{ ...child, step: false }} accent={accent} />
+			</Step>
+		))
+	}
+</div>

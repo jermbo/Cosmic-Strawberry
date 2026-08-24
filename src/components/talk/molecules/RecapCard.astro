@@ -1,0 +1,26 @@
+---
+import type { TalkBlock, TalkAccent } from "../../../lib/proto/talks/ast";
+import CardBody from "./CardBody.astro";
+
+interface Props {
+	block: TalkBlock;
+	accent: TalkAccent;
+}
+
+const { block, accent } = Astro.props;
+const cardAccent = block.accent ?? accent;
+---
+
+<article class="recap-card" data-accent={cardAccent} data-molecule="recap-card">
+	{
+		block.html && <div set:html={block.html} />
+	}
+	{
+		!block.html && (
+			<>
+				<h3>{block.label}</h3>
+				<p>{block.body}</p>
+			</>
+		)
+	}
+</article>

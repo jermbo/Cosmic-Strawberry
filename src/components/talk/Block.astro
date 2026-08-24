@@ -1,0 +1,43 @@
+---
+import type { TalkBlock, TalkAccent } from "../../lib/proto/talks/ast";
+import { pickMotion } from "../../lib/proto/talks/ast";
+import Step from "./Step.astro";
+import Group from "./molecules/Group.astro";
+import Cards from "./molecules/Cards.astro";
+import Card from "./molecules/Card.astro";
+import Letters from "./molecules/Letters.astro";
+import Altitude from "./molecules/Altitude.astro";
+import Col from "./molecules/Col.astro";
+import Recap from "./molecules/Recap.astro";
+import RecapCard from "./molecules/RecapCard.astro";
+import Pills from "./molecules/Pills.astro";
+import Callout from "./molecules/Callout.astro";
+import Prose from "./molecules/Prose.astro";
+
+interface Props {
+	block: TalkBlock;
+	accent?: TalkAccent;
+}
+
+const { block, accent = "purple" } = Astro.props;
+const motion = pickMotion(block.attrs);
+const wrap = !!block.step;
+const inner = { ...block, step: false };
+const molecule = inner.molecule;
+const children = inner.children ?? [];
+---
+
+<Step on={wrap} motion={motion}>
+	{molecule === "group" && <Group children={children} accent={accent} />}
+	{molecule === "cards" && <Cards block={inner} accent={accent} />}
+	{molecule === "card" && <Card block={inner} accent={accent} />}
+	{molecule === "letters" && <Letters block={inner} />}
+	{molecule === "altitude" && <Altitude block={inner} />}
+	{molecule === "col" && <Col block={inner} accent={accent} />}
+	{molecule === "recap" && <Recap block={inner} accent={accent} />}
+	{molecule === "recap-card" && <RecapCard block={inner} accent={accent} />}
+	{molecule === "pills" && <Pills block={inner} />}
+	{molecule === "callout" && <Callout block={inner} />}
+	{!molecule && inner.html && <Prose html={inner.html} />}
+	{!molecule && !inner.html && <Group children={children} accent={accent} />}
+</Step>

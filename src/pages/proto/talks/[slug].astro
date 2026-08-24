@@ -1,0 +1,35 @@
+---
+import Talk from "../../../layouts/Talk.astro";
+import TalkShow from "../../../components/talk/TalkShow.astro";
+import { loadTalk } from "../../../lib/proto/talks/load";
+
+export function getStaticPaths() {
+	const sources = import.meta.glob<string>("../../../content/talks/*.md", {
+		query: "?raw",
+		import: "default",
+		eager: true,
+	});
+
+	return Object.entries(sources).flatMap(([path, source]) => {
+		const slug = path.match(/([^/]+)\.md$/)?.[1];
+		if (!slug) return [];
+		const { meta, doc } = loadTalk(source);
+		return [{ params: { slug }, props: { meta, doc } }];
+	});
+}
+
+interface Props {
+	meta: {
+		title: string;
+		series: string;
+		description: string;
+	};
+	doc: import("../../../lib/proto/talks/ast").TalkDoc;
+}
+
+const { meta, doc } = Astro.props;
+---
+
+<Talk title={`${meta.title} — ${meta.series}`} desc={meta.description}>
+	<TalkShow title={meta.title} doc={doc} />
+</Talk>

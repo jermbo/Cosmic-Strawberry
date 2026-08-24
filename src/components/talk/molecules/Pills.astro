@@ -1,0 +1,11 @@
+---
+import type { TalkBlock } from "../../../lib/proto/talks/ast";
+
+interface Props {
+	block: TalkBlock;
+}
+
+const { block } = Astro.props;
+---
+
+<div class="break-pills" data-molecule="pills" set:html={block.html} />

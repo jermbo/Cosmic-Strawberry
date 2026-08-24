@@ -1,0 +1,13 @@
+---
+import type { TalkBlock, TalkAccent } from "../../../lib/proto/talks/ast";
+
+interface Props {
+	block: TalkBlock;
+	accent: TalkAccent;
+}
+
+const { block, accent } = Astro.props;
+const colAccent = block.accent ?? accent;
+---
+
+<div class={`talk-col accent-${colAccent}`} data-molecule="col" set:html={block.html} />

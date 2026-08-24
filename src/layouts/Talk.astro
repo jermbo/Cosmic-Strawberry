@@ -1,0 +1,40 @@
+---
+/**
+ * Full-bleed talk shell. No proto nav, no stripe, no theme toggle —
+ * the show owns the viewport end to end. Exit is a small control inside
+ * the talk chrome, not a site header.
+ */
+import "../styles/talk.css";
+
+interface Props {
+	title: string;
+	desc?: string;
+}
+
+const { title, desc = "Cosmic Strawberry — talk" } = Astro.props;
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content={desc} />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<title>{title}</title>
+
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+
+		<script is:inline>
+			document.documentElement.classList.add("js");
+		</script>
+	</head>
+	<body>
+		<a class="talk-skip" href="#talk-stage">Skip to slides</a>
+		<slot />
+	</body>
+</html>

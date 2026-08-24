@@ -1,0 +1,13 @@
+---
+import type { TalkBlock, TalkAccent } from "../../../lib/proto/talks/ast";
+import StepBlocks from "./StepBlocks.astro";
+
+interface Props {
+	block: TalkBlock;
+	accent: TalkAccent;
+}
+
+const { block, accent } = Astro.props;
+---
+
+<StepBlocks items={block.children ?? []} accent={accent} class="recap-row" molecule="recap" />

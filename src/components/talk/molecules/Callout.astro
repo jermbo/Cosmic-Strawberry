@@ -1,0 +1,14 @@
+---
+import type { TalkBlock } from "../../../lib/proto/talks/ast";
+
+interface Props {
+	block: TalkBlock;
+}
+
+const { block } = Astro.props;
+
+const CALLOUT_KINDS = ["important", "note", "warn"] as const;
+const calloutKind = block.attrs.find((a) => CALLOUT_KINDS.includes(a as (typeof CALLOUT_KINDS)[number])) ?? "note";
+---
+
+<aside class={`talk-callout talk-callout--${calloutKind}`} data-molecule="callout" set:html={block.html} />

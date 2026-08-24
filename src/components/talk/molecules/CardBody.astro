@@ -1,0 +1,24 @@
+---
+interface Props {
+	html?: string;
+	label?: string;
+	body?: string;
+	accent: string;
+	class?: string;
+}
+
+const { html, label, body, accent, class: className = "talk-card__inner" } = Astro.props;
+---
+
+{
+	html && <div class={className} data-accent={accent} set:html={html} />
+}
+
+{
+	!html && (
+		<div class={className} data-accent={accent}>
+			<h3>{label}</h3>
+			<p>{body}</p>
+		</div>
+	)
+}

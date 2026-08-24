@@ -9,6 +9,11 @@ prototype: design intent, colour, typography, the schematic line-work language,
 animation principles, component inventory, and how it is wired. The live half is
 the kit page at `/proto/kit`.
 
+## Talks
+
+[**docs/talks.md**](talks.md) — markdown decks with `::slide` / `:::molecule` /
+molecule fences. Live example: `/proto/talks/your-ai-has-amnesia`.
+
 ## Ideas
 
 Each file is one self-contained concept: what it is, how it would be built, and

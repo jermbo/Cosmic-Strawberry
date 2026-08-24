@@ -1,0 +1,13 @@
+---
+import type { TalkBlock, TalkAccent } from "../../../lib/proto/talks/ast";
+import Block from "../Block.astro";
+
+interface Props {
+	children: TalkBlock[];
+	accent: TalkAccent;
+}
+
+const { children, accent } = Astro.props;
+---
+
+{children.map((child) => <Block block={child} accent={accent} />)}

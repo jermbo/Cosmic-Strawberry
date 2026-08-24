@@ -1,0 +1,27 @@
+---
+/**
+ * Optional progressive-reveal wrapper. When `on` is false, renders children bare.
+ */
+interface Props {
+	on?: boolean;
+	motion?: string | null;
+}
+
+const { on = false, motion = "fade" } = Astro.props;
+---
+
+{
+	on && (
+		<div class="talk-step" data-step data-motion={motion ?? "fade"}>
+			<slot />
+		</div>
+	)
+}
+
+{
+	!on && (
+		<>
+			<slot />
+		</>
+	)
+}

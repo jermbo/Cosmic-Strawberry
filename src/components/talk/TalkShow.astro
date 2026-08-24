@@ -1,0 +1,50 @@
+---
+import type { TalkDoc } from "../../lib/proto/talks/ast";
+import SlideView from "./SlideView.astro";
+
+interface Props {
+	title: string;
+	doc: TalkDoc;
+}
+
+const { title, doc } = Astro.props;
+const total = doc.slides.length;
+---
+
+<div
+	class="talk"
+	id="talk-stage"
+	data-talk
+	data-accent="purple"
+	tabindex="0"
+	role="region"
+	aria-roledescription="carousel"
+	aria-label={`${title}. Arrow keys advance reveals, then slides.`}
+>
+	<div class="talk__stage">
+		{doc.slides.map((slide, i) => <SlideView slide={slide} index={i} />)}
+	</div>
+
+	<div class="talk__chrome" data-no-advance>
+		<div class="talk__top">
+			<a class="talk__brand" href="/proto/hub/option-6">Exit · Hub</a>
+			<span class="talk__counter" data-counter>01 / {String(total).padStart(2, "0")}</span>
+		</div>
+		<div></div>
+		<div class="talk__bottom">
+			<div class="talk__nav">
+				<button type="button" data-prev aria-label="Previous">Prev</button>
+				<button type="button" data-next aria-label="Next">Next</button>
+			</div>
+			<span class="talk__hint">← → · Space · reveals then slides</span>
+		</div>
+	</div>
+
+	<div class="talk__progress" data-progress aria-hidden="true"><i></i></div>
+	<div class="talk__status" data-status role="status" aria-live="polite"></div>
+</div>
+
+<script>
+	import { initTalkShow } from "../../lib/proto/talks/show";
+	initTalkShow();
+</script>

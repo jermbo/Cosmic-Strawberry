@@ -1,0 +1,27 @@
+---
+import type { TalkSlide } from "../../lib/proto/talks/ast";
+import { slideKind, pickAccent, layoutClass } from "../../lib/proto/talks/ast";
+import Block from "./Block.astro";
+
+interface Props {
+	slide: TalkSlide;
+	index: number;
+}
+
+const { slide, index } = Astro.props;
+const kind = slideKind(slide.attrs);
+const accent = pickAccent(slide.attrs);
+const isBreak = kind === "break" || kind === "cta";
+---
+
+<section
+	class:list={["talk__slide", layoutClass(kind)]}
+	data-slide
+	data-kind={kind}
+	data-accent={accent}
+	data-fill={isBreak ? accent : undefined}
+	aria-hidden={index === 0 ? "false" : "true"}
+>
+	{isBreak && <span class="break-mark" aria-hidden="true" />}
+	{slide.blocks.map((b) => <Block block={b} accent={accent} />)}
+</section>

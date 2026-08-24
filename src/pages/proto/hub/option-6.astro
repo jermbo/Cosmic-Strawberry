@@ -16,6 +16,7 @@ import Proto from "../../../layouts/Proto.astro";
 import SchemaMark from "../../../components/proto/SchemaMark.astro";
 import SchemaCore from "../../../components/proto/SchemaCore.astro";
 import { projects } from "../../../data/projects";
+import { talks } from "../../../data/talks";
 import { writing } from "../../../data/writing";
 import { lab } from "../../../data/lab";
 
@@ -55,6 +56,24 @@ const rows: { num: string; name: string; cells: Cell[] }[] = [
 	},
 	{
 		num: "02",
+		name: "Talks",
+		cells: talks.map((t) => ({
+			idx: t.idx,
+			kicker: t.series.toLowerCase(),
+			title: t.title,
+			blurb: t.blurb,
+			meta: `${t.minutes} min`,
+			byline: t.date,
+			href: t.href,
+			external: false,
+			variant: t.variant,
+			accent: "red",
+			ghost: t.ghost,
+			cta: "Watch",
+		})),
+	},
+	{
+		num: "03",
 		name: "Writing",
 		cells: writing.map((w) => ({
 			idx: w.idx,
@@ -72,7 +91,7 @@ const rows: { num: string; name: string; cells: Cell[] }[] = [
 		})),
 	},
 	{
-		num: "03",
+		num: "04",
 		name: "Lab",
 		cells: lab.map((l, i) => ({
 			idx: l.idx,
