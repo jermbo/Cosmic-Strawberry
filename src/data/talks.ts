@@ -1,35 +1,47 @@
 /**
- * Talks shelf for the hub. Each entry points at a full-bleed show under
- * `/proto/talks/…`. Adding a talk is a data edit plus a page.
+ * Talks shelf for the hub. Metadata comes from each talk's markdown frontmatter
+ * (`title`, `series`, `description`, `minutes`, `date`, `idx`, `ghost`, `variant`).
+ * Drop a `.md` under `src/content/talks/` and it shows up here automatically.
  */
+import { loadTalk, slugFromPath, type TalkVariant } from "../lib/proto/talks/load";
 
 export interface Talk {
 	idx: string;
 	slug: string;
 	title: string;
 	href: string;
-	/** Talk series label — e.g. TALK 201 */
 	series: string;
 	date: string;
 	minutes: number;
 	blurb: string;
-	/** One word behind the hub cell */
 	ghost: string;
-	variant: "stack" | "orbit" | "trace" | "nozzle";
+	variant: TalkVariant;
 }
 
-export const talks: Talk[] = [
-	{
-		idx: "T01",
-		slug: "your-ai-has-amnesia",
-		title: "Your AI Has Amnesia",
-		href: "/proto/talks/your-ai-has-amnesia",
-		series: "TALK 201",
-		date: "2026.08",
-		minutes: 25,
-		blurb:
-			"Writing code, docs, and tests for agents that forget everything between sessions.",
-		ghost: "Amnesia",
-		variant: "trace",
-	},
-];
+const sources = import.meta.glob<string>("../content/talks/*.md", {
+	query: "?raw",
+	import: "default",
+	eager: true,
+});
+
+export const talks: Talk[] = Object.entries(sources)
+	.flatMap(([path, source]) => {
+		const slug = slugFromPath(path);
+		if (!slug) return [];
+		const { meta } = loadTalk(source);
+		return [
+			{
+				idx: meta.idx,
+				slug,
+				title: meta.title,
+				href: `/proto/talks/${slug}`,
+				series: meta.series,
+				date: meta.date,
+				minutes: meta.minutes,
+				blurb: meta.description,
+				ghost: meta.ghost,
+				variant: meta.variant,
+			},
+		];
+	})
+	.sort((a, b) => a.idx.localeCompare(b.idx));

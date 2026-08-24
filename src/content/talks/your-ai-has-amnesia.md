@@ -4,6 +4,9 @@ series: TALK 201
 description: Writing code, docs, and tests for agents that forget everything between sessions.
 minutes: 25
 date: "2026.08"
+idx: T01
+ghost: Amnesia
+variant: trace
 ---
 
 <!--

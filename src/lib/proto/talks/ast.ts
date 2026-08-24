@@ -1,28 +1,11 @@
 /** Talk markdown AST — compiled from directive fences. */
 
+import { MOTION_ATTRS, MOTION_SET, type MotionAttr } from "./motions";
+
+export type { MotionAttr };
+export { MOTION_ATTRS, MOTION_SET };
+
 export type TalkAccent = "purple" | "lime" | "orange" | "lavender";
-
-/** Keep in sync with MOTIONS in show.ts. */
-export const MOTION_ATTRS = [
-	"fade",
-	"reveal-bottom",
-	"reveal-top",
-	"reveal-left",
-	"reveal-right",
-	"zoom-in",
-	"zoom-out",
-	"squish-in",
-	"squish-out",
-	"pop",
-	"blur-in",
-	"flip-x",
-	"flip-y",
-	"spin-in",
-] as const;
-
-export type MotionAttr = (typeof MOTION_ATTRS)[number];
-
-export const MOTION_SET = new Set<string>(MOTION_ATTRS);
 
 export const ACCENTS = ["purple", "lime", "orange", "lavender"] as const;
 

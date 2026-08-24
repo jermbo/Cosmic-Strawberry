@@ -26,7 +26,6 @@ const ACCENT_SET = new Set<string>(ACCENTS);
 
 const LIST_MOLECULES: Record<string, string> = {
 	letters: "letter",
-	altitude: "alt-row",
 	cards: "card",
 	recap: "recap-card",
 };
@@ -100,8 +99,8 @@ function listItems(list: List): { label: string; body: string; letter?: string }
 
 function splitReveal(attrs: string[]) {
 	const motion = attrs.filter((a) => MOTION_SET.has(a));
-	const perItem = attrs.includes("step") || attrs.includes("stagger");
-	const layout = attrs.filter((a) => a !== "step" && a !== "stagger" && !MOTION_SET.has(a));
+	const perItem = attrs.includes("step");
+	const layout = attrs.filter((a) => a !== "step" && !MOTION_SET.has(a));
 	return {
 		layout,
 		motion,
@@ -179,7 +178,7 @@ function nodesToBlocks(nodes: Content[]): TalkBlock[] {
 			}
 		}
 
-		if (name === "col" || name === "callout" || name === "pills" || name === "card") {
+		if (name === "col" || name === "callout" || name === "pills") {
 			blocks.push(htmlMolecule(name, attrs, kids));
 			continue;
 		}

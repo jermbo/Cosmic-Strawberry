@@ -255,11 +255,11 @@ body {
 .talk-prose h1,
 .talk-prose h2 {
 	margin: 0;
-	font-size: clamp(2rem, 4.8vw, 3.75rem);
+	font-size: var(--talk-h-size, clamp(2rem, 4.8vw, 3.75rem));
 	font-weight: 700;
 	line-height: var(--talk-lh-display);
 	letter-spacing: -0.03em;
-	max-width: 22ch;
+	max-width: var(--talk-h-max, 22ch);
 }
 
 .talk-prose h3 {
@@ -322,7 +322,6 @@ body {
 
 .talk-cards > .talk-step,
 .recap-row > .talk-step,
-.alt-stack > .talk-step,
 .layout-letters__row > .talk-step {
 	min-width: 0;
 }
@@ -499,28 +498,6 @@ body {
 	color: var(--talk-fg);
 }
 
-.alt-stack {
-	display: grid;
-	gap: 0.4lh;
-	max-width: 72ch;
-}
-
-.alt-row {
-	display: grid;
-	grid-template-columns: minmax(12ch, 16ch) 1fr;
-	gap: 2ch;
-	align-items: center;
-	border-radius: 0.75rem;
-	padding: 0.65lh 1.5ch;
-}
-
-.alt-row__label {
-	font-size: 0.95rem;
-	font-weight: 600;
-	line-height: var(--talk-lh-tight);
-	color: var(--talk-accent);
-}
-
 .recap-row {
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -543,8 +520,8 @@ body {
 }
 
 .layout-title .talk-prose h1 {
-	font-size: clamp(2.5rem, 7vw, 5.5rem);
-	max-width: 20ch;
+	--talk-h-size: clamp(2.5rem, 7vw, 5.5rem);
+	--talk-h-max: 20ch;
 }
 
 .layout-lead {
@@ -556,11 +533,7 @@ body {
 	grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
 	gap: clamp(3ch, 4vw, 6ch);
 	align-items: center;
-}
-
-.layout-split .talk-prose h1,
-.layout-split .talk-prose h2 {
-	max-width: 18ch;
+	--talk-h-max: 18ch;
 }
 
 .layout-letters {
@@ -616,14 +589,14 @@ body {
 .layout-cta .talk-prose h1,
 .layout-cta .talk-prose h2 {
 	color: var(--talk-break-ink);
-	font-size: clamp(2.75rem, 8vw, 6rem);
-	max-width: 16ch;
+	--talk-h-size: clamp(2.75rem, 8vw, 6rem);
+	--talk-h-max: 16ch;
 }
 
 .layout-cta .talk-prose h1,
 .layout-cta .talk-prose h2 {
-	font-size: clamp(2.25rem, 5.5vw, 4.25rem);
-	max-width: 18ch;
+	--talk-h-size: clamp(2.25rem, 5.5vw, 4.25rem);
+	--talk-h-max: 18ch;
 }
 
 .layout-break .talk-prose p,
@@ -690,43 +663,38 @@ body {
 /* ——— responsive ——— */
 
 @media (min-width: 1000px) {
-	.talk-prose h1,
-	.talk-prose h2 {
-		max-width: min(28ch, calc(100vw - (2 * var(--talk-pad)) - 4ch));
+	.talk__slide {
+		--talk-h-max: min(28ch, calc(100vw - (2 * var(--talk-pad)) - 4ch));
 	}
 
-	.layout-title .talk-prose h1 {
-		font-size: clamp(2.75rem, 5.2vw, 4.75rem);
-		max-width: min(24ch, calc(100vw - (2 * var(--talk-pad)) - 4ch));
+	.layout-title {
+		--talk-h-size: clamp(2.75rem, 5.2vw, 4.75rem);
+		--talk-h-max: min(24ch, calc(100vw - (2 * var(--talk-pad)) - 4ch));
 	}
 
-	.layout-lead .talk-prose h1,
-	.layout-lead .talk-prose h2 {
-		max-width: min(30ch, calc(100vw - (2 * var(--talk-pad)) - 4ch));
+	.layout-lead {
+		--talk-h-max: min(30ch, calc(100vw - (2 * var(--talk-pad)) - 4ch));
 	}
 
-	.layout-split .talk-prose h1,
-	.layout-split .talk-prose h2 {
-		max-width: min(22ch, 100%);
+	.layout-split {
+		--talk-h-max: min(22ch, 100%);
 	}
 
-	.layout-break .talk-prose h1,
-	.layout-break .talk-prose h2 {
-		font-size: clamp(3rem, 6vw, 5.25rem);
-		max-width: min(18ch, calc(100vw - (2 * var(--talk-pad)) - 4ch));
+	.layout-break {
+		--talk-h-size: clamp(3rem, 6vw, 5.25rem);
+		--talk-h-max: min(18ch, calc(100vw - (2 * var(--talk-pad)) - 4ch));
 	}
 
-	.layout-cta .talk-prose h1,
-	.layout-cta .talk-prose h2 {
-		font-size: clamp(2.5rem, 4.5vw, 4rem);
-		max-width: min(22ch, calc(100vw - (2 * var(--talk-pad)) - 4ch));
+	.layout-cta {
+		--talk-h-size: clamp(2.5rem, 4.5vw, 4rem);
+		--talk-h-max: min(22ch, calc(100vw - (2 * var(--talk-pad)) - 4ch));
 	}
 
-	.layout-letters .talk-prose h2,
-	.layout-altitude .talk-prose h2,
-	.layout-columns .talk-prose h2,
-	.layout-recap .talk-prose h2 {
-		max-width: min(34ch, calc(100vw - (2 * var(--talk-pad)) - 4ch));
+	.layout-letters,
+	.layout-altitude,
+	.layout-columns,
+	.layout-recap {
+		--talk-h-max: min(34ch, calc(100vw - (2 * var(--talk-pad)) - 4ch));
 	}
 }
 
@@ -754,11 +722,6 @@ body {
 
 	.letter-card__label {
 		font-size: 0.65rem;
-	}
-
-	.alt-row {
-		grid-template-columns: 1fr;
-		gap: 0.25rem;
 	}
 
 	.talk__hint {

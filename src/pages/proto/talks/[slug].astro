@@ -1,7 +1,9 @@
 ---
 import Talk from "../../../layouts/Talk.astro";
 import TalkShow from "../../../components/talk/TalkShow.astro";
-import { loadTalk } from "../../../lib/proto/talks/load";
+import { loadTalk, slugFromPath } from "../../../lib/proto/talks/load";
+import type { TalkDoc } from "../../../lib/proto/talks/ast";
+import type { TalkMeta } from "../../../lib/proto/talks/load";
 
 export function getStaticPaths() {
 	const sources = import.meta.glob<string>("../../../content/talks/*.md", {
@@ -11,7 +13,7 @@ export function getStaticPaths() {
 	});
 
 	return Object.entries(sources).flatMap(([path, source]) => {
-		const slug = path.match(/([^/]+)\.md$/)?.[1];
+		const slug = slugFromPath(path);
 		if (!slug) return [];
 		const { meta, doc } = loadTalk(source);
 		return [{ params: { slug }, props: { meta, doc } }];
@@ -19,12 +21,8 @@ export function getStaticPaths() {
 }
 
 interface Props {
-	meta: {
-		title: string;
-		series: string;
-		description: string;
-	};
-	doc: import("../../../lib/proto/talks/ast").TalkDoc;
+	meta: TalkMeta;
+	doc: TalkDoc;
 }
 
 const { meta, doc } = Astro.props;

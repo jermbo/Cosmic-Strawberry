@@ -1,25 +1,18 @@
 ---
-import type { TalkBlock } from "../../../lib/proto/talks/ast";
-import { pickMotion } from "../../../lib/proto/talks/ast";
-import Step from "../Step.astro";
+import type { TalkBlock, TalkAccent } from "../../../lib/proto/talks/ast";
+import StepBlocks from "./StepBlocks.astro";
 
 interface Props {
 	block: TalkBlock;
+	accent?: TalkAccent;
 }
 
-const { block } = Astro.props;
-const items = block.children ?? [];
+const { block, accent = "purple" } = Astro.props;
 ---
 
-<div class="layout-letters__row" data-molecule="letters">
-	{
-		items.map((child) => (
-			<Step on={!!child.step} motion={pickMotion(child.attrs)}>
-				<div class="letter-card">
-					<span class="letter-card__char">{child.letter ?? child.label}</span>
-					<span class="letter-card__label">{child.body}</span>
-				</div>
-			</Step>
-		))
-	}
-</div>
+<StepBlocks
+	items={block.children ?? []}
+	accent={accent}
+	class="layout-letters__row"
+	molecule="letters"
+/>

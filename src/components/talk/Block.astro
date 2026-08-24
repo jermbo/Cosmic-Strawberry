@@ -6,7 +6,7 @@ import Group from "./molecules/Group.astro";
 import Cards from "./molecules/Cards.astro";
 import Card from "./molecules/Card.astro";
 import Letters from "./molecules/Letters.astro";
-import Altitude from "./molecules/Altitude.astro";
+import Letter from "./molecules/Letter.astro";
 import Col from "./molecules/Col.astro";
 import Recap from "./molecules/Recap.astro";
 import RecapCard from "./molecules/RecapCard.astro";
@@ -31,8 +31,8 @@ const children = inner.children ?? [];
 	{molecule === "group" && <Group children={children} accent={accent} />}
 	{molecule === "cards" && <Cards block={inner} accent={accent} />}
 	{molecule === "card" && <Card block={inner} accent={accent} />}
-	{molecule === "letters" && <Letters block={inner} />}
-	{molecule === "altitude" && <Altitude block={inner} />}
+	{molecule === "letters" && <Letters block={inner} accent={accent} />}
+	{molecule === "letter" && <Letter block={inner} />}
 	{molecule === "col" && <Col block={inner} accent={accent} />}
 	{molecule === "recap" && <Recap block={inner} accent={accent} />}
 	{molecule === "recap-card" && <RecapCard block={inner} accent={accent} />}

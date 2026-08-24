@@ -5,6 +5,7 @@
  * Hash: `#3` / `#3.2`. Reduced motion → instant.
  */
 import gsap from "gsap";
+import { MOTIONS, type MotionAttr } from "./motions";
 
 const reduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -21,33 +22,19 @@ const CLEAR = {
 	filter: "blur(0px)",
 } as const;
 
-const HIDDEN_BASE = { autoAlpha: 0, x: 0, y: 0, scale: 1, scaleX: 1, scaleY: 1, rotation: 0, rotateX: 0, rotateY: 0, filter: "blur(0px)" };
-
-type MotionSpec = { from: gsap.TweenVars; ease?: string };
-
-const MOTIONS: Record<string, MotionSpec> = {
-	fade: { from: { autoAlpha: 0, y: 8 } },
-	"reveal-bottom": { from: { autoAlpha: 0, y: 28 } },
-	"reveal-top": { from: { autoAlpha: 0, y: -28 } },
-	"reveal-left": { from: { autoAlpha: 0, x: -32 } },
-	"reveal-right": { from: { autoAlpha: 0, x: 32 } },
-	"zoom-in": { from: { autoAlpha: 0, scale: 0.72 } },
-	"zoom-out": { from: { autoAlpha: 0, scale: 1.28 } },
-	"squish-in": { from: { autoAlpha: 0, scaleY: 0.08 }, ease: "power3.out" },
-	"squish-out": { from: { autoAlpha: 0, scaleX: 1.5, scaleY: 0.28 }, ease: "power3.out" },
-	pop: { from: { autoAlpha: 0, scale: 0.45 }, ease: "back.out(1.6)" },
-	"blur-in": { from: { autoAlpha: 0, filter: "blur(14px)" } },
-	"flip-x": { from: { autoAlpha: 0, rotateY: 78, transformPerspective: 900 }, ease: "power2.out" },
-	"flip-y": { from: { autoAlpha: 0, rotateX: 78, transformPerspective: 900 }, ease: "power2.out" },
-	"spin-in": { from: { autoAlpha: 0, rotation: -14, scale: 0.88 }, ease: "power2.out" },
-};
+const HIDDEN = { ...CLEAR, autoAlpha: 0 };
 
 function stepsOf(slide: HTMLElement): HTMLElement[] {
 	return Array.from(slide.querySelectorAll<HTMLElement>("[data-step]"));
 }
 
-function motionOf(el: HTMLElement): MotionSpec {
-	return MOTIONS[el.dataset.motion ?? "fade"] ?? MOTIONS.fade;
+function motionOf(el: HTMLElement) {
+	const key = (el.dataset.motion ?? "fade") as MotionAttr;
+	return MOTIONS[key] ?? MOTIONS.fade;
+}
+
+function pad(n: number): string {
+	return String(n).padStart(2, "0");
 }
 
 function readHash(slideCount: number): { slide: number; revealed: number } | null {
@@ -99,8 +86,9 @@ export function initTalkShow(): void {
 			el.classList.toggle("is-revealed", on);
 			el.setAttribute("aria-hidden", on ? "false" : "true");
 
-			if (!animate || reduced() || !(on && i === count - 1)) {
-				gsap.set(el, on ? { ...CLEAR } : { ...HIDDEN_BASE });
+			const isLatest = on && i === count - 1;
+			if (!animate || reduced() || !isLatest) {
+				gsap.set(el, on ? { ...CLEAR } : { ...HIDDEN });
 				return;
 			}
 
@@ -121,16 +109,18 @@ export function initTalkShow(): void {
 		const slide = slides[index];
 		const steps = stepsOf(slide);
 		const n = slides.length;
-		if (counter) counter.textContent = `${String(index + 1).padStart(2, "0")} / ${String(n).padStart(2, "0")}`;
 
-		const stepFrac = steps.length ? revealed / Math.max(steps.length, 1) : 1;
+		if (counter) counter.textContent = `${pad(index + 1)} / ${pad(n)}`;
+
+		const stepFrac = steps.length ? revealed / steps.length : 1;
 		if (progress) progress.style.setProperty("--p", String(Math.min(1, (index + stepFrac) / n)));
 
 		if (status) {
-			status.textContent =
-				steps.length && revealed < steps.length
-					? `Slide ${index + 1} of ${n}, reveal ${revealed} of ${steps.length}`
-					: `Slide ${index + 1} of ${n}`;
+			if (steps.length && revealed < steps.length) {
+				status.textContent = `Slide ${index + 1} of ${n}, reveal ${revealed} of ${steps.length}`;
+			} else {
+				status.textContent = `Slide ${index + 1} of ${n}`;
+			}
 		}
 
 		if (prevBtn) prevBtn.disabled = index === 0 && revealed === 0;
@@ -156,8 +146,9 @@ export function initTalkShow(): void {
 
 		updateChrome();
 
-		if (from !== undefined && from !== index && !reduced()) {
-			const dir = index > from ? 1 : -1;
+		const animateSlide = from !== undefined && from !== index && !reduced();
+		if (animateSlide) {
+			const dir = index > from! ? 1 : -1;
 			busy = true;
 			gsap.fromTo(
 				slides[index],
@@ -172,9 +163,11 @@ export function initTalkShow(): void {
 					},
 				},
 			);
-			gsap.set(slides[from], { autoAlpha: 0, x: 0 });
+			gsap.set(slides[from!], { autoAlpha: 0, x: 0 });
 		} else {
-			slides.forEach((s, i) => gsap.set(s, { autoAlpha: i === index ? 1 : 0, x: 0 }));
+			slides.forEach((s, i) => {
+				gsap.set(s, { autoAlpha: i === index ? 1 : 0, x: 0 });
+			});
 		}
 
 		syncSteps(slides[index], revealed, false);
@@ -186,7 +179,8 @@ export function initTalkShow(): void {
 		const from = index;
 		index = next;
 		revealed = showAllSteps ? stepsOf(slides[index]).length : 0;
-		paintSlide(from === next ? undefined : from);
+		if (from === next) paintSlide();
+		else paintSlide(from);
 	}
 
 	function applyHash(): void {
@@ -194,14 +188,17 @@ export function initTalkShow(): void {
 		if (!pos) return;
 		const nextRevealed = Math.min(pos.revealed, stepsOf(slides[pos.slide]).length);
 		if (pos.slide === index && nextRevealed === revealed) return;
+
 		const from = index;
 		index = pos.slide;
 		revealed = nextRevealed;
-		if (from !== index) paintSlide(undefined);
-		else {
-			syncSteps(slides[index], revealed, false);
-			updateChrome();
+
+		if (from !== index) {
+			paintSlide();
+			return;
 		}
+		syncSteps(slides[index], revealed, false);
+		updateChrome();
 	}
 
 	function forward(): void {

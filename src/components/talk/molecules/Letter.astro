@@ -1,0 +1,14 @@
+---
+import type { TalkBlock } from "../../../lib/proto/talks/ast";
+
+interface Props {
+	block: TalkBlock;
+}
+
+const { block } = Astro.props;
+---
+
+<div class="letter-card" data-molecule="letter">
+	<span class="letter-card__char">{block.letter ?? block.label}</span>
+	<span class="letter-card__label">{block.body}</span>
+</div>
