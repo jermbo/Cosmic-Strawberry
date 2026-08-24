@@ -55,6 +55,8 @@ const SLIDE_KINDS = [
 	"columns",
 	"matter",
 	"recap",
+	"figure",
+	"gallery",
 ] as const;
 
 /** `matter` shares the columns layout. */

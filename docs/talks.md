@@ -62,6 +62,8 @@ Numbers are 1-based.
 | `columns`  | Title + two columns                        |
 | `matter`   | Alias for `columns`                        |
 | `recap`    | Title + recap cards                        |
+| `figure`   | Title + one dominant image                 |
+| `gallery`  | Title + two-column image grid              |
 | _(none)_   | Falls back to `lead`-like body             |
 
 ### Accent / fill
@@ -105,6 +107,10 @@ Default motion when omitted on a step: `fade`.
 - First paragraph that is only emphasis (`*kicker*` or `_kicker_`) → section kicker
 - `#` / `##` → slide title
 - Following paragraphs → body / lede
+- `![alt](/path.png)` → image (use `figure` or `gallery` layouts for screenshot-heavy slides)
+
+Images live under `public/` and are referenced with a root path, e.g.
+`![Nesting](/talks/architecting-your-front-end/Nesting-SCSS-Good.png)`.
 
 ---
 
