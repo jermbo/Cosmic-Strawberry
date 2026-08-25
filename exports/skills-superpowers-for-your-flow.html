@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Instructions + references + resources. Built once, used everywhere." />
+<title>Skills — Superpowers for Your Flow — TALK 202</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+/* Talk show — full-bleed, independent of proto.css */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+:root {
+	--talk-bg: #070707;
+	--talk-fg: #f5f5f5;
+	--talk-mute: #a3a3a3;
+	--talk-faint: #5c5c5c;
+	--talk-panel: #161616;
+	--talk-purple: #b794f6;
+	--talk-lime: #b8f53d;
+	--talk-orange: #ff5a35;
+	--talk-lavender: #c4b5fd;
+	--talk-break-lime: #b8f53d;
+	--talk-break-orange: #e85d36;
+	--talk-break-lavender: #c4b5e8;
+	--talk-break-ink: #0a0a0a;
+	--talk-accent: var(--talk-purple);
+	--talk-sans: "Space Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+	--talk-pad: clamp(2ch, 4vw, 6ch);
+	--talk-measure: 60ch;
+	--talk-lh-display: 1.1;
+	--talk-lh-body: 1.5;
+	--talk-lh-tight: 1.35;
+}
+
+html,
+body {
+	margin: 0;
+	height: 100%;
+	background: var(--talk-bg);
+	color: var(--talk-fg);
+	font-family: var(--talk-sans);
+	line-height: var(--talk-lh-body);
+	-webkit-font-smoothing: antialiased;
+	text-wrap: balance;
+}
+
+body {
+	overflow: hidden;
+}
+
+/* ——— shell ——— */
+
+.talk-skip {
+	position: absolute;
+	left: -9999px;
+	top: 0;
+	z-index: 100;
+	padding: 0.5rem 0.75rem;
+	background: var(--talk-fg);
+	color: var(--talk-bg);
+	text-decoration: none;
+	font-size: 0.85rem;
+}
+
+.talk-skip:focus {
+	left: 0.75rem;
+	top: 0.75rem;
+}
+
+.talk {
+	position: relative;
+	width: 100%;
+	height: 100dvh;
+	outline: none;
+	user-select: none;
+}
+
+.talk:focus-visible {
+	box-shadow: inset 0 0 0 2px var(--talk-accent);
+}
+
+.talk__stage {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+}
+
+.talk__slide {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	padding: calc(var(--talk-pad) + 2.5lh) var(--talk-pad) calc(var(--talk-pad) + 3lh);
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+.talk__slide.is-current {
+	pointer-events: auto;
+}
+
+.talk__slide[data-accent="lime"] {
+	--talk-accent: var(--talk-lime);
+}
+.talk__slide[data-accent="orange"] {
+	--talk-accent: var(--talk-orange);
+}
+.talk__slide[data-accent="lavender"] {
+	--talk-accent: var(--talk-lavender);
+}
+.talk__slide[data-accent="purple"] {
+	--talk-accent: var(--talk-purple);
+}
+
+/* ——— chrome ——— */
+
+.talk__chrome {
+	position: absolute;
+	inset: 0;
+	z-index: 5;
+	pointer-events: none;
+	display: grid;
+	grid-template-rows: auto 1fr auto;
+	padding: 0.85rem var(--talk-pad);
+}
+
+.talk__chrome a,
+.talk__chrome button {
+	pointer-events: auto;
+}
+
+.talk__top,
+.talk__bottom {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.talk__brand,
+.talk__counter {
+	font-size: 0.7rem;
+	font-weight: 600;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--talk-mute);
+	text-decoration: none;
+}
+
+.talk__counter {
+	font-variant-numeric: tabular-nums;
+	letter-spacing: 0.12em;
+}
+
+.talk__brand {
+	letter-spacing: 0.14em;
+}
+
+.talk__brand:hover {
+	color: var(--talk-fg);
+}
+
+.talk__nav {
+	display: flex;
+	gap: 0.4rem;
+}
+
+.talk__nav button {
+	appearance: none;
+	border: 1px solid color-mix(in srgb, var(--talk-fg) 18%, transparent);
+	background: transparent;
+	color: var(--talk-fg);
+	font: inherit;
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	padding: 0.45rem 0.75rem;
+	border-radius: 999px;
+	cursor: pointer;
+}
+
+.talk__nav button:hover:not(:disabled) {
+	background: color-mix(in srgb, var(--talk-fg) 8%, transparent);
+}
+
+.talk__nav button:disabled {
+	opacity: 0.28;
+	cursor: default;
+}
+
+.talk__hint {
+	font-size: 0.65rem;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--talk-faint);
+}
+
+.talk__progress {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 3px;
+	background: color-mix(in srgb, var(--talk-fg) 8%, transparent);
+	pointer-events: none;
+}
+
+.talk__progress > i {
+	display: block;
+	height: 100%;
+	width: calc(var(--p, 0) * 100%);
+	background: var(--talk-accent);
+	transition: width 0.35s ease;
+}
+
+.talk[data-accent="lime"] {
+	--talk-accent: var(--talk-lime);
+}
+.talk[data-accent="orange"] {
+	--talk-accent: var(--talk-orange);
+}
+.talk[data-accent="lavender"] {
+	--talk-accent: var(--talk-lavender);
+}
+
+.talk__status {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+}
+
+/* ——— prose (markdown) ——— */
+
+.talk-prose {
+	min-width: 0;
+}
+
+.talk-prose > p:first-child:has(> em:only-child),
+.talk-prose > p:first-child:has(> strong:only-child) {
+	margin: 0 0 0.75lh;
+	font-size: clamp(0.7rem, 1.1vw, 0.85rem);
+	font-weight: 600;
+	line-height: var(--talk-lh-tight);
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--talk-accent);
+}
+
+.talk-prose > p:first-child em,
+.talk-prose > p:first-child strong {
+	font-style: normal;
+	font-weight: 600;
+}
+
+.talk-prose h1,
+.talk-prose h2 {
+	margin: 0;
+	font-size: var(--talk-h-size, clamp(2rem, 4.8vw, 3.75rem));
+	font-weight: 700;
+	line-height: var(--talk-lh-display);
+	letter-spacing: -0.03em;
+	max-width: var(--talk-h-max, 22ch);
+}
+
+.talk-prose h3 {
+	margin: 0 0 0.25lh;
+	font-size: clamp(1rem, 1.4vw, 1.2rem);
+	font-weight: 600;
+	line-height: var(--talk-lh-tight);
+}
+
+.talk-prose p {
+	margin: 0.75lh 0 0;
+	font-size: clamp(1rem, 1.5vw, 1.25rem);
+	line-height: var(--talk-lh-body);
+	color: var(--talk-mute);
+	max-width: var(--talk-measure);
+}
+
+.talk-prose ul {
+	margin: 0.5lh 0 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: 0.35lh;
+	max-width: var(--talk-measure);
+}
+
+.talk-prose li,
+.talk-col li {
+	position: relative;
+	padding-left: 1.5ch;
+	font-size: clamp(0.95rem, 1.3vw, 1.15rem);
+	line-height: var(--talk-lh-tight);
+}
+
+.talk-prose li::before,
+.talk-col li::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 0.55lh;
+	width: 0.45ch;
+	height: 0.45ch;
+	border-radius: 50%;
+	background: currentColor;
+	translate: 0 -50%;
+}
+
+.talk-prose > p:has(> img:only-child) {
+	margin: 0.75lh 0 0;
+	max-width: none;
+}
+
+.talk-prose img {
+	display: block;
+	width: 100%;
+	max-width: min(100%, 72ch);
+	max-height: min(48vh, 26rem);
+	height: auto;
+	object-fit: contain;
+	object-position: left top;
+	border-radius: 0.45rem;
+	border: 1px solid color-mix(in srgb, var(--talk-fg) 14%, transparent);
+	background: color-mix(in srgb, var(--talk-fg) 4%, transparent);
+}
+
+.talk-prose pre {
+	margin: 0.85lh 0 0;
+	padding: 0.85lh 1.25ch;
+	max-width: min(100%, 78ch);
+	max-height: min(42vh, 22rem);
+	overflow: auto;
+	border-radius: 0.45rem;
+	border: 1px solid color-mix(in srgb, var(--talk-fg) 14%, transparent);
+	background: color-mix(in srgb, var(--talk-fg) 6%, transparent);
+	font-size: clamp(0.72rem, 1.05vw, 0.9rem);
+	line-height: 1.45;
+}
+
+.talk-prose code {
+	font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+	font-size: 0.92em;
+}
+
+.talk-prose :not(pre) > code {
+	padding: 0.1em 0.35ch;
+	border-radius: 0.25rem;
+	background: color-mix(in srgb, var(--talk-fg) 8%, transparent);
+}
+
+.talk-prose blockquote {
+	margin: 0.85lh 0 0;
+	padding: 0.35lh 0 0.35lh 1.5ch;
+	border-left: 3px solid var(--talk-accent);
+	max-width: var(--talk-measure);
+	color: var(--talk-mute);
+	font-size: clamp(0.95rem, 1.35vw, 1.15rem);
+	line-height: var(--talk-lh-body);
+}
+
+.talk-prose blockquote p {
+	margin: 0;
+	color: inherit;
+}
+
+/* ——— steps ——— */
+
+.talk-step {
+	opacity: 0;
+	visibility: hidden;
+	transform-origin: 50% 50%;
+	transform-style: preserve-3d;
+}
+
+.talk-step.is-revealed {
+	visibility: visible;
+}
+
+.talk-cards > .talk-step,
+.recap-row > .talk-step,
+.layout-letters__row > .talk-step {
+	min-width: 0;
+}
+
+/* ——— molecules ——— */
+
+.talk-callout {
+	margin-top: 1lh;
+	padding: 0.75lh 1.5ch;
+	border-radius: 0.75rem;
+	border-left: 0.35ch solid var(--talk-lime);
+	background: var(--talk-panel);
+	max-width: var(--talk-measure);
+}
+
+.talk-callout--important,
+.talk-callout--warn {
+	border-left-color: var(--talk-orange);
+}
+
+.talk-callout p {
+	margin: 0;
+	color: var(--talk-fg);
+	font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+	line-height: var(--talk-lh-body);
+}
+
+.talk-cards {
+	display: grid;
+	gap: 0.5lh;
+}
+
+.talk-cards--row {
+	grid-template-columns: repeat(auto-fit, minmax(22ch, 1fr));
+}
+
+.talk-card,
+.recap-card,
+.letter-card,
+.alt-row {
+	background: var(--talk-panel);
+	border-radius: 0.85rem;
+	line-height: var(--talk-lh-body);
+}
+
+.talk-card,
+.recap-card {
+	padding: 0.85lh 1.5ch;
+}
+
+.talk-card__inner h3,
+.recap-card h3 {
+	margin: 0 0 0.25lh;
+	font-size: clamp(1rem, 1.4vw, 1.2rem);
+	font-weight: 600;
+	line-height: var(--talk-lh-tight);
+	color: var(--talk-accent);
+}
+
+.recap-card h3 {
+	font-size: clamp(1.05rem, 1.5vw, 1.3rem);
+	color: var(--talk-fg);
+}
+
+.talk-card__inner p,
+.recap-card p,
+.alt-row__body {
+	margin: 0;
+	font-size: clamp(0.85rem, 1.1vw, 0.95rem);
+	line-height: var(--talk-lh-body);
+	color: var(--talk-mute);
+}
+
+.recap-card {
+	border-left: 0.35ch solid var(--talk-accent);
+}
+
+.recap-card[data-accent="lime"] {
+	--talk-accent: var(--talk-lime);
+}
+.recap-card[data-accent="orange"] {
+	--talk-accent: var(--talk-orange);
+}
+.recap-card[data-accent="purple"] {
+	--talk-accent: var(--talk-purple);
+}
+.recap-card[data-accent="lavender"] {
+	--talk-accent: var(--talk-lavender);
+}
+
+.talk-col h3 {
+	margin: 0 0 0.75lh;
+	font-size: 0.7rem;
+	font-weight: 600;
+	line-height: var(--talk-lh-tight);
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--talk-accent);
+}
+
+.talk-col.accent-lime {
+	--talk-accent: var(--talk-lime);
+}
+.talk-col.accent-orange {
+	--talk-accent: var(--talk-orange);
+}
+.talk-col.accent-purple {
+	--talk-accent: var(--talk-purple);
+}
+.talk-col.accent-lavender {
+	--talk-accent: var(--talk-lavender);
+}
+
+.talk-col ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: 0.35lh;
+	color: var(--talk-fg);
+}
+
+.break-pills ul {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75ch;
+	margin: 1lh 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.break-pills li {
+	background: color-mix(in srgb, var(--talk-break-ink) 14%, transparent);
+	color: var(--talk-break-ink);
+	border-radius: 999px;
+	padding: 0.35lh 1.25ch;
+	font-size: clamp(0.85rem, 1.2vw, 1rem);
+	font-weight: 600;
+	line-height: var(--talk-lh-tight);
+}
+
+.break-pills li::before {
+	display: none;
+}
+
+.layout-letters__row {
+	display: grid;
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+	gap: 1ch;
+	align-self: center;
+}
+
+.letter-card {
+	aspect-ratio: 3 / 4;
+	display: grid;
+	place-content: center;
+	gap: 0.5lh;
+	text-align: center;
+	padding: 1ch;
+	height: 100%;
+}
+
+.letter-card__char {
+	font-size: clamp(2.5rem, 6vw, 4.5rem);
+	font-weight: 700;
+	line-height: 1;
+	color: var(--talk-accent);
+}
+
+.letter-card__label {
+	font-size: clamp(0.75rem, 1.2vw, 0.95rem);
+	font-weight: 500;
+	line-height: var(--talk-lh-tight);
+	color: var(--talk-fg);
+}
+
+.recap-row {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 1.25ch;
+}
+
+/* ——— layouts ——— */
+
+.layout-title,
+.layout-lead,
+.layout-letters,
+.layout-altitude,
+.layout-columns,
+.layout-recap,
+.layout-figure,
+.layout-gallery {
+	align-content: center;
+}
+
+.layout-title {
+	justify-items: start;
+}
+
+.layout-title .talk-prose h1 {
+	--talk-h-size: clamp(2.5rem, 7vw, 5.5rem);
+	--talk-h-max: 20ch;
+}
+
+.layout-lead {
+	justify-items: start;
+	max-width: 72ch;
+}
+
+.layout-split {
+	grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+	gap: clamp(3ch, 4vw, 6ch);
+	align-items: center;
+	--talk-h-max: 18ch;
+}
+
+.layout-letters {
+	grid-template-rows: auto 1fr;
+	gap: 1.25lh;
+}
+
+.layout-altitude {
+	gap: 0.4lh;
+}
+
+.layout-columns,
+.layout-recap {
+	gap: 1lh;
+}
+
+.layout-columns {
+	grid-template-columns: 1fr 1fr;
+}
+
+.layout-columns > .talk-prose {
+	grid-column: 1 / -1;
+	padding-bottom: 0.5lh;
+	border-bottom: 1px solid color-mix(in srgb, var(--talk-fg) 12%, transparent);
+}
+
+.layout-recap {
+	gap: 1.25lh;
+}
+
+.layout-figure {
+	justify-items: start;
+	gap: 0.75lh;
+}
+
+.layout-figure .talk-prose {
+	width: min(100%, 96ch);
+}
+
+.layout-figure .talk-prose img {
+	max-width: 100%;
+	max-height: min(62vh, 36rem);
+}
+
+.layout-gallery {
+	justify-items: start;
+	gap: 0.75lh;
+}
+
+.layout-gallery .talk-prose {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 1.25ch 1.75ch;
+	align-items: start;
+	width: min(100%, 110ch);
+}
+
+.layout-gallery .talk-prose > p:first-child:has(> em:only-child),
+.layout-gallery .talk-prose > p:first-child:has(> strong:only-child),
+.layout-gallery .talk-prose h1,
+.layout-gallery .talk-prose h2,
+.layout-gallery .talk-prose h3,
+.layout-gallery .talk-prose > p:not(:has(> img:only-child)) {
+	grid-column: 1 / -1;
+}
+
+.layout-gallery .talk-prose img {
+	max-width: 100%;
+	max-height: min(42vh, 22rem);
+}
+
+/* color fills */
+
+.layout-break,
+.layout-cta {
+	background: var(--talk-break-lime);
+	color: var(--talk-break-ink);
+	align-content: end;
+	justify-items: start;
+	padding-bottom: calc(var(--talk-pad) + 3lh);
+}
+
+.layout-break[data-fill="orange"],
+.layout-cta[data-fill="orange"] {
+	background: var(--talk-break-orange);
+}
+.layout-break[data-fill="lavender"],
+.layout-cta[data-fill="lavender"] {
+	background: var(--talk-break-lavender);
+}
+
+.layout-break .talk-prose h1,
+.layout-break .talk-prose h2,
+.layout-cta .talk-prose h1,
+.layout-cta .talk-prose h2 {
+	color: var(--talk-break-ink);
+	--talk-h-size: clamp(2.75rem, 8vw, 6rem);
+	--talk-h-max: 16ch;
+}
+
+.layout-cta .talk-prose h1,
+.layout-cta .talk-prose h2 {
+	--talk-h-size: clamp(2.25rem, 5.5vw, 4.25rem);
+	--talk-h-max: 18ch;
+}
+
+.layout-break .talk-prose p,
+.layout-cta .talk-prose p,
+.layout-break .talk-prose > p:first-child:has(> em:only-child) {
+	color: var(--talk-break-ink);
+}
+
+.layout-cta .talk-prose p {
+	max-width: 48ch;
+}
+
+.break-mark {
+	position: absolute;
+	top: calc(var(--talk-pad) + 2lh);
+	left: var(--talk-pad);
+	width: 1.1ch;
+	height: 1.1ch;
+	background: var(--talk-break-ink);
+	clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+}
+
+/* chrome on fills */
+.talk[data-kind="break"],
+.talk[data-kind="cta"] {
+	--talk-chrome: color-mix(in srgb, var(--talk-break-ink) 55%, transparent);
+}
+
+.talk[data-kind="break"] .talk__brand,
+.talk[data-kind="break"] .talk__counter,
+.talk[data-kind="break"] .talk__hint,
+.talk[data-kind="cta"] .talk__brand,
+.talk[data-kind="cta"] .talk__counter,
+.talk[data-kind="cta"] .talk__hint {
+	color: var(--talk-chrome);
+}
+
+.talk[data-kind="break"] .talk__brand:hover,
+.talk[data-kind="cta"] .talk__brand:hover {
+	color: var(--talk-break-ink);
+}
+
+.talk[data-kind="break"] .talk__nav button,
+.talk[data-kind="cta"] .talk__nav button {
+	border-color: color-mix(in srgb, var(--talk-break-ink) 28%, transparent);
+	color: var(--talk-break-ink);
+}
+
+.talk[data-kind="break"] .talk__progress,
+.talk[data-kind="cta"] .talk__progress {
+	background: color-mix(in srgb, var(--talk-break-ink) 18%, transparent);
+}
+
+.talk[data-kind="break"] .talk__progress > i,
+.talk[data-kind="cta"] .talk__progress > i {
+	background: var(--talk-break-ink);
+}
+
+.talk[data-kind="break"]:focus-visible,
+.talk[data-kind="cta"]:focus-visible {
+	box-shadow: inset 0 0 0 2px var(--talk-break-ink);
+}
+
+/* ——— responsive ——— */
+
+@media (min-width: 1000px) {
+	.talk__slide {
+		--talk-h-max: min(28ch, calc(100vw - (2 * var(--talk-pad)) - 4ch));
+	}
+
+	.layout-title {
+		--talk-h-size: clamp(2.75rem, 5.2vw, 4.75rem);
+		--talk-h-max: min(24ch, calc(100vw - (2 * var(--talk-pad)) - 4ch));
+	}
+
+	.layout-lead {
+		--talk-h-max: min(30ch, calc(100vw - (2 * var(--talk-pad)) - 4ch));
+	}
+
+	.layout-split {
+		--talk-h-max: min(22ch, 100%);
+	}
+
+	.layout-break {
+		--talk-h-size: clamp(3rem, 6vw, 5.25rem);
+		--talk-h-max: min(18ch, calc(100vw - (2 * var(--talk-pad)) - 4ch));
+	}
+
+	.layout-cta {
+		--talk-h-size: clamp(2.5rem, 4.5vw, 4rem);
+		--talk-h-max: min(22ch, calc(100vw - (2 * var(--talk-pad)) - 4ch));
+	}
+
+	.layout-letters,
+	.layout-altitude,
+	.layout-columns,
+	.layout-recap,
+	.layout-figure,
+	.layout-gallery {
+		--talk-h-max: min(34ch, calc(100vw - (2 * var(--talk-pad)) - 4ch));
+	}
+}
+
+@media (max-width: 820px) {
+	.layout-split,
+	.layout-columns,
+	.layout-gallery .talk-prose,
+	.recap-row {
+		grid-template-columns: 1fr;
+	}
+
+	.layout-letters__row {
+		gap: 0.5ch;
+	}
+
+	.letter-card {
+		aspect-ratio: auto;
+		min-height: 5.5lh;
+		gap: 0.25lh;
+		padding: 0.5ch;
+	}
+
+	.letter-card__char {
+		font-size: 1.6rem;
+	}
+
+	.letter-card__label {
+		font-size: 0.65rem;
+	}
+
+	.talk__hint {
+		display: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.talk__progress > i {
+		transition: none;
+	}
+}
+
+</style>
+<script>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+<a class="talk-skip" href="#talk-stage">Skip to slides</a>
+<div class="talk" id="talk-stage" data-talk data-accent="purple" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Skills — Superpowers for Your Flow. Arrow keys advance reveals, then slides.">
+	<div class="talk__stage"><section class="talk__slide layout-title" data-slide data-kind="title" data-accent="lime" aria-hidden="false"><div class="talk-prose"><p><em>TALK 202</em></p>
+<h1>Skills: Superpowers for Your Flow</h1>
+<p>Instructions + references + resources. Built once, used everywhere.</p></div></section><section class="talk__slide layout-split" data-slide data-kind="split" data-accent="lime" aria-hidden="true"><div class="talk-prose"><p><em>01 — THE IDEA</em></p>
+<h2>What is a skill?</h2></div><div class="talk-cards talk-cards--stack" data-molecule="cards"><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="lime"><h3>A folder your agent reads</h3><p>When the task calls for it</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="lime"><h3>Minimum viable</h3><p>One SKILL.md file</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="lime"><h3>Optionally</h3><p>Add references/ and resources/ folders</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="lime"><h3>Harness agnostic</h3><p>Not just a Claude thing</p></div></article></div></div><div class="talk-step" data-step data-motion="reveal-bottom"><aside class="talk-callout talk-callout--important" data-molecule="callout"><p>Write it once. It travels with you across chats, projects, repos. No more re-explaining the same thing every session.</p></aside></div></section><section class="talk__slide layout-split" data-slide data-kind="split" data-accent="purple" aria-hidden="true"><div class="talk-prose"><p><em>01 — THE IDEA</em></p>
+<h2>Anatomy of a skill</h2></div><div class="talk-cards talk-cards--stack" data-molecule="cards"><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="purple"><h3>SKILL.md</h3><p>Required. The instructions — what to do, when to do it.</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="purple"><h3>references/</h3><p>Stuff to consult. Doesn't cost context until it's needed.</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="purple"><h3>resources/</h3><p>Scripts, templates, lookup tables.</p></div></article></div></div></section><section class="talk__slide layout-break" data-slide data-kind="break" data-accent="lavender" data-fill="lavender" aria-hidden="true"><span class="break-mark" aria-hidden="true"></span><div class="talk-prose"><p><em>A REAL SKILL.MD</em></p>
+<h1>The frontmatter</h1></div></section><section class="talk__slide layout-split" data-slide data-kind="split" data-accent="purple" aria-hidden="true"><div class="talk-prose"><p><em>02 — A REAL SKILL.MD</em></p>
+<h2>The frontmatter</h2></div><div class="talk-cards talk-cards--stack" data-molecule="cards"><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="purple"><h3>name</h3><p>commit-message-enforcer</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="purple"><h3>description</h3><p>Use when writing a git commit message. Enforces team convention (type, scope, imperative mood) and rejects vague messages before they're committed.</p></div></article></div></div></section><section class="talk__slide layout-split" data-slide data-kind="split" data-accent="purple" aria-hidden="true"><div class="talk-prose"><p><em>02 — A REAL SKILL.MD</em></p>
+<h2>The instructions</h2></div><div class="talk-cards talk-cards--stack" data-molecule="cards"><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="purple"><h3>1</h3><p>Read the staged diff.</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="purple"><h3>2</h3><p>Draft a message in type(scope): summary format.</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="purple"><h3>3</h3><p>Reject the draft if the summary is vague (&quot;fix stuff&quot;, &quot;updates&quot;) — rewrite until it says what actually changed.</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="purple"><h3>4</h3><p>Confirm with me before committing.</p></div></article></div></div><div class="talk-step" data-step data-motion="reveal-bottom"><aside class="talk-callout talk-callout--important" data-molecule="callout"><p>That <strong>description</strong> field isn't documentation. It's the trigger. It's the only thing deciding whether this skill fires at all.</p></aside></div></section><section class="talk__slide layout-columns" data-slide data-kind="matter" data-accent="lime" aria-hidden="true"><div class="talk-prose"><p><em>02 — A REAL SKILL.MD</em></p>
+<h2>Writing a trigger that fires</h2></div><div class="talk-step" data-step data-motion="reveal-left"><div class="talk-col accent-orange" data-molecule="col"><h3>Too broad</h3>
+<p>Helps with git stuff</p>
+<p>Could mean anything. Never fires, or fires for the wrong thing.</p></div></div><div class="talk-step" data-step data-motion="reveal-right"><div class="talk-col accent-lime" data-molecule="col"><h3>Specific</h3>
+<p>Use when writing a git commit message</p>
+<p>Matches the moment it's needed.</p></div></div><div class="talk-step" data-step data-motion="fade"><div class="talk-prose"><p>Write the description as <em>the situation</em>, not the topic. If you can't picture the exact moment this should kick in, neither can the agent.</p></div></div></section><section class="talk__slide layout-break" data-slide data-kind="break" data-accent="orange" data-fill="orange" aria-hidden="true"><span class="break-mark" aria-hidden="true"></span><div class="talk-prose"><h1>Three different jobs</h1>
+<p>Don't mix them up.</p></div></section><section class="talk__slide layout-recap" data-slide data-kind="recap" data-accent="orange" aria-hidden="true"><div class="talk-prose"><p><em>03 — THREE JOBS</em></p>
+<h2>Instructions, references, scripts</h2></div><div class="recap-row" data-molecule="recap"><div class="talk-step" data-step data-motion="reveal-bottom"><article class="recap-card" data-accent="purple" data-molecule="recap-card"><h3>Instructions</h3><p>The judgment calls. The &quot;when&quot; and the &quot;why&quot; — what order, what to check, when to stop and ask. If it requires thinking, it's an instruction.</p></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="recap-card" data-accent="lime" data-molecule="recap-card"><h3>References</h3><p>Knowledge to consult, not hold in your head. Pulled in only when needed. Costs nothing until it's relevant.</p></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="recap-card" data-accent="orange" data-molecule="recap-card"><h3>Scripts</h3><p>Fixed logic. Deterministic, one right answer. Reasoning through the same thing every time? It should be running code.</p></article></div></div><div class="talk-step" data-step data-motion="reveal-bottom"><aside class="talk-callout talk-callout--note" data-molecule="callout"><p>Get this split wrong and a skill either burns tokens re-deriving things that never change, or tries to hardcode something that actually needed judgment.</p></aside></div></section><section class="talk__slide layout-lead" data-slide data-kind="lead" data-accent="lime" aria-hidden="true"><div class="talk-prose"><p><em>04 — FINDING SKILLS</em></p>
+<h2>Finding the skill hiding in your day</h2>
+<p>You already know what this is. You just haven't named it yet.</p></div><div class="talk-cards talk-cards--stack" data-molecule="cards"><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="lime"><h3>Re-explain</h3><p>The thing you re-explain to the agent every single time</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="lime"><h3>Same order</h3><p>The steps you do in the same order without thinking about it</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="lime"><h3>Judgment worn smooth</h3><p>The call you've made so many times it's not really a judgment call anymore</p></div></article></div></div><div class="talk-step" data-step data-motion="fade"><div class="talk-prose"><p>That's not busywork. That's a skill you haven't written down. If you can say it simply — that's the thing to capture.</p></div></div></section><section class="talk__slide layout-break" data-slide data-kind="break" data-accent="lime" data-fill="lime" aria-hidden="true"><span class="break-mark" aria-hidden="true"></span><div class="talk-prose"><p><em>DEV EXAMPLE</em></p>
+<h1>plan-pbi / execute-pbi</h1>
+<p>Runs the whole ticket lifecycle.</p></div></section><section class="talk__slide layout-split" data-slide data-kind="split" data-accent="lime" aria-hidden="true"><div class="talk-prose"><p><em>05 — DEV EXAMPLE</em></p>
+<h2>plan-pbi / execute-pbi</h2></div><div class="talk-cards talk-cards--stack" data-molecule="cards"><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="lime"><h3>1</h3><p>Loads the PBI, moves it to the right swim lane</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="lime"><h3>2</h3><p>Compares requirements against the codebase</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="lime"><h3>3</h3><p>Asks clarifying questions, documents the answers</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="lime"><h3>4</h3><p>Writes the code, checks for correctness</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="lime"><h3>5</h3><p>Drafts a PR, moves the ticket again, requests review</p></div></article></div></div><div class="talk-step" data-step data-motion="reveal-bottom"><aside class="talk-callout talk-callout--note" data-molecule="callout"><p>This isn't a shortcut for one step. It's the entire flow, encoded once.</p></aside></div></section><section class="talk__slide layout-split" data-slide data-kind="split" data-accent="purple" aria-hidden="true"><div class="talk-prose"><p><em>05 — DEV EXAMPLE</em></p>
+<h2>app-grill</h2>
+<p>Inspired by Matt Pocock's grill-with-docs, bent to fit my own process.</p></div><div class="talk-cards talk-cards--stack" data-molecule="cards"><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="purple"><h3>Creates</h3><p>An initiative folder</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="purple"><h3>Grills</h3><p>About requirements, explores the possibilities</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="purple"><h3>Logs</h3><p>Every answer as a decision</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="purple"><h3>Keeps</h3><p>A glossary updated as we go</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="purple"><h3>Drafts</h3><p>Features and PBIs out of the conversation</p></div></article></div></div><div class="talk-step" data-step data-motion="reveal-bottom"><aside class="talk-callout talk-callout--important" data-molecule="callout"><p>The interview isn't the point. The paper trail it leaves behind is.</p></aside></div></section><section class="talk__slide layout-break" data-slide data-kind="break" data-accent="lavender" data-fill="lavender" aria-hidden="true"><span class="break-mark" aria-hidden="true"></span><div class="talk-prose"><p><em>OUTSIDE THE CODEBASE</em></p>
+<h1>Writing coach</h1>
+<p>Grades my writing like a high school English teacher.</p></div></section><section class="talk__slide layout-split" data-slide data-kind="split" data-accent="purple" aria-hidden="true"><div class="talk-prose"><p><em>06 — OUTSIDE THE CODEBASE</em></p>
+<h2>Writing coach</h2></div><div class="talk-cards talk-cards--row" data-molecule="cards"><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="purple"><h3>Point</h3><p>Is the point actually clear?</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="purple"><h3>Voice</h3><p>Is the voice and tone consistent?</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="purple"><h3>Grammar</h3><p>Is the grammar right?</p></div></article></div></div><div class="talk-step" data-step data-motion="fade"><div class="talk-prose"><p>It won't rewrite it for me. It gives feedback, I rewrite, it grades again. The job isn't to fix my writing. It's to make me better at fixing it myself.</p></div></div><div class="talk-step" data-step data-motion="reveal-bottom"><aside class="talk-callout talk-callout--note" data-molecule="callout"><p>Same structure as any dev skill — instructions on how to grade, references for what "good" looks like, no scripts needed. It just points somewhere other than code.</p></aside></div></section><section class="talk__slide layout-split" data-slide data-kind="split" data-accent="orange" aria-hidden="true"><div class="talk-prose"><p><em>07 — NON-DEV EXAMPLE</em></p>
+<h2>Solo run</h2>
+<p>Started as a way to learn D&#x26;D. Turned into a full toolkit — bookkeeper, campaign manager, fact checker, rule explainer, scene setter.</p></div><div class="talk-step" data-step data-motion="fade"><div class="talk-prose"><p>Hand it a PDF of a new game, and it teaches you the system by playing it with you.</p></div></div><div class="talk-step" data-step data-motion="reveal-bottom"><aside class="talk-callout talk-callout--important" data-molecule="callout"><p><strong>The split, doing real work</strong> — The dice rolls and reference charts run as scripts, not conversation. No reason to make the model reinvent a d20 roll every time. Set it once, look it up after that. Not hypothetical — actually running every session.</p></aside></div></section><section class="talk__slide layout-lead" data-slide data-kind="lead" data-accent="lime" aria-hidden="true"><div class="talk-prose"><p><em>08 — RESOURCES</em></p>
+<h2>Resources</h2></div><div class="talk-cards talk-cards--stack" data-molecule="cards"><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="lime"><h3>Skills docs</h3><p>code.claude.com/docs/en/skills</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="lime"><h3>Matt Pocock's skills</h3><p>github.com/mattpocock/skills</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="lime"><h3>Anthropic's example skills</h3><p>github.com/anthropics/skills</p></div></article></div></div></section><section class="talk__slide layout-split" data-slide data-kind="split" data-accent="lime" aria-hidden="true"><div class="talk-prose"><p><em>09 — HANDS-ON</em></p>
+<h2>Build a skill for something in your own repo. Now.</h2>
+<p>Pick a lane.</p></div><div class="talk-cards talk-cards--row" data-molecule="cards"><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="lime"><h3>Repo hygiene</h3><p>Onboarding skill, decision record keeper, glossary builder</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="lime"><h3>Workflow</h3><p>Ticket-to-branch, PR description drafter, changelog generator</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="lime"><h3>Quality</h3><p>Commit message enforcer, naming convention checker, test coverage gap finder</p></div></article></div><div class="talk-step" data-step data-motion="reveal-bottom"><article class="talk-card" data-molecule="card"><div class="talk-card__inner" data-accent="lime"><h3>Easy first skill</h3><p>Standup summary, meeting notes → action items, code review checklist walker</p></div></article></div></div></section><section class="talk__slide layout-cta" data-slide data-kind="cta" data-accent="lime" data-fill="lime" aria-hidden="true"><span class="break-mark" aria-hidden="true"></span><div class="talk-prose"><p><em>Mine might not solve your problem. That's fine — it's not supposed to.</em></p>
+<h1>Build for your own flow. That's when it actually becomes a superpower.</h1></div></section></div>
+	<div class="talk__chrome" data-no-advance>
+		<div class="talk__top">
+			
+			<span class="talk__counter" data-counter>01 / 19</span>
+		</div>
+		<div></div>
+		<div class="talk__bottom">
+			<div class="talk__nav">
+				<button type="button" data-prev aria-label="Previous">Prev</button>
+				<button type="button" data-next aria-label="Next">Next</button>
+			</div>
+			<span class="talk__hint">← → · Space · reveals then slides</span>
+		</div>
+	</div>
+	<div class="talk__progress" data-progress aria-hidden="true"><i></i></div>
+	<div class="talk__status" data-status role="status" aria-live="polite"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+<script>
+"use strict";
+(() => {
+  // scripts/gsap-cdn-shim.js
+  var gsap_cdn_shim_default = globalThis.gsap;
+
+  // src/lib/proto/talks/motions.ts
+  var MOTION_ATTRS = [
+    "fade",
+    "reveal-bottom",
+    "reveal-top",
+    "reveal-left",
+    "reveal-right",
+    "zoom-in",
+    "zoom-out",
+    "squish-in",
+    "squish-out",
+    "pop"
+  ];
+  var MOTION_SET = new Set(MOTION_ATTRS);
+  var MOTIONS = {
+    fade: { from: { autoAlpha: 0, y: 8 } },
+    "reveal-bottom": { from: { autoAlpha: 0, y: 28 } },
+    "reveal-top": { from: { autoAlpha: 0, y: -28 } },
+    "reveal-left": { from: { autoAlpha: 0, x: -32 } },
+    "reveal-right": { from: { autoAlpha: 0, x: 32 } },
+    "zoom-in": { from: { autoAlpha: 0, scale: 0.72 } },
+    "zoom-out": { from: { autoAlpha: 0, scale: 1.28 } },
+    "squish-in": { from: { autoAlpha: 0, scaleY: 0.08 }, ease: "power3.out" },
+    "squish-out": { from: { autoAlpha: 0, scaleX: 1.5, scaleY: 0.28 }, ease: "power3.out" },
+    pop: { from: { autoAlpha: 0, scale: 0.45 }, ease: "back.out(1.6)" }
+  };
+
+  // src/lib/proto/talks/show.ts
+  var reduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var CLEAR = {
+    autoAlpha: 1,
+    x: 0,
+    y: 0,
+    scale: 1,
+    scaleX: 1,
+    scaleY: 1,
+    rotation: 0,
+    rotateX: 0,
+    rotateY: 0,
+    filter: "blur(0px)"
+  };
+  var HIDDEN = { ...CLEAR, autoAlpha: 0 };
+  function stepsOf(slide) {
+    return Array.from(slide.querySelectorAll("[data-step]"));
+  }
+  function motionOf(el) {
+    const key = el.dataset.motion ?? "fade";
+    return MOTIONS[key] ?? MOTIONS.fade;
+  }
+  function pad(n) {
+    return String(n).padStart(2, "0");
+  }
+  function readHash(slideCount) {
+    const raw = window.location.hash.replace(/^#/, "").trim();
+    if (!raw) return null;
+    const m = raw.match(/^(\d+)(?:\.(\d+))?$/);
+    if (!m) return null;
+    const slide = Number(m[1]) - 1;
+    const revealed = m[2] !== void 0 ? Number(m[2]) : 0;
+    if (!Number.isFinite(slide) || slide < 0 || slide >= slideCount) return null;
+    if (!Number.isFinite(revealed) || revealed < 0) return null;
+    return { slide, revealed };
+  }
+  function writeHash(slideIndex, revealed) {
+    const slide = String(slideIndex + 1);
+    const next = revealed > 0 ? `#${slide}.${revealed}` : `#${slide}`;
+    if (window.location.hash === next) return;
+    history.replaceState(null, "", `${window.location.pathname}${window.location.search}${next}`);
+  }
+  function initTalkShow() {
+    const root = document.querySelector("[data-talk]");
+    if (!root) return;
+    const slides = Array.from(root.querySelectorAll("[data-slide]"));
+    const counter = root.querySelector("[data-counter]");
+    const progress = root.querySelector("[data-progress]");
+    const status = root.querySelector("[data-status]");
+    const prevBtn = root.querySelector("[data-prev]");
+    const nextBtn = root.querySelector("[data-next]");
+    if (!slides.length) return;
+    let index = 0;
+    let revealed = 0;
+    let busy = false;
+    let writingHash = false;
+    const boot = readHash(slides.length);
+    if (boot) {
+      index = boot.slide;
+      revealed = Math.min(boot.revealed, stepsOf(slides[index]).length);
+    }
+    function syncSteps(slide, count, animate) {
+      const steps = stepsOf(slide);
+      steps.forEach((el, i) => {
+        const on = i < count;
+        el.classList.toggle("is-revealed", on);
+        el.setAttribute("aria-hidden", on ? "false" : "true");
+        const isLatest = on && i === count - 1;
+        if (!animate || reduced() || !isLatest) {
+          gsap_cdn_shim_default.set(el, on ? { ...CLEAR } : { ...HIDDEN });
+          return;
+        }
+        busy = true;
+        const { from, ease = "power3.out" } = motionOf(el);
+        gsap_cdn_shim_default.fromTo(el, from, {
+          ...CLEAR,
+          duration: 0.48,
+          ease,
+          onComplete: () => {
+            busy = false;
+          }
+        });
+      });
+    }
+    function updateChrome() {
+      const slide = slides[index];
+      const steps = stepsOf(slide);
+      const n = slides.length;
+      if (counter) counter.textContent = `${pad(index + 1)} / ${pad(n)}`;
+      const stepFrac = steps.length ? revealed / steps.length : 1;
+      if (progress) progress.style.setProperty("--p", String(Math.min(1, (index + stepFrac) / n)));
+      if (status) {
+        if (steps.length && revealed < steps.length) {
+          status.textContent = `Slide ${index + 1} of ${n}, reveal ${revealed} of ${steps.length}`;
+        } else {
+          status.textContent = `Slide ${index + 1} of ${n}`;
+        }
+      }
+      if (prevBtn) prevBtn.disabled = index === 0 && revealed === 0;
+      if (nextBtn) nextBtn.disabled = index === n - 1 && revealed >= steps.length;
+      root.dataset.accent = slide.dataset.accent ?? "purple";
+      root.dataset.kind = slide.dataset.kind ?? "";
+      writingHash = true;
+      writeHash(index, revealed);
+      queueMicrotask(() => {
+        writingHash = false;
+      });
+    }
+    function paintSlide(from) {
+      slides.forEach((s, i) => {
+        const on = i === index;
+        s.classList.toggle("is-current", on);
+        s.setAttribute("aria-hidden", on ? "false" : "true");
+        s.inert = !on;
+      });
+      updateChrome();
+      const animateSlide = from !== void 0 && from !== index && !reduced();
+      if (animateSlide) {
+        const dir = index > from ? 1 : -1;
+        busy = true;
+        gsap_cdn_shim_default.fromTo(
+          slides[index],
+          { autoAlpha: 0, x: dir * 28 },
+          {
+            autoAlpha: 1,
+            x: 0,
+            duration: 0.42,
+            ease: "power3.out",
+            onComplete: () => {
+              busy = false;
+            }
+          }
+        );
+        gsap_cdn_shim_default.set(slides[from], { autoAlpha: 0, x: 0 });
+      } else {
+        slides.forEach((s, i) => {
+          gsap_cdn_shim_default.set(s, { autoAlpha: i === index ? 1 : 0, x: 0 });
+        });
+      }
+      syncSteps(slides[index], revealed, false);
+    }
+    function goSlide(to, showAllSteps) {
+      const next = Math.max(0, Math.min(slides.length - 1, to));
+      if (busy) return;
+      const from = index;
+      index = next;
+      revealed = showAllSteps ? stepsOf(slides[index]).length : 0;
+      if (from === next) paintSlide();
+      else paintSlide(from);
+    }
+    function applyHash() {
+      const pos = readHash(slides.length);
+      if (!pos) return;
+      const nextRevealed = Math.min(pos.revealed, stepsOf(slides[pos.slide]).length);
+      if (pos.slide === index && nextRevealed === revealed) return;
+      const from = index;
+      index = pos.slide;
+      revealed = nextRevealed;
+      if (from !== index) {
+        paintSlide();
+        return;
+      }
+      syncSteps(slides[index], revealed, false);
+      updateChrome();
+    }
+    function forward() {
+      if (busy) return;
+      const steps = stepsOf(slides[index]);
+      if (revealed < steps.length) {
+        revealed += 1;
+        syncSteps(slides[index], revealed, true);
+        updateChrome();
+        return;
+      }
+      if (index < slides.length - 1) goSlide(index + 1, false);
+    }
+    function back() {
+      if (busy) return;
+      if (revealed > 0) {
+        revealed -= 1;
+        syncSteps(slides[index], revealed, false);
+        updateChrome();
+        return;
+      }
+      if (index > 0) goSlide(index - 1, true);
+    }
+    prevBtn?.addEventListener("click", back);
+    nextBtn?.addEventListener("click", forward);
+    window.addEventListener("keydown", (e) => {
+      const t = e.target;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const go = {
+        ArrowRight: forward,
+        ArrowDown: forward,
+        PageDown: forward,
+        " ": forward,
+        ArrowLeft: back,
+        ArrowUp: back,
+        PageUp: back,
+        Backspace: back,
+        Home: () => goSlide(0, false),
+        End: () => goSlide(slides.length - 1, true)
+      };
+      const fn = go[e.key];
+      if (!fn) return;
+      e.preventDefault();
+      fn();
+    });
+    root.addEventListener("click", (e) => {
+      const target = e.target;
+      if (target.closest("a, button, [data-no-advance]")) return;
+      const rect = root.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      if (x > rect.width * 0.66) forward();
+      else if (x < rect.width * 0.33) back();
+    });
+    let touchX = 0;
+    root.addEventListener(
+      "touchstart",
+      (e) => {
+        touchX = e.changedTouches[0]?.clientX ?? 0;
+      },
+      { passive: true }
+    );
+    root.addEventListener(
+      "touchend",
+      (e) => {
+        const dx = (e.changedTouches[0]?.clientX ?? 0) - touchX;
+        if (Math.abs(dx) < 48) return;
+        if (dx < 0) forward();
+        else back();
+      },
+      { passive: true }
+    );
+    window.addEventListener("hashchange", () => {
+      if (!writingHash) applyHash();
+    });
+    paintSlide();
+    root.focus({ preventScroll: true });
+  }
+
+  // scripts/talk-standalone-boot.ts
+  initTalkShow();
+})();
+
+</script>
+</body>
+</html>
