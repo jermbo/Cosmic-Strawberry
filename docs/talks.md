@@ -231,3 +231,13 @@ variant: trace # stack | orbit | trace | nozzle
 ```
 
 2. The page appears at `/proto/talks/your-slug`. The hub Talks row picks it up from the same frontmatter via [`src/data/talks.ts`](../src/data/talks.ts).
+
+### Archiving legacy talks from GitHub
+
+Talks from [jermbo/Talks](https://github.com/jermbo/Talks) were imported with wording preserved and sidecar images interleaved. Re-run:
+
+```bash
+node scripts/archive-talk.mjs
+```
+
+(Requires source markdown under `.tmp-talks-src/` as the script expects.) Assets live in `public/talks/<slug>/`.
